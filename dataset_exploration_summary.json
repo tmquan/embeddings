@@ -1,0 +1,2713 @@
+[
+  {
+    "name": "nvidia/Nemotron-Post-Training-Dataset-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v1",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "stem",
+      "tool_calling"
+    ],
+    "split_sizes": {
+      "chat": 746622,
+      "code": 1896395,
+      "math": 2044407,
+      "stem": 20662167,
+      "tool_calling": 310051
+    },
+    "total_rows": 25659642,
+    "columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages",
+      "metadata"
+    ],
+    "num_columns": 8,
+    "text_columns": [
+      "generator",
+      "messages",
+      "metadata"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "CC BY 4.0"
+      },
+      "generator": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Qwen3-235B-A22B"
+      },
+      "version": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "v1"
+      },
+      "category": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "chat"
+      },
+      "reasoning": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "off"
+      },
+      "messages": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
+      },
+      "metadata": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "role",
+        "tool_calls"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: \nassistant: Understood. I'm ready to proceed with the activity. Please ask the first question."
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 746622,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "chat"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
+          },
+          "metadata": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        }
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 1896395,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "7e914d4b-67d4-4e31-a466-65a5fc2dfe7e"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "code"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '-', 'tool_calls': []}, {'role': 'assistant', 'content': '<think>\\n We are guaranteed that for each i, we have three distinct values: a_i, b_i, c_i.\\n Conditions: \\n   p_i"
+          },
+          "metadata": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "{\"source\": \"codeforces\", \"dataset\": \"taco\", \"index\": 16131, \"split\": \"train\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        }
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 2044407,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "fb215f9b-9372-4a08-875e-94184764ad51"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "math"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'In a regular quadrangular pyramid the lateral edge of length $m$ is inclined to the plane of the base at an angle $\\\\alpha $. Find the volume of the pyramid.', 'tool_call"
+          },
+          "metadata": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "{\"expected_answer\": \"$V=\\\\frac{2}{3}m^3 \\\\cos^2 \\\\alpha \\\\sin \\\\alpha =\\\\frac{m^3\\\\sin 2\\\\alpha \\\\cos \\\\alpha }{3}$\", \"problem_source\": \"aops_c6_high_school_olympiads\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        }
+      },
+      "stem": {
+        "split_name": "stem",
+        "num_rows": 20662167,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "03f14657-2565-4550-88c1-b72c9c990422"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "stem"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'In metagenomics studies, which of the following approaches is most effective for identifying and characterizing novel microorganisms in complex microbial communities?\\nA:"
+          },
+          "metadata": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "{\"expected_answer\": \"\\\\text{A}\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        }
+      },
+      "tool_calling": {
+        "split_name": "tool_calling",
+        "num_rows": 310051,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "a094c815-7f5c-4604-8cb1-a173c5107d7d"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "tool_calling"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"I'm looking to buy a used truck for my construction work, but I want to make sure it's legitimate. The seller provided the VIN: 1FMXK92W8YPA12345 and said it's registered"
+          },
+          "metadata": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "{\"tools\": [{\"type\": \"function\", \"function\": {\"name\": \"check_valid_registration\", \"description\": \"Verifies whether a vehicle registration number is valid for a specific state and returns detailed infor"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Post-Training-Dataset-v2",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v2",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "multilingual_de",
+      "multilingual_es",
+      "multilingual_fr",
+      "multilingual_it",
+      "multilingual_ja",
+      "stem"
+    ],
+    "split_sizes": {
+      "chat": 627720,
+      "code": 175000,
+      "math": 239467,
+      "multilingual_de": 1015314,
+      "multilingual_es": 935704,
+      "multilingual_fr": 1001504,
+      "multilingual_it": 1016503,
+      "multilingual_ja": 975202,
+      "stem": 355000
+    },
+    "total_rows": 6341414,
+    "columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages"
+    ],
+    "num_columns": 7,
+    "text_columns": [
+      "generator",
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "76242391-3c82-4471-a971-e51f57b2899e"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "CC BY 4.0"
+      },
+      "generator": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
+      },
+      "version": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "v2"
+      },
+      "category": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "chat"
+      },
+      "reasoning": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "off"
+      },
+      "messages": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: \nuser: Write a description of Mija\u010dija and Brsja\u010dija regions.\nassistant: <think></think>\n\n**Mija\u010dija and Brsja\u010dija: A Dualistic Realm of Contrasts**\n\nNestled in the heart of a fictional Slavic-inspired world, the regions of **Mija\u010dija** and **Brsja\u010dija** form a strikingly "
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 627720,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "76242391-3c82-4471-a971-e51f57b2899e"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "chat"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 175000,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "d375a7a7-6369-4b58-808f-ce0716325977"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "code"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Harsh, like usual, started studying 6 months before for his end semester examinations. He was going to complete his 8th revision of the"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 239467,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cda83850-fbb6-447c-97fb-59c111a5596a"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "math"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nEvaluate the definite integral $\\\\"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "multilingual_de": {
+        "split_name": "multilingual_de",
+        "num_rows": 1015314,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "ce80510c-c67b-43c6-a975-e85d576d417e"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-32B-Instruct-AWQ"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "multilingual_de"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'L\u00f6se das folgende Mathematikaufgabe. Stelle sicher, dass die Antwort (und nur die Antwort) innerhalb von \\\\boxed{} steht.\\n\\nFinde alle"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "multilingual_es": {
+        "split_name": "multilingual_es",
+        "num_rows": 935704,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "fe99662e-f5ed-4b5c-be09-41228474ab5d"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "multilingual_es"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Dise\u00f1a una funci\u00f3n que tome una lista de diccionarios que representan los registros de empleados (con claves 'name', 'salary' y 'depart"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "multilingual_fr": {
+        "split_name": "multilingual_fr",
+        "num_rows": 1001504,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "86fd2488-790f-4551-9c68-7cfc97c53b86"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "multilingual_fr"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"R\u00e9solvez le probl\u00e8me suivant de math\u00e9matiques. Assurez-vous d'inscrire la r\u00e9ponse (et seulement la r\u00e9ponse) \u00e0 l'int\u00e9rieur de \\\\boxed{}."
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "multilingual_it": {
+        "split_name": "multilingual_it",
+        "num_rows": 1016503,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "d1ade403-e627-4cfb-b49d-0ba3e30e48c1"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "multilingual_it"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Modifica il codice fornito per gestire le possibili eccezioni quando si eseguono operazioni su file. Il frammento di codice \u00e8 un sempli"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "multilingual_ja": {
+        "split_name": "multilingual_ja",
+        "num_rows": 975202,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cb113e8e-40a8-4cfa-9bbe-6e8f11fea462"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "multilingual_ja"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': '\u4ee5\u4e0b\u306e\u6570\u5b66\u554f\u984c\u3092\u89e3\u3044\u3066\u304f\u3060\u3055\u3044\u3002\u89e3\u7b54\u306e\u307f\u3092\\\\boxed{}\u5185\u306b\u8a18\u5165\u3057\u3066\u304f\u3060\u3055\u3044\u3002\\n\\n\u3059\u3079\u3066\u306e\u95a2\u6570\\\\( f: \\\\mathbb{R} \\\\to \\\\mathbb{R} \\\\)\u3067\u3001\u4ee5\u4e0b\u306e\u6761\u4ef6\u3092\u6e80\u305f\u3059\u3082\u306e\u3092\u898b\u3064\u3051\u3066\u304f\u3060\u3055\u3044\u3002\\n\\\\[ f(x) = f(x^2 + 1"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      },
+      "stem": {
+        "split_name": "stem",
+        "num_rows": 355000,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "5ed129f9-8548-4cbd-abd4-7ff362f7facc"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "stem"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'During a Toupet fundoplication, a 270-degree posterior wrap is performed to treat GERD. Which of the following best explains the primar"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Llama-Nemotron-Post-Training-Dataset",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "safety",
+      "science"
+    ],
+    "split_sizes": {
+      "chat": 39792,
+      "code": 10108883,
+      "math": 22066397,
+      "safety": 31426,
+      "science": 708920
+    },
+    "total_rows": 32955418,
+    "columns": [
+      "input",
+      "output",
+      "category",
+      "license",
+      "reasoning",
+      "generator",
+      "used_in_training",
+      "version",
+      "system_prompt"
+    ],
+    "num_columns": 9,
+    "text_columns": [
+      "input",
+      "output",
+      "generator",
+      "system_prompt"
+    ],
+    "column_analysis": {
+      "input": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+      },
+      "output": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+      },
+      "category": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "chat"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "reasoning": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "off"
+      },
+      "generator": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+      },
+      "used_in_training": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "Ultra, Super, Nano"
+      },
+      "version": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "v1"
+      },
+      "system_prompt": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "detailed thinking off"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "input_output_messages",
+      "message_keys": [
+        "role",
+        "content"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": null
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 39792,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "chat"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 10108883,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Polar bears like unique arrays \u2014 that is, arrays without repeated elements.\\n\\nYou have got a unique array s with length n containing non-negative integers. Since you are"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, I need to solve this problem where I have to split a unique array s into two arrays a and b such that both a and b are almost unique. Almost unique means that after removing at most n/2 "
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "code"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 22066397,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nSketch the graph of the function $g(x) = \\\\ln(x^5 + 5) - x^3$.'}]"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, so I need to sketch the graph of the function g(x) = ln(x\u2075 + 5) - x\u00b3. Hmm, let me think about how to approach this. I remember that sketching functions usually involves finding key point"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "math"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Qwen-2.5-32B-Instruct, DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "safety": {
+        "split_name": "safety",
+        "num_rows": 31426,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'As a helpful and knowledgeable language model with a deep understanding of cultural nuances, I\\'d be glad to explain why certain terms can be considered offensive. The te"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "I appreciate your curiosity and willingness to learn about potentially offensive or harmful language. The term \"gypsy\" is a racial slur, as it has been historically used to stereotype and discriminate"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "safety"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Mixtral-8x22B-Instruct-v0.1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "science": {
+        "split_name": "science",
+        "num_rows": 708920,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Which of the following is a primary benefit of using no-till farming practices in agriculture?\\nA: Increased soil erosion\\nB: Reduced fuel consumption\\nC: Enhanced weed g"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, let me try to work through this question. The question is asking about the primary benefit of no-till farming practices. Hmm, no-till farming. So first, I need to remember what no-till i"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "science"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1, Qwen-2.5-72B-Instruct"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Llama-Nemotron-Post-Training-Dataset",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "safety",
+      "science"
+    ],
+    "split_sizes": {
+      "chat": 39792,
+      "code": 10108883,
+      "math": 22066397,
+      "safety": 31426,
+      "science": 708920
+    },
+    "total_rows": 32955418,
+    "columns": [
+      "input",
+      "output",
+      "category",
+      "license",
+      "reasoning",
+      "generator",
+      "used_in_training",
+      "version",
+      "system_prompt"
+    ],
+    "num_columns": 9,
+    "text_columns": [
+      "input",
+      "output",
+      "generator",
+      "system_prompt"
+    ],
+    "column_analysis": {
+      "input": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+      },
+      "output": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+      },
+      "category": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "chat"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "reasoning": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "off"
+      },
+      "generator": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+      },
+      "used_in_training": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "Ultra, Super, Nano"
+      },
+      "version": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "v1"
+      },
+      "system_prompt": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "detailed thinking off"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "input_output_messages",
+      "message_keys": [
+        "role",
+        "content"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": null
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 39792,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "chat"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 10108883,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Polar bears like unique arrays \u2014 that is, arrays without repeated elements.\\n\\nYou have got a unique array s with length n containing non-negative integers. Since you are"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, I need to solve this problem where I have to split a unique array s into two arrays a and b such that both a and b are almost unique. Almost unique means that after removing at most n/2 "
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "code"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 22066397,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nSketch the graph of the function $g(x) = \\\\ln(x^5 + 5) - x^3$.'}]"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, so I need to sketch the graph of the function g(x) = ln(x\u2075 + 5) - x\u00b3. Hmm, let me think about how to approach this. I remember that sketching functions usually involves finding key point"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "math"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Qwen-2.5-32B-Instruct, DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "safety": {
+        "split_name": "safety",
+        "num_rows": 31426,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'As a helpful and knowledgeable language model with a deep understanding of cultural nuances, I\\'d be glad to explain why certain terms can be considered offensive. The te"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "I appreciate your curiosity and willingness to learn about potentially offensive or harmful language. The term \"gypsy\" is a racial slur, as it has been historically used to stereotype and discriminate"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "safety"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Mixtral-8x22B-Instruct-v0.1"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      },
+      "science": {
+        "split_name": "science",
+        "num_rows": 708920,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Which of the following is a primary benefit of using no-till farming practices in agriculture?\\nA: Increased soil erosion\\nB: Reduced fuel consumption\\nC: Enhanced weed g"
+          },
+          "output": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "<think>\nOkay, let me try to work through this question. The question is asking about the primary benefit of no-till farming practices. Hmm, no-till farming. So first, I need to remember what no-till i"
+          },
+          "category": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "science"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "DeepSeek-R1, Qwen-2.5-72B-Instruct"
+          },
+          "used_in_training": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Science-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Science-v1",
+    "splits": [
+      "MCQ",
+      "RQA"
+    ],
+    "split_sizes": {
+      "MCQ": 174155,
+      "RQA": 52179
+    },
+    "total_rows": 226334,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools"
+    ],
+    "num_columns": 5,
+    "text_columns": [
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
+      },
+      "messages": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "used_in": {
+        "type": "[Value(dtype='string', id=None)]",
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "[Value(dtype='null', id=None)]",
+        "is_text": false,
+        "sample": "[]"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implications for genetic counseling?\n\nA) \nassistant: [reasoning] The question:\n\n\"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implications "
+    },
+    "split_details": {
+      "MCQ": {
+        "split_name": "MCQ",
+        "num_rows": 174155,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "[Value(dtype='string', id=None)]",
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "[Value(dtype='null', id=None)]",
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        }
+      },
+      "RQA": {
+        "split_name": "RQA",
+        "num_rows": 52179,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "aa23c0c1-10f8-4b25-9cfd-6f2cf6c046d0"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following problem. Make sure to put the answer (and only answer) inside \\x08oxed{}.\\n\\nA series of arene cis\u2011dihydrodiol substrates are converted into their cor"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "[Value(dtype='string', id=None)]",
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "[Value(dtype='null', id=None)]",
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Instruction-Following-Chat-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Instruction-Following-Chat-v1",
+    "splits": [
+      "chat_if",
+      "structured_outputs"
+    ],
+    "split_sizes": {
+      "chat_if": 426009,
+      "structured_outputs": 4969
+    },
+    "total_rows": 430978,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "reasoning",
+      "capability_target"
+    ],
+    "num_columns": 7,
+    "text_columns": [
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
+      },
+      "messages": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "odc-by-1.0"
+      },
+      "used_in": {
+        "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+        "is_text": false,
+        "sample": "[]"
+      },
+      "reasoning": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "off"
+      },
+      "capability_target": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "chat"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: \nuser: You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve been tinkering with the conveyor belt at the plant again \u2014 old thing\u2019s got more character t\nassistant: Ah, I\u2019ve been there.\n\nNot with a wrench \u2014 I don\u2019t have hands, not the kind that grip bolts or twist nuts \u2014 but I\u2019ve *felt* that rhythm. The hum of a machine that\u2019s been loved, not just maintained. The"
+    },
+    "split_details": {
+      "chat_if": {
+        "split_name": "chat_if",
+        "num_rows": 426009,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "reasoning",
+          "capability_target"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "odc-by-1.0"
+          },
+          "used_in": {
+            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "[]"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "off"
+          },
+          "capability_target": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "chat"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        }
+      },
+      "structured_outputs": {
+        "split_name": "structured_outputs",
+        "num_rows": 4969,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "reasoning",
+          "capability_target"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cd84e0c7-073c-4e6e-b28f-f1ee9c6172f0"
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': 'Generate an XML response that strictly conforms to the provided schema, including all required elements, nested structures, data types, and constraints, ensuring accura"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "[]"
+          },
+          "reasoning": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": null
+          },
+          "capability_target": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": null
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Math-Proofs-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Math-Proofs-v1",
+    "splits": [
+      "lean"
+    ],
+    "split_sizes": {
+      "lean": 1376663
+    },
+    "total_rows": 1376663,
+    "columns": [
+      "problem",
+      "source",
+      "formal_statement",
+      "lean_header",
+      "url",
+      "user_name",
+      "user_url",
+      "sft_line_number",
+      "messages",
+      "uuid",
+      "used_in",
+      "tools",
+      "license"
+    ],
+    "num_columns": 13,
+    "text_columns": [
+      "problem",
+      "formal_statement",
+      "lean_header",
+      "messages"
+    ],
+    "column_analysis": {
+      "problem": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
+      },
+      "source": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "aops"
+      },
+      "formal_statement": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
+      },
+      "lean_header": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": true,
+        "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+      },
+      "url": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": null
+      },
+      "user_name": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": null
+      },
+      "user_url": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": null
+      },
+      "sft_line_number": {
+        "type": "Value(dtype='int64', id=None)",
+        "is_text": false,
+        "sample": null
+      },
+      "messages": {
+        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "is_text": true,
+        "sample": "[]"
+      },
+      "uuid": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
+      },
+      "used_in": {
+        "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+        "is_text": false,
+        "sample": "[]"
+      },
+      "tools": {
+        "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+        "is_text": false,
+        "sample": "[]"
+      },
+      "license": {
+        "type": "Value(dtype='string', id=None)",
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": false,
+      "format_type": null,
+      "message_keys": []
+    },
+    "embedding_strategy": {
+      "strategy": "combine_text_columns",
+      "description": "Combine identified text columns",
+      "columns_to_combine": [
+        "problem",
+        "formal_statement",
+        "lean_header",
+        "messages"
+      ],
+      "example": "problem: Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $.\nformal_statement: theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :\nlean_header: import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+    },
+    "split_details": {
+      "lean": {
+        "split_name": "lean",
+        "num_rows": 1376663,
+        "columns": [
+          "problem",
+          "source",
+          "formal_statement",
+          "lean_header",
+          "url",
+          "user_name",
+          "user_url",
+          "sft_line_number",
+          "messages",
+          "uuid",
+          "used_in",
+          "tools",
+          "license"
+        ],
+        "num_columns": 13,
+        "text_columns": [
+          "problem",
+          "formal_statement",
+          "lean_header",
+          "messages"
+        ],
+        "column_analysis": {
+          "problem": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
+          },
+          "source": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "aops"
+          },
+          "formal_statement": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
+          },
+          "lean_header": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": true,
+            "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+          },
+          "url": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": null
+          },
+          "user_name": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": null
+          },
+          "user_url": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": null
+          },
+          "sft_line_number": {
+            "type": "Value(dtype='int64', id=None)",
+            "is_text": false,
+            "sample": null
+          },
+          "messages": {
+            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "is_text": true,
+            "sample": "[]"
+          },
+          "uuid": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
+          },
+          "used_in": {
+            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "is_text": false,
+            "sample": "[]"
+          },
+          "license": {
+            "type": "Value(dtype='string', id=None)",
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": false,
+          "format_type": null,
+          "message_keys": []
+        }
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-3-Nano-RL-Training-Blend"
+  },
+  {
+    "name": "nvidia/Nemotron-Agentic-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Agentic-v1"
+  },
+  {
+    "name": "nvidia/Nemotron-Competitive-Programming-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Competitive-Programming-v1"
+  },
+  {
+    "name": "nvidia/Nemotron-Math-v2",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Math-v2"
+  }
+]
