@@ -34,14 +34,14 @@ from transformers import AutoTokenizer, AutoModel
 # Local imports
 from config import (
     DATASET_CONFIGS,
+    DEFAULT_DTYPE,
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_CHUNK_SIZE,
     DEFAULT_DATASETS_DIR,
     DEFAULT_EMBEDDINGS_DIR,
     MODEL_ID_DEFAULT,
     MODEL_EMBED_SIZE,
     MODEL_MAX_TOKENS,
-    DEFAULT_BATCH_SIZE,
-    DEFAULT_CHUNK_SIZE,
-    DEFAULT_DTYPE,
 )
 
 # Setup logging
@@ -298,6 +298,32 @@ class NemotronEmbeddingExtractor:
         return np.vstack(chunk_embeddings)
 
 
+def get_shard_info(dataset_path: Path, split_name: str) -> tuple[List[int], int]:
+    """
+    Get shard information from the dataset_info.json file.
+    
+    Args:
+        dataset_path: Path to dataset directory
+        split_name: Name of the split
+    
+    Returns:
+        Tuple of (shard_lengths, total_shards)
+    """
+    dataset_info_path = dataset_path / split_name / "dataset_info.json"
+    
+    if dataset_info_path.exists():
+        with open(dataset_info_path, 'r') as f:
+            info = json.load(f)
+            
+        # Get shard lengths for this split
+        if "splits" in info and split_name in info["splits"]:
+            split_info = info["splits"][split_name]
+            shard_lengths = split_info.get("shard_lengths", [])
+            return shard_lengths, len(shard_lengths)
+    
+    return [], 0
+
+
 def process_split_distributed(
     dataset_name: str,
     split_name: str,
@@ -309,6 +335,7 @@ def process_split_distributed(
 ) -> Dict[str, Any]:
     """
     Process a single dataset split using distributed multi-GPU processing.
+    Saves embeddings matching the original dataset shard structure.
     
     Args:
         dataset_name: Name of the dataset
@@ -316,7 +343,7 @@ def process_split_distributed(
         dataset_path: Path to dataset directory
         output_dir: Output directory for embeddings
         extractors: List of Ray actor references (one per GPU)
-        chunk_size: Number of samples to process per chunk
+        chunk_size: Number of samples to process per chunk (used if no shard info)
         num_gpus: Number of GPUs to use
     
     Returns:
@@ -335,64 +362,84 @@ def process_split_distributed(
     split_output_dir = output_dir / split_name
     split_output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Split data into chunks
-    num_chunks = (num_samples + chunk_size - 1) // chunk_size
-    logger.info(f"  Processing in {num_chunks} chunks of {chunk_size} across {num_gpus} GPUs")
+    # Get shard information from dataset_info.json
+    shard_lengths, total_shards = get_shard_info(dataset_path, split_name)
     
-    # Distribute chunks across GPUs
-    chunk_futures = []
+    if shard_lengths and total_shards > 0:
+        # Use original shard structure
+        logger.info(f"  Using original shard structure: {total_shards} shards")
+        num_chunks = total_shards
+        chunk_boundaries = []
+        start_idx = 0
+        for shard_len in shard_lengths:
+            end_idx = start_idx + shard_len
+            chunk_boundaries.append((start_idx, end_idx))
+            start_idx = end_idx
+    else:
+        # Fallback to uniform chunks
+        logger.info(f"  No shard info found, using uniform chunks of size {chunk_size}")
+        num_chunks = (num_samples + chunk_size - 1) // chunk_size
+        total_shards = num_chunks
+        chunk_boundaries = []
+        for chunk_idx in range(num_chunks):
+            start_idx = chunk_idx * chunk_size
+            end_idx = min(start_idx + chunk_size, num_samples)
+            chunk_boundaries.append((start_idx, end_idx))
     
-    for chunk_idx in range(num_chunks):
-        start_idx = chunk_idx * chunk_size
-        end_idx = min(start_idx + chunk_size, num_samples)
-        
-        # Get chunk data
-        chunk_data = [dataset[i] for i in range(start_idx, end_idx)]
+    logger.info(f"  Processing {num_chunks} shards across {num_gpus} GPUs")
+    
+    # Distribute shards across GPUs
+    shard_futures = []
+    
+    for shard_idx, (start_idx, end_idx) in enumerate(chunk_boundaries):
+        # Get shard data
+        shard_data = [dataset[i] for i in range(start_idx, end_idx)]
         
         # Assign to GPU in round-robin fashion
-        gpu_idx = chunk_idx % num_gpus
+        gpu_idx = shard_idx % num_gpus
         extractor = extractors[gpu_idx]
         
         # Submit task to GPU
-        future = extractor.process_chunk.remote(chunk_data, dataset_name)
-        chunk_futures.append((chunk_idx, future))
+        future = extractor.process_chunk.remote(shard_data, dataset_name)
+        shard_futures.append((shard_idx, future, len(shard_data)))
     
     # Collect results with progress bar
-    logger.info(f"  Waiting for {len(chunk_futures)} chunk(s) to complete...")
+    logger.info(f"  Waiting for {len(shard_futures)} shard(s) to complete...")
     
     completed = 0
-    with tqdm(total=len(chunk_futures), desc=f"  {split_name}") as pbar:
-        for chunk_idx, future in chunk_futures:
+    with tqdm(total=len(shard_futures), desc=f"  {split_name}") as pbar:
+        for shard_idx, future, shard_size in shard_futures:
             try:
-                chunk_embeddings = ray.get(future)
+                shard_embeddings = ray.get(future)
                 
-                # Save chunk
-                chunk_file = split_output_dir / f"embeddings_chunk_{chunk_idx:04d}.npy"
-                np.save(chunk_file, chunk_embeddings)
+                # Save shard with 5-digit zero-padding matching input format
+                # Format: data-{shard_idx:05d}-of-{total_shards:05d}.npy
+                shard_file = split_output_dir / f"data-{shard_idx:05d}-of-{total_shards:05d}.npy"
+                np.save(shard_file, shard_embeddings)
                 
                 completed += 1
                 pbar.update(1)
             except Exception as e:
-                logger.error(f"  ✗ Error processing chunk {chunk_idx}: {e}")
+                logger.error(f"  ✗ Error processing shard {shard_idx}: {e}")
     
-    # Save metadata
+    # Save metadata matching dataset structure
     metadata = {
         "dataset_name": dataset_name,
         "split_name": split_name,
         "num_samples": num_samples,
-        "num_chunks": num_chunks,
-        "chunks_completed": completed,
-        "chunk_size": chunk_size,
+        "num_shards": total_shards,
+        "shards_completed": completed,
+        "shard_lengths": shard_lengths if shard_lengths else [end - start for start, end in chunk_boundaries],
         "embedding_dim": MODEL_EMBED_SIZE,
         "model_id": MODEL_ID_DEFAULT,
         "num_gpus": num_gpus,
     }
     
-    metadata_file = split_output_dir / "metadata.json"
+    metadata_file = split_output_dir / "embedding_metadata.json"
     with open(metadata_file, 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    logger.info(f"  ✓ Processed {completed}/{num_chunks} chunks ({completed * chunk_size:,} samples)")
+    logger.info(f"  ✓ Processed {completed}/{total_shards} shards ({num_samples:,} samples)")
     logger.info(f"  ✓ Saved to {split_output_dir}")
     
     return metadata
