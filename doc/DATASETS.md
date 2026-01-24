@@ -4,28 +4,59 @@ Generated from `/raid/datasets` on 2026-01-24.
 
 ## Summary
 
-| Dataset | Format | Total Rows | Splits | Strategy |
-|---------|--------|------------|--------|----------|
-| Llama-Nemotron-Post-Training-Dataset | arrow | 32,955,418 | 5 | input_output |
-| Nemotron-3-Nano-RL-Training-Blend | jsonl | 93,244 | 1 | combine_columns |
-| Nemotron-Agentic-v1 | jsonl | 335,122 | 2 | concatenate_messages |
-| Nemotron-Competitive-Programming-v1 | jsonl | 3,927,984 | 6 | concatenate_messages |
-| Nemotron-Instruction-Following-Chat-v1 | arrow | 430,978 | 2 | concatenate_messages |
-| Nemotron-Math-Proofs-v1 | arrow | 1,376,663 | 1 | combine_columns |
-| Nemotron-Math-v2 | jsonl | 7,085,839 | 5 | concatenate_messages |
-| Nemotron-Post-Training-Dataset-v1 | arrow | 25,659,642 | 5 | concatenate_messages |
-| Nemotron-Post-Training-Dataset-v2 | arrow | 6,341,414 | 9 | concatenate_messages |
-| Nemotron-Pretraining-Dataset-sample | parquet | 27,706 | 10 | direct_text |
-| Nemotron-SWE-v1 | arrow | 51,029 | 1 | concatenate_messages |
-| Nemotron-Science-v1 | arrow | 226,334 | 2 | concatenate_messages |
+| Dataset | Version | Format | Total Rows | Splits | Files | Strategy |
+|---------|---------|--------|------------|--------|-------|----------|
+| **Pretraining** |
+| Nemotron-Pretraining-Dataset-sample | pretrain | parquet | 27,706 | 10 | 10 | direct_text |
+| **Llama-Nemotron** |
+| Llama-Nemotron-Post-Training-Dataset | llama-sft | arrow | 32,955,418 | 5 | 247 | input_output |
+| **Post-Training v1** |
+| Nemotron-Post-Training-Dataset-v1 | v1 | arrow | 25,659,642 | 5 | 1,023 | concatenate_messages |
+| **Post-Training v2** |
+| Nemotron-Post-Training-Dataset-v2 | v2 | arrow | 6,341,414 | 9 | 201 | concatenate_messages |
+| **Post-Training v3** |
+| Nemotron-Instruction-Following-Chat-v1 | v3-chat | arrow | 430,978 | 2 | 15 | concatenate_messages |
+| Nemotron-Agentic-v1 | v3-agentic | jsonl | 335,122 | 2 | 2 | concatenate_messages |
+| Nemotron-Science-v1 | v3-science | arrow | 226,334 | 2 | 6 | concatenate_messages |
+| Nemotron-Math-Proofs-v1 | v3-math-proofs | arrow | 1,376,663 | 1 | 58 | combine_columns |
+| Nemotron-Math-v2 | v3-math | jsonl | 7,085,839 | 5 | 5 | concatenate_messages |
+| Nemotron-3-Nano-RL-Training-Blend | v3-rl-blend | jsonl | 93,244 | 1 | 1 | combine_columns |
+| Nemotron-Competitive-Programming-v1 | v3-competitive | jsonl | 3,927,984 | 6 | 6 | concatenate_messages |
+| Nemotron-SWE-v1 | v3-swe | arrow | 51,029 | 1 | 21 | concatenate_messages |
 
-**Total: 78,511,373 rows across 12 datasets**
+**Total: 78,511,373 rows across 12 datasets (1,595 files)**
 
 ---
 
 ## Detailed Statistics
 
-### nvidia/Llama-Nemotron-Post-Training-Dataset
+### nvidia/Nemotron-Pretraining-Dataset-sample (pretrain)
+
+- **Format**: Parquet
+- **Total Rows**: 27,706
+- **Strategy**: `direct_text`
+
+**Columns**:
+- `id`
+- `text` (text)
+
+**Splits**:
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| Nemotron-CC-Diverse-QA | ~2,771 | 1 parquet | 0 |
+| Nemotron-CC-High-Quality | ~2,771 | 1 parquet | 0 |
+| Nemotron-CC-High-Quality-Synthetic | ~2,771 | 1 parquet | 0 |
+| Nemotron-CC-MATH | ~2,771 | 1 parquet | 0 |
+| Nemotron-CC-Translated-Diverse-QA | ~2,771 | 1 parquet | 0 |
+| Nemotron-Code-Metadata | ~2,771 | 1 parquet | 0 |
+| Nemotron-SFT-Code | ~2,771 | 1 parquet | 0 |
+| Nemotron-SFT-General | ~2,771 | 1 parquet | 0 |
+| Nemotron-SFT-MATH | ~2,771 | 1 parquet | 0 |
+| Nemotron-Synthetic-Code | ~2,771 | 1 parquet | 0 |
+
+---
+
+### nvidia/Llama-Nemotron-Post-Training-Dataset (llama-sft)
 
 - **Format**: Arrow (HuggingFace)
 - **Total Rows**: 32,955,418
@@ -43,95 +74,74 @@ Generated from `/raid/datasets` on 2026-01-24.
 - `system_prompt`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| chat | 39,792 |
-| code | 10,108,883 |
-| math | 22,066,397 |
-| safety | 31,426 |
-| science | 708,920 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| chat | 39,792 | 1 arrow | 0 |
+| code | 10,108,883 | 92 arrow | 0-91 |
+| math | 22,066,397 | 141 arrow | 0-140 |
+| safety | 31,426 | 1 arrow | 0 |
+| science | 708,920 | 12 arrow | 0-11 |
 
 ---
 
-### nvidia/Nemotron-3-Nano-RL-Training-Blend
+### nvidia/Nemotron-Post-Training-Dataset-v1 (v1)
 
-- **Format**: JSONL
-- **Total Rows**: 93,244
-- **Strategy**: `combine_columns`
+- **Format**: Arrow (HuggingFace)
+- **Total Rows**: 25,659,642
+- **Strategy**: `concatenate_messages`
 
 **Columns**:
-- `id`
-- `responses_create_params` (text)
-- `ground_truth`
+- `uuid`
+- `license`
+- `generator`
+- `version`
 - `category`
-- `environment_name`
-- `agent_ref`
-- `pass_rate`
-- `pass_rate_total`
-- `pass_rate_passed`
-- `dataset`
-
-**Splits**:
-| Split | Rows |
-|-------|------|
-| train | 93,244 |
-
----
-
-### nvidia/Nemotron-Agentic-v1
-
-- **Format**: JSONL
-- **Total Rows**: 335,122
-- **Strategy**: `concatenate_messages`
-
-**Columns**:
-- `uuid`
-- `messages` (text)
-- `license`
-- `used_in`
-- `tools`
 - `reasoning`
+- `messages` (text)
+- `metadata`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| interactive_agent | ~167,561 |
-| tool_calling | ~167,561 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| chat | 746,622 | 8 arrow | 0-7 |
+| code | 1,896,395 | 183 arrow | 0-182 |
+| math | 2,044,407 | 159 arrow | 0-158 |
+| stem | 20,662,167 | 660 arrow | 0-659 |
+| tool_calling | 310,051 | 13 arrow | 0-12 |
 
 ---
 
-### nvidia/Nemotron-Competitive-Programming-v1
+### nvidia/Nemotron-Post-Training-Dataset-v2 (v2)
 
-- **Format**: JSONL
-- **Total Rows**: 3,927,984
+- **Format**: Arrow (HuggingFace)
+- **Total Rows**: 6,341,414
 - **Strategy**: `concatenate_messages`
 
 **Columns**:
 - `uuid`
-- `messages` (text)
 - `license`
-- `used_in`
-- `tools`
-- `dataset`
-- `split`
-- `index`
-- `source`
-- `difficulty`
-- `question_id`
+- `generator`
+- `version`
+- `category`
+- `reasoning`
+- `messages` (text)
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| competitive_coding_cpp.part_00 | ~654,664 |
-| competitive_coding_cpp.part_01 | ~654,664 |
-| competitive_coding_python.part_00 | ~654,664 |
-| competitive_coding_python.part_01 | ~654,664 |
-| infinibyte.part_00 | ~654,664 |
-| infinibyte.part_01 | ~654,664 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| chat | 627,720 | 12 arrow | 0-11 |
+| code | 175,000 | 2 arrow | 0-1 |
+| math | 239,467 | 2 arrow | 0-1 |
+| multilingual_de | 1,015,314 | 38 arrow | 0-37 |
+| multilingual_es | 935,704 | 33 arrow | 0-32 |
+| multilingual_fr | 1,001,504 | 37 arrow | 0-36 |
+| multilingual_it | 1,016,503 | 38 arrow | 0-37 |
+| multilingual_ja | 975,202 | 37 arrow | 0-36 |
+| stem | 355,000 | 2 arrow | 0-1 |
 
 ---
 
-### nvidia/Nemotron-Instruction-Following-Chat-v1
+### nvidia/Nemotron-Instruction-Following-Chat-v1 (v3-chat)
 
 - **Format**: Arrow (HuggingFace)
 - **Total Rows**: 430,978
@@ -147,14 +157,57 @@ Generated from `/raid/datasets` on 2026-01-24.
 - `capability_target`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| chat_if | 426,009 |
-| structured_outputs | 4,969 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| chat_if | 426,009 | 14 arrow | 0-13 |
+| structured_outputs | 4,969 | 1 arrow | 0 |
 
 ---
 
-### nvidia/Nemotron-Math-Proofs-v1
+### nvidia/Nemotron-Agentic-v1 (v3-agentic)
+
+- **Format**: JSONL
+- **Total Rows**: 335,122
+- **Strategy**: `concatenate_messages`
+
+**Columns**:
+- `uuid`
+- `messages` (text)
+- `license`
+- `used_in`
+- `tools`
+- `reasoning`
+
+**Splits**:
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| interactive_agent | ~167,561 | 1 jsonl | shard_size based |
+| tool_calling | ~167,561 | 1 jsonl | shard_size based |
+
+---
+
+### nvidia/Nemotron-Science-v1 (v3-science)
+
+- **Format**: Arrow (HuggingFace)
+- **Total Rows**: 226,334
+- **Strategy**: `concatenate_messages`
+
+**Columns**:
+- `uuid`
+- `messages` (text)
+- `license`
+- `used_in`
+- `tools`
+
+**Splits**:
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| MCQ | 174,155 | 4 arrow | 0-3 |
+| RQA | 52,179 | 2 arrow | 0-1 |
+
+---
+
+### nvidia/Nemotron-Math-Proofs-v1 (v3-math-proofs)
 
 - **Format**: Arrow (HuggingFace)
 - **Total Rows**: 1,376,663
@@ -176,13 +229,13 @@ Generated from `/raid/datasets` on 2026-01-24.
 - `license`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| lean | 1,376,663 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| lean | 1,376,663 | 58 arrow | 0-57 |
 
 ---
 
-### nvidia/Nemotron-Math-v2
+### nvidia/Nemotron-Math-v2 (v3-math)
 
 - **Format**: JSONL
 - **Total Rows**: 7,085,839
@@ -200,100 +253,73 @@ Generated from `/raid/datasets` on 2026-01-24.
 - `license`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| high.part_00 | ~1,417,168 |
-| high.part_01 | ~1,417,168 |
-| high.part_02 | ~1,417,168 |
-| low | ~1,417,168 |
-| medium | ~1,417,167 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| high.part_00 | ~1,417,168 | 1 jsonl | shard_size based |
+| high.part_01 | ~1,417,168 | 1 jsonl | shard_size based |
+| high.part_02 | ~1,417,168 | 1 jsonl | shard_size based |
+| low | ~1,417,168 | 1 jsonl | shard_size based |
+| medium | ~1,417,167 | 1 jsonl | shard_size based |
 
 ---
 
-### nvidia/Nemotron-Post-Training-Dataset-v1
+### nvidia/Nemotron-3-Nano-RL-Training-Blend (v3-rl-blend)
 
-- **Format**: Arrow (HuggingFace)
-- **Total Rows**: 25,659,642
-- **Strategy**: `concatenate_messages`
-
-**Columns**:
-- `uuid`
-- `license`
-- `generator`
-- `version`
-- `category`
-- `reasoning`
-- `messages` (text)
-- `metadata`
-
-**Splits**:
-| Split | Rows |
-|-------|------|
-| chat | 746,622 |
-| code | 1,896,395 |
-| math | 2,044,407 |
-| stem | 20,662,167 |
-| tool_calling | 310,051 |
-
----
-
-### nvidia/Nemotron-Post-Training-Dataset-v2
-
-- **Format**: Arrow (HuggingFace)
-- **Total Rows**: 6,341,414
-- **Strategy**: `concatenate_messages`
-
-**Columns**:
-- `uuid`
-- `license`
-- `generator`
-- `version`
-- `category`
-- `reasoning`
-- `messages` (text)
-
-**Splits**:
-| Split | Rows |
-|-------|------|
-| chat | 627,720 |
-| code | 175,000 |
-| math | 239,467 |
-| multilingual_de | 1,015,314 |
-| multilingual_es | 935,704 |
-| multilingual_fr | 1,001,504 |
-| multilingual_it | 1,016,503 |
-| multilingual_ja | 975,202 |
-| stem | 355,000 |
-
----
-
-### nvidia/Nemotron-Pretraining-Dataset-sample
-
-- **Format**: Parquet
-- **Total Rows**: 27,706
-- **Strategy**: `direct_text`
+- **Format**: JSONL
+- **Total Rows**: 93,244
+- **Strategy**: `combine_columns`
 
 **Columns**:
 - `id`
-- `text` (text)
+- `responses_create_params` (text)
+- `ground_truth`
+- `category`
+- `environment_name`
+- `agent_ref`
+- `pass_rate`
+- `pass_rate_total`
+- `pass_rate_passed`
+- `dataset`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| Nemotron-CC-Diverse-QA | ~2,771 |
-| Nemotron-CC-High-Quality | ~2,771 |
-| Nemotron-CC-High-Quality-Synthetic | ~2,771 |
-| Nemotron-CC-MATH | ~2,771 |
-| Nemotron-CC-Translated-Diverse-QA | ~2,771 |
-| Nemotron-Code-Metadata | ~2,771 |
-| Nemotron-SFT-Code | ~2,771 |
-| Nemotron-SFT-General | ~2,771 |
-| Nemotron-SFT-MATH | ~2,771 |
-| Nemotron-Synthetic-Code | ~2,771 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| train | 93,244 | 1 jsonl | shard_size based |
 
 ---
 
-### nvidia/Nemotron-SWE-v1
+### nvidia/Nemotron-Competitive-Programming-v1 (v3-competitive)
+
+- **Format**: JSONL
+- **Total Rows**: 3,927,984
+- **Strategy**: `concatenate_messages`
+
+**Columns**:
+- `uuid`
+- `messages` (text)
+- `license`
+- `used_in`
+- `tools`
+- `dataset`
+- `split`
+- `index`
+- `source`
+- `difficulty`
+- `question_id`
+
+**Splits**:
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| competitive_coding_cpp.part_00 | ~654,664 | 1 jsonl | shard_size based |
+| competitive_coding_cpp.part_01 | ~654,664 | 1 jsonl | shard_size based |
+| competitive_coding_python.part_00 | ~654,664 | 1 jsonl | shard_size based |
+| competitive_coding_python.part_01 | ~654,664 | 1 jsonl | shard_size based |
+| infinibyte.part_00 | ~654,664 | 1 jsonl | shard_size based |
+| infinibyte.part_01 | ~654,664 | 1 jsonl | shard_size based |
+
+---
+
+### nvidia/Nemotron-SWE-v1 (v3-swe)
 
 - **Format**: Arrow (HuggingFace)
 - **Total Rows**: 51,029
@@ -309,30 +335,9 @@ Generated from `/raid/datasets` on 2026-01-24.
 - `repo`
 
 **Splits**:
-| Split | Rows |
-|-------|------|
-| r2e_gym | 51,029 |
-
----
-
-### nvidia/Nemotron-Science-v1
-
-- **Format**: Arrow (HuggingFace)
-- **Total Rows**: 226,334
-- **Strategy**: `concatenate_messages`
-
-**Columns**:
-- `uuid`
-- `messages` (text)
-- `license`
-- `used_in`
-- `tools`
-
-**Splits**:
-| Split | Rows |
-|-------|------|
-| MCQ | 174,155 |
-| RQA | 52,179 |
+| Split | Rows | Files | Shards |
+|-------|------|-------|--------|
+| r2e_gym | 51,029 | 21 arrow | 0-20 |
 
 ---
 
@@ -344,6 +349,20 @@ Generated from `/raid/datasets` on 2026-01-24.
 | `input_output` | Combine input messages + output | Llama-Nemotron-Post-Training-Dataset |
 | `combine_columns` | Combine multiple text columns | Math-Proofs-v1, RL-Training-Blend |
 | `direct_text` | Direct text extraction from `text` column | Pretraining-Dataset-sample |
+
+---
+
+## Shard Naming Convention
+
+| Format | Strategy | Shard Naming |
+|--------|----------|--------------|
+| **Arrow/Parquet** (≥8 files) | 1 shard per source file | `shard_XXXXX.npy` where XXXXX = source file index |
+| **Arrow/Parquet** (<8 files) | Chunk-parallel across GPUs | `shard_XXXXX.npy` interleaved (0,8,16... for GPU0) |
+| **JSONL** | Accumulate until shard_size | `shard_XXXXX.npy` interleaved by GPU |
+
+**Multi-GPU Distribution**:
+- If #files ≥ #GPUs: Each GPU processes different files (file-parallel)
+- If #files < #GPUs: All GPUs process all files, different chunks (chunk-parallel)
 
 ---
 

@@ -26,10 +26,6 @@ NUM_GPUS=8
 
 # All datasets to process (in order of priority/size)
 DATASETS=(
-    "pretrain-sample"              # 28K rows
-    "llama-sft"                    # 33M rows
-    "v1"                           # 26M rows  
-    "v2"                           # 6M rows
     "v3-math"                      # 7M rows
     "v3-competitive-programming"   # 4M rows
     "v3-math-proofs"               # 1.4M rows
@@ -38,6 +34,10 @@ DATASETS=(
     "v3-science"                   # 226K rows
     "v3-rl-blend"                  # 93K rows
     "v3-swe"                       # 51K rows
+    "pretrain-sample"              # 28K rows
+    "llama-sft"                    # 33M rows
+    "v1"                           # 26M rows  
+    "v2"                           # 6M rows
 )
 
 # Parse arguments
