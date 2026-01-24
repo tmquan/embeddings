@@ -392,27 +392,159 @@ def get_parquet_statistics(dataset_path: Path) -> Tuple[Dict[str, SplitInfo], Li
 
 def identify_text_columns(columns: List[str], dataset_name: str) -> Tuple[List[str], str]:
     """
-    Identify text columns and embedding strategy based on column names and dataset.
+    Identify text columns and embedding strategy based on dataset name.
+    
+    Explicit mapping for each dataset for easy inspection and modification.
     
     Returns:
         Tuple of (text_columns, embedding_strategy)
+    
+    Dataset Reference:
+    -----------------
+    | Dataset                  | Key Text Columns                                    | Strategy            |
+    |--------------------------|-----------------------------------------------------|---------------------|
+    | pretrain-sample          | text                                                | direct_text         |
+    | llama-sft                | input + output                                      | input_output        |
+    | v1                       | messages                                            | concatenate_messages|
+    | v2                       | messages                                            | concatenate_messages|
+    | v3-instruction-chat      | messages                                            | concatenate_messages|
+    | v3-agentic               | messages                                            | concatenate_messages|
+    | v3-science               | messages                                            | concatenate_messages|
+    | v3-math-proofs           | problem + formal_statement + lean_header + messages | math_proofs         |
+    | v3-math                  | messages                                            | concatenate_messages|
+    | v3-rl-blend              | responses_create_params                             | combine_columns     |
+    | v3-competitive-prog      | messages                                            | concatenate_messages|
+    | v3-swe                   | messages                                            | concatenate_messages|
     """
     dataset_lower = dataset_name.lower()
     
-    # Dataset-specific handling (check before generic patterns)
+    # ==========================================================================
+    # EXPLICIT DATASET MAPPINGS
+    # ==========================================================================
     
-    # Math-Proofs: includes problem, formal_statement, lean_header AND messages
-    if 'math-proofs' in dataset_lower or 'math_proofs' in dataset_lower:
-        if 'problem' in columns or 'formal_statement' in columns:
-            text_cols = ['problem', 'formal_statement', 'lean_header', 'messages']
-            text_cols = [c for c in text_cols if c in columns]
+    # -------------------------------------------------------------------------
+    # pretrain-sample: nvidia/Nemotron-Pretraining-Dataset-sample
+    # Columns: id, text
+    # -------------------------------------------------------------------------
+    if 'pretraining' in dataset_lower or 'pretrain' in dataset_lower:
+        if 'text' in columns:
+            return ['text'], 'direct_text'
+    
+    # -------------------------------------------------------------------------
+    # llama-sft: nvidia/Llama-Nemotron-Post-Training-Dataset
+    # Columns: input, output, category, license, reasoning, generator, 
+    #          used_in_training, version, system_prompt
+    # -------------------------------------------------------------------------
+    elif 'llama-nemotron' in dataset_lower or 'llama_nemotron' in dataset_lower:
+        if 'input' in columns and 'output' in columns:
+            return ['input', 'output'], 'input_output'
+    
+    # -------------------------------------------------------------------------
+    # v3-math-proofs: nvidia/Nemotron-Math-Proofs-v1
+    # Columns: problem, source, formal_statement, lean_header, url, user_name,
+    #          user_url, sft_line_number, messages, uuid, used_in, tools, license
+    # -------------------------------------------------------------------------
+    elif 'math-proofs' in dataset_lower or 'math_proofs' in dataset_lower:
+        text_cols = []
+        if 'problem' in columns:
+            text_cols.append('problem')
+        if 'formal_statement' in columns:
+            text_cols.append('formal_statement')
+        if 'lean_header' in columns:
+            text_cols.append('lean_header')
+        if 'messages' in columns:
+            text_cols.append('messages')
+        if text_cols:
             return text_cols, 'math_proofs'
     
-    # Input/output format (Llama-Nemotron)
+    # -------------------------------------------------------------------------
+    # v3-rl-blend: nvidia/Nemotron-3-Nano-RL-Training-Blend
+    # Columns: id, responses_create_params, ground_truth, category, 
+    #          environment_name, agent_ref, pass_rate, pass_rate_total, 
+    #          pass_rate_passed, dataset
+    # -------------------------------------------------------------------------
+    elif 'rl-training-blend' in dataset_lower or 'rl_training_blend' in dataset_lower or 'nano-rl' in dataset_lower:
+        if 'responses_create_params' in columns:
+            return ['responses_create_params'], 'combine_columns'
+    
+    # -------------------------------------------------------------------------
+    # v3-math: nvidia/Nemotron-Math-v2
+    # Columns: expected_answer, problem, original_expected_answer, 
+    #          changed_answer_to_majority, data_source, messages, tools, 
+    #          used_in, metadata, license, uuid, url, user_url, user_name
+    # Note: messages contains the full problem + solution, so we use messages
+    # -------------------------------------------------------------------------
+    elif 'nemotron-math' in dataset_lower or 'nemotron_math' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v3-competitive-programming: nvidia/Nemotron-Competitive-Programming-v1
+    # Columns: uuid, messages, license, used_in, tools, dataset, split, 
+    #          index, source, difficulty, question_id
+    # -------------------------------------------------------------------------
+    elif 'competitive-programming' in dataset_lower or 'competitive_programming' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v3-instruction-chat: nvidia/Nemotron-Instruction-Following-Chat-v1
+    # Columns: uuid, messages, license, used_in, tools, reasoning, capability_target
+    # -------------------------------------------------------------------------
+    elif 'instruction-following' in dataset_lower or 'instruction_following' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v3-agentic: nvidia/Nemotron-Agentic-v1
+    # Columns: uuid, messages, license, used_in, tools, reasoning
+    # -------------------------------------------------------------------------
+    elif 'agentic' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v3-science: nvidia/Nemotron-Science-v1
+    # Columns: uuid, messages, license, used_in, tools
+    # -------------------------------------------------------------------------
+    elif 'science' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v3-swe: nvidia/Nemotron-SWE-v1
+    # Columns: uuid, messages, license, used_in, tools, dataset, repo
+    # -------------------------------------------------------------------------
+    elif 'swe' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v1: nvidia/Nemotron-Post-Training-Dataset-v1
+    # Columns: uuid, license, generator, version, category, reasoning, 
+    #          messages, metadata
+    # -------------------------------------------------------------------------
+    elif 'post-training-dataset-v1' in dataset_lower or 'post_training_dataset_v1' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # -------------------------------------------------------------------------
+    # v2: nvidia/Nemotron-Post-Training-Dataset-v2
+    # Columns: uuid, license, generator, version, category, reasoning, messages
+    # -------------------------------------------------------------------------
+    elif 'post-training-dataset-v2' in dataset_lower or 'post_training_dataset_v2' in dataset_lower:
+        if 'messages' in columns:
+            return ['messages'], 'concatenate_messages'
+    
+    # ==========================================================================
+    # FALLBACK: Generic detection based on column names
+    # ==========================================================================
+    
+    # Input/output format (generic)
     if 'input' in columns and 'output' in columns:
         return ['input', 'output'], 'input_output'
     
-    # Standard messages format
+    # Standard messages format (most common)
     if 'messages' in columns:
         return ['messages'], 'concatenate_messages'
     
@@ -420,7 +552,7 @@ def identify_text_columns(columns: List[str], dataset_name: str) -> Tuple[List[s
     if 'text' in columns:
         return ['text'], 'direct_text'
     
-    # Math proofs format (generic check - also include messages if present)
+    # Math proofs format (generic)
     if 'problem' in columns and 'formal_statement' in columns:
         text_cols = ['problem', 'formal_statement']
         if 'lean_header' in columns:

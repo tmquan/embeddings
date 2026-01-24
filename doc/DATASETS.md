@@ -387,6 +387,33 @@ Generated from `/raid/datasets` on 2026-01-24.
 
 ---
 
+### HuggingFace Web Verification (2026-01-24)
+
+Verified against HuggingFace dataset previews:
+
+| Dataset | HuggingFace Path | Verified Columns | Status |
+|---------|------------------|------------------|--------|
+| **pretrain-sample** | `nvidia/Nemotron-Pretraining-Dataset-sample` | id, **text** | ✅ |
+| **llama-sft** | `nvidia/Llama-Nemotron-Post-Training-Dataset` | **input**, **output**, category, license, reasoning, generator, used_in_training, version, system_prompt | ✅ |
+| **v1** | `nvidia/Nemotron-Post-Training-Dataset-v1` | uuid, license, generator, version, category, reasoning, **messages**, metadata | ✅ |
+| **v2** | `nvidia/Nemotron-Post-Training-Dataset-v2` | uuid, license, generator, version, category, reasoning, **messages** | ✅ |
+| **v3-instruction-chat** | `nvidia/Nemotron-Instruction-Following-Chat-v1` | uuid, **messages**, license, used_in, tools, reasoning, capability_target | ✅ |
+| **v3-agentic** | `nvidia/Nemotron-Agentic-v1` | uuid, **messages**, license, used_in, tools, reasoning | ✅ |
+| **v3-science** | `nvidia/Nemotron-Science-v1` | uuid, **messages**, license, used_in, tools | ✅ |
+| **v3-math-proofs** | `nvidia/Nemotron-Math-Proofs-v1` | **problem**, source, **formal_statement**, **lean_header**, url, user_name, user_url, sft_line_number, **messages**, uuid, used_in, tools, license | ✅ |
+| **v3-math** | `nvidia/Nemotron-Math-v2` | expected_answer, problem, original_expected_answer, changed_answer_to_majority, data_source, **messages** (with reasoning_content), tools, used_in, metadata, license | ✅ |
+| **v3-rl-blend** | `nvidia/Nemotron-3-Nano-RL-Training-Blend` | id, **responses_create_params**, ground_truth, category, environment_name, agent_ref, pass_rate, pass_rate_total, pass_rate_passed, dataset | ✅ |
+| **v3-competitive-prog** | `nvidia/Nemotron-Competitive-Programming-v1` | uuid, **messages**, license, used_in, tools, dataset, split, index, source, difficulty, question_id | ✅ |
+| **v3-swe** | `nvidia/Nemotron-SWE-v1` | uuid, **messages**, license, used_in, tools, dataset, repo | ✅ |
+
+**Key Findings:**
+- Most datasets use `messages` column containing conversation turns with `role`, `content`, and sometimes `reasoning_content`
+- Llama-Nemotron uses separate `input`/`output` columns (different format from v1/v2/v3)
+- Math-proofs uniquely has multiple meaningful text columns that should be combined
+- RL-blend uses `responses_create_params` (unique RL training structure)
+
+---
+
 ### Column Classification
 
 | Column Type | Columns | Usage |
