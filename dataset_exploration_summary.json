@@ -1,38 +1,4836 @@
 [
   {
     "name": "nvidia/Nemotron-Post-Training-Dataset-v1",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v1",
+    "format": "arrow",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "stem",
+      "tool_calling"
+    ],
+    "split_sizes": {
+      "chat": 746624,
+      "code": 1896429,
+      "math": 2044422,
+      "stem": 20662620,
+      "tool_calling": 310063
+    },
+    "total_rows": 25660158,
+    "columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages",
+      "metadata"
+    ],
+    "num_columns": 8,
+    "string_columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages",
+      "metadata"
+    ],
+    "text_columns": [
+      "generator",
+      "messages",
+      "metadata"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "CC BY 4.0"
+      },
+      "generator": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Qwen3-235B-A22B"
+      },
+      "version": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "v1"
+      },
+      "category": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "chat"
+      },
+      "reasoning": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "off"
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
+      },
+      "metadata": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "role",
+        "tool_calls"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: \nassistant: Understood. I'm ready to proceed with the activity. Please ask the first question."
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 746624,
+        "num_files": 8,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "chat"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
+          },
+          "metadata": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 1896429,
+        "num_files": 183,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "7e914d4b-67d4-4e31-a466-65a5fc2dfe7e"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "code"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '-', 'tool_calls': []}, {'role': 'assistant', 'content': '<think>\\n We are guaranteed that for each i, we have three distinct values: a_i, b_i, c_i.\\n Conditions: \\n   p_i"
+          },
+          "metadata": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "{\"source\": \"codeforces\", \"dataset\": \"taco\", \"index\": 16131, \"split\": \"train\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 2044422,
+        "num_files": 159,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "fb215f9b-9372-4a08-875e-94184764ad51"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "math"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'In a regular quadrangular pyramid the lateral edge of length $m$ is inclined to the plane of the base at an angle $\\\\alpha $. Find the volume of the pyramid.', 'tool_call"
+          },
+          "metadata": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "{\"expected_answer\": \"$V=\\\\frac{2}{3}m^3 \\\\cos^2 \\\\alpha \\\\sin \\\\alpha =\\\\frac{m^3\\\\sin 2\\\\alpha \\\\cos \\\\alpha }{3}$\", \"problem_source\": \"aops_c6_high_school_olympiads\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      },
+      "stem": {
+        "split_name": "stem",
+        "num_rows": 20662620,
+        "num_files": 660,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "03f14657-2565-4550-88c1-b72c9c990422"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "stem"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'In metagenomics studies, which of the following approaches is most effective for identifying and characterizing novel microorganisms in complex microbial communities?\\nA:"
+          },
+          "metadata": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "{\"expected_answer\": \"\\\\text{A}\"}"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      },
+      "tool_calling": {
+        "split_name": "tool_calling",
+        "num_rows": 310063,
+        "num_files": 13,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "num_columns": 8,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages",
+          "metadata"
+        ],
+        "text_columns": [
+          "generator",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "a094c815-7f5c-4604-8cb1-a173c5107d7d"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "tool_calling"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"I'm looking to buy a used truck for my construction work, but I want to make sure it's legitimate. The seller provided the VIN: 1FMXK92W8YPA12345 and said it's registered"
+          },
+          "metadata": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "{\"tools\": [{\"type\": \"function\", \"function\": {\"name\": \"check_valid_registration\", \"description\": \"Verifies whether a vehicle registration number is valid for a specific state and returns detailed infor"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-Post-Training-Dataset-v2",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v2",
+    "format": "arrow",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "multilingual_de",
+      "multilingual_es",
+      "multilingual_fr",
+      "multilingual_it",
+      "multilingual_ja",
+      "stem"
+    ],
+    "split_sizes": {
+      "chat": 627720,
+      "code": 175000,
+      "math": 239468,
+      "multilingual_de": 1015322,
+      "multilingual_es": 935715,
+      "multilingual_fr": 1001516,
+      "multilingual_it": 1016538,
+      "multilingual_ja": 975209,
+      "stem": 355000
+    },
+    "total_rows": 6341488,
+    "columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages"
+    ],
+    "num_columns": 7,
+    "string_columns": [
+      "uuid",
+      "license",
+      "generator",
+      "version",
+      "category",
+      "reasoning",
+      "messages"
+    ],
+    "text_columns": [
+      "generator",
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "76242391-3c82-4471-a971-e51f57b2899e"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "CC BY 4.0"
+      },
+      "generator": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
+      },
+      "version": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "v2"
+      },
+      "category": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "chat"
+      },
+      "reasoning": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "off"
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: \nuser: Write a description of Mija\u010dija and Brsja\u010dija regions.\nassistant: <think></think>\n\n**Mija\u010dija and Brsja\u010dija: A Dualistic Realm of Contrasts**\n\nNestled in the heart of a fictional Slavic-inspired world, the regions of **Mija\u010dija** and **Brsja\u010dija** form a strikingly "
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 627720,
+        "num_files": 12,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "76242391-3c82-4471-a971-e51f57b2899e"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "chat"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 175000,
+        "num_files": 2,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "d375a7a7-6369-4b58-808f-ce0716325977"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "code"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Harsh, like usual, started studying 6 months before for his end semester examinations. He was going to complete his 8th revision of the"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 239468,
+        "num_files": 2,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cda83850-fbb6-447c-97fb-59c111a5596a"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "math"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nEvaluate the definite integral $\\\\"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "multilingual_de": {
+        "split_name": "multilingual_de",
+        "num_rows": 1015322,
+        "num_files": 38,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "ce80510c-c67b-43c6-a975-e85d576d417e"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-32B-Instruct-AWQ"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "multilingual_de"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'L\u00f6se das folgende Mathematikaufgabe. Stelle sicher, dass die Antwort (und nur die Antwort) innerhalb von \\\\boxed{} steht.\\n\\nFinde alle"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "multilingual_es": {
+        "split_name": "multilingual_es",
+        "num_rows": 935715,
+        "num_files": 33,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "fe99662e-f5ed-4b5c-be09-41228474ab5d"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "multilingual_es"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Dise\u00f1a una funci\u00f3n que tome una lista de diccionarios que representan los registros de empleados (con claves 'name', 'salary' y 'depart"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "multilingual_fr": {
+        "split_name": "multilingual_fr",
+        "num_rows": 1001516,
+        "num_files": 37,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "86fd2488-790f-4551-9c68-7cfc97c53b86"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "multilingual_fr"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"R\u00e9solvez le probl\u00e8me suivant de math\u00e9matiques. Assurez-vous d'inscrire la r\u00e9ponse (et seulement la r\u00e9ponse) \u00e0 l'int\u00e9rieur de \\\\boxed{}."
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "multilingual_it": {
+        "split_name": "multilingual_it",
+        "num_rows": 1016538,
+        "num_files": 38,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "d1ade403-e627-4cfb-b49d-0ba3e30e48c1"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "multilingual_it"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Modifica il codice fornito per gestire le possibili eccezioni quando si eseguono operazioni su file. Il frammento di codice \u00e8 un sempli"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "multilingual_ja": {
+        "split_name": "multilingual_ja",
+        "num_rows": 975209,
+        "num_files": 37,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cb113e8e-40a8-4cfa-9bbe-6e8f11fea462"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "multilingual_ja"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': '\u4ee5\u4e0b\u306e\u6570\u5b66\u554f\u984c\u3092\u89e3\u3044\u3066\u304f\u3060\u3055\u3044\u3002\u89e3\u7b54\u306e\u307f\u3092\\\\boxed{}\u5185\u306b\u8a18\u5165\u3057\u3066\u304f\u3060\u3055\u3044\u3002\\n\\n\u3059\u3079\u3066\u306e\u95a2\u6570\\\\( f: \\\\mathbb{R} \\\\to \\\\mathbb{R} \\\\)\u3067\u3001\u4ee5\u4e0b\u306e\u6761\u4ef6\u3092\u6e80\u305f\u3059\u3082\u306e\u3092\u898b\u3064\u3051\u3066\u304f\u3060\u3055\u3044\u3002\\n\\\\[ f(x) = f(x^2 + 1"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "stem": {
+        "split_name": "stem",
+        "num_rows": 355000,
+        "num_files": 2,
+        "columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "license",
+          "generator",
+          "version",
+          "category",
+          "reasoning",
+          "messages"
+        ],
+        "text_columns": [
+          "generator",
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "5ed129f9-8548-4cbd-abd4-7ff362f7facc"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "CC BY 4.0"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1-0528"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v2"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "stem"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'During a Toupet fundoplication, a 270-degree posterior wrap is performed to treat GERD. Which of the following best explains the primar"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Llama-Nemotron-Post-Training-Dataset",
+    "format": "arrow",
+    "splits": [
+      "chat",
+      "code",
+      "math",
+      "safety",
+      "science"
+    ],
+    "split_sizes": {
+      "chat": 39792,
+      "code": 10108960,
+      "math": 22066500,
+      "safety": 31426,
+      "science": 708924
+    },
+    "total_rows": 32955602,
+    "columns": [
+      "input",
+      "output",
+      "category",
+      "license",
+      "reasoning",
+      "generator",
+      "used_in_training",
+      "version",
+      "system_prompt"
+    ],
+    "num_columns": 9,
+    "string_columns": [
+      "input",
+      "output",
+      "category",
+      "license",
+      "reasoning",
+      "generator",
+      "used_in_training",
+      "version",
+      "system_prompt"
+    ],
+    "text_columns": [
+      "input",
+      "output",
+      "generator",
+      "system_prompt"
+    ],
+    "column_analysis": {
+      "input": {
+        "type": "list<item: struct<role: string, content: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+      },
+      "output": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+      },
+      "category": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "chat"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "reasoning": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "off"
+      },
+      "generator": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+      },
+      "used_in_training": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "Ultra, Super, Nano"
+      },
+      "version": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "v1"
+      },
+      "system_prompt": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "detailed thinking off"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "input_output_messages",
+      "message_keys": [
+        "role",
+        "content"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": null
+    },
+    "split_details": {
+      "chat": {
+        "split_name": "chat",
+        "num_rows": 39792,
+        "num_files": 1,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
+          },
+          "output": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "chat"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
+          },
+          "used_in_training": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        },
+        "format": "arrow"
+      },
+      "code": {
+        "split_name": "code",
+        "num_rows": 10108960,
+        "num_files": 92,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Polar bears like unique arrays \u2014 that is, arrays without repeated elements.\\n\\nYou have got a unique array s with length n containing non-negative integers. Since you are"
+          },
+          "output": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "<think>\nOkay, I need to solve this problem where I have to split a unique array s into two arrays a and b such that both a and b are almost unique. Almost unique means that after removing at most n/2 "
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "code"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        },
+        "format": "arrow"
+      },
+      "math": {
+        "split_name": "math",
+        "num_rows": 22066500,
+        "num_files": 141,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nSketch the graph of the function $g(x) = \\\\ln(x^5 + 5) - x^3$.'}]"
+          },
+          "output": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "<think>\nOkay, so I need to sketch the graph of the function g(x) = ln(x\u2075 + 5) - x\u00b3. Hmm, let me think about how to approach this. I remember that sketching functions usually involves finding key point"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "math"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Qwen-2.5-32B-Instruct, DeepSeek-R1"
+          },
+          "used_in_training": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1.1"
+          },
+          "system_prompt": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        },
+        "format": "arrow"
+      },
+      "safety": {
+        "split_name": "safety",
+        "num_rows": 31426,
+        "num_files": 1,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'As a helpful and knowledgeable language model with a deep understanding of cultural nuances, I\\'d be glad to explain why certain terms can be considered offensive. The te"
+          },
+          "output": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "I appreciate your curiosity and willingness to learn about potentially offensive or harmful language. The term \"gypsy\" is a racial slur, as it has been historically used to stereotype and discriminate"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "safety"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Mixtral-8x22B-Instruct-v0.1"
+          },
+          "used_in_training": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Ultra, Super, Nano"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "detailed thinking off"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        },
+        "format": "arrow"
+      },
+      "science": {
+        "split_name": "science",
+        "num_rows": 708924,
+        "num_files": 12,
+        "columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "input",
+          "output",
+          "category",
+          "license",
+          "reasoning",
+          "generator",
+          "used_in_training",
+          "version",
+          "system_prompt"
+        ],
+        "text_columns": [
+          "input",
+          "output",
+          "generator",
+          "system_prompt"
+        ],
+        "column_analysis": {
+          "input": {
+            "type": "list<item: struct<role: string, content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Which of the following is a primary benefit of using no-till farming practices in agriculture?\\nA: Increased soil erosion\\nB: Reduced fuel consumption\\nC: Enhanced weed g"
+          },
+          "output": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "<think>\nOkay, let me try to work through this question. The question is asking about the primary benefit of no-till farming practices. Hmm, no-till farming. So first, I need to remember what no-till i"
+          },
+          "category": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "science"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          },
+          "generator": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "DeepSeek-R1, Qwen-2.5-72B-Instruct"
+          },
+          "used_in_training": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Ultra, Nano"
+          },
+          "version": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "v1"
+          },
+          "system_prompt": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "detailed thinking on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "input_output_messages",
+          "message_keys": [
+            "role",
+            "content"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-Science-v1",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Science-v1",
+    "format": "arrow",
+    "splits": [
+      "MCQ",
+      "RQA"
+    ],
+    "split_sizes": {
+      "MCQ": 174156,
+      "RQA": 52180
+    },
+    "total_rows": 226336,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools"
+    ],
+    "num_columns": 5,
+    "string_columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in"
+    ],
+    "text_columns": [
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "used_in": {
+        "type": "list<item: string>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "list<item: null>",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[]"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implications for genetic counseling?\n\nA) \nassistant: [reasoning] The question:\n\n\"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implications "
+    },
+    "split_details": {
+      "MCQ": {
+        "split_name": "MCQ",
+        "num_rows": 174156,
+        "num_files": 4,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<item: null>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "RQA": {
+        "split_name": "RQA",
+        "num_rows": 52180,
+        "num_files": 2,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aa23c0c1-10f8-4b25-9cfd-6f2cf6c046d0"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following problem. Make sure to put the answer (and only answer) inside \\x08oxed{}.\\n\\nA series of arene cis\u2011dihydrodiol substrates are converted into their cor"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<item: null>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-Instruction-Following-Chat-v1",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Instruction-Following-Chat-v1",
+    "format": "arrow",
+    "splits": [
+      "chat_if",
+      "structured_outputs"
+    ],
+    "split_sizes": {
+      "chat_if": 426020,
+      "structured_outputs": 4969
+    },
+    "total_rows": 430989,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "reasoning",
+      "capability_target"
+    ],
+    "num_columns": 7,
+    "string_columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "reasoning",
+      "capability_target"
+    ],
+    "text_columns": [
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "odc-by-1.0"
+      },
+      "used_in": {
+        "type": "list<item: string>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "list<item: null>",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[]"
+      },
+      "reasoning": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "off"
+      },
+      "capability_target": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "chat"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: \nuser: You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve been tinkering with the conveyor belt at the plant again \u2014 old thing\u2019s got more character t\nassistant: Ah, I\u2019ve been there.\n\nNot with a wrench \u2014 I don\u2019t have hands, not the kind that grip bolts or twist nuts \u2014 but I\u2019ve *felt* that rhythm. The hum of a machine that\u2019s been loved, not just maintained. The"
+    },
+    "split_details": {
+      "chat_if": {
+        "split_name": "chat_if",
+        "num_rows": 426020,
+        "num_files": 14,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "reasoning",
+          "capability_target"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "reasoning",
+          "capability_target"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "odc-by-1.0"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<item: null>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "off"
+          },
+          "capability_target": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "chat"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      },
+      "structured_outputs": {
+        "split_name": "structured_outputs",
+        "num_rows": 4969,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "reasoning",
+          "capability_target"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "reasoning",
+          "capability_target"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cd84e0c7-073c-4e6e-b28f-f1ee9c6172f0"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': 'Generate an XML response that strictly conforms to the provided schema, including all required elements, nested structures, data types, and constraints, ensuring accura"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list<item: null>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "reasoning": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": null
+          },
+          "capability_target": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": null
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-Math-Proofs-v1",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Math-Proofs-v1",
+    "format": "arrow",
+    "splits": [
+      "lean"
+    ],
+    "split_sizes": {
+      "lean": 1376688
+    },
+    "total_rows": 1376688,
+    "columns": [
+      "problem",
+      "source",
+      "formal_statement",
+      "lean_header",
+      "url",
+      "user_name",
+      "user_url",
+      "sft_line_number",
+      "messages",
+      "uuid",
+      "used_in",
+      "tools",
+      "license"
+    ],
+    "num_columns": 13,
+    "string_columns": [
+      "problem",
+      "source",
+      "formal_statement",
+      "lean_header",
+      "url",
+      "user_name",
+      "user_url",
+      "messages",
+      "uuid",
+      "used_in",
+      "license"
+    ],
+    "text_columns": [
+      "problem",
+      "formal_statement",
+      "lean_header",
+      "messages"
+    ],
+    "column_analysis": {
+      "problem": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
+      },
+      "source": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "aops"
+      },
+      "formal_statement": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
+      },
+      "lean_header": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+      },
+      "url": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": null
+      },
+      "user_name": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": null
+      },
+      "user_url": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": null
+      },
+      "sft_line_number": {
+        "type": "int64",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": null
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[]"
+      },
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
+      },
+      "used_in": {
+        "type": "list<item: string>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "[]"
+      },
+      "tools": {
+        "type": "list<item: null>",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[]"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": false,
+      "format_type": null,
+      "message_keys": []
+    },
+    "embedding_strategy": {
+      "strategy": "combine_text_columns",
+      "description": "Combine identified text columns",
+      "columns_to_combine": [
+        "problem",
+        "formal_statement",
+        "lean_header",
+        "messages"
+      ],
+      "example": "problem: Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $.\nformal_statement: theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :\nlean_header: import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+    },
+    "split_details": {
+      "lean": {
+        "split_name": "lean",
+        "num_rows": 1376688,
+        "num_files": 58,
+        "columns": [
+          "problem",
+          "source",
+          "formal_statement",
+          "lean_header",
+          "url",
+          "user_name",
+          "user_url",
+          "sft_line_number",
+          "messages",
+          "uuid",
+          "used_in",
+          "tools",
+          "license"
+        ],
+        "num_columns": 13,
+        "string_columns": [
+          "problem",
+          "source",
+          "formal_statement",
+          "lean_header",
+          "url",
+          "user_name",
+          "user_url",
+          "messages",
+          "uuid",
+          "used_in",
+          "license"
+        ],
+        "text_columns": [
+          "problem",
+          "formal_statement",
+          "lean_header",
+          "messages"
+        ],
+        "column_analysis": {
+          "problem": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
+          },
+          "source": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aops"
+          },
+          "formal_statement": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
+          },
+          "lean_header": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
+          },
+          "url": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": null
+          },
+          "user_name": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": null
+          },
+          "user_url": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": null
+          },
+          "sft_line_number": {
+            "type": "int64",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": null
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, reasoning_content: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[]"
+          },
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list<item: null>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": false,
+          "format_type": null,
+          "message_keys": []
+        },
+        "format": "arrow"
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-3-Nano-RL-Training-Blend",
+    "format": "jsonl",
+    "splits": [
+      "train"
+    ],
+    "split_sizes": {
+      "train": 93244
+    },
+    "total_rows": 93244,
+    "columns": [
+      "id",
+      "responses_create_params",
+      "ground_truth",
+      "category",
+      "environment_name",
+      "agent_ref",
+      "pass_rate",
+      "pass_rate_total",
+      "pass_rate_passed",
+      "dataset"
+    ],
+    "num_columns": 10,
+    "string_columns": [
+      "category",
+      "environment_name",
+      "dataset"
+    ],
+    "text_columns": [
+      "responses_create_params",
+      "dataset"
+    ],
+    "column_analysis": {
+      "id": {
+        "type": "int",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "317"
+      },
+      "responses_create_params": {
+        "type": "dict",
+        "is_string_type": false,
+        "is_text": true,
+        "sample": "{'input': [{'role': 'system', 'content': \"Today's date is Thursday, 2023-11-30 and the current time is 23:59:00. Remember the current date and time when answering queries. Meetings must not start befo"
+      },
+      "ground_truth": {
+        "type": "list<dict keys=['name', 'arguments']>",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[{'name': 'email_delete_email', 'arguments': '{\"email_id\": \"00000259\"}'}]"
+      },
+      "category": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "workbench_email"
+      },
+      "environment_name": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "workbench"
+      },
+      "agent_ref": {
+        "type": "dict",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "{'type': 'responses_api_agents', 'name': 'workplace_assistant_simple_agent'}"
+      },
+      "pass_rate": {
+        "type": "float",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "0.75"
+      },
+      "pass_rate_total": {
+        "type": "int",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "8"
+      },
+      "pass_rate_passed": {
+        "type": "int",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "6"
+      },
+      "dataset": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "nano_v3_sft_profiled_workbench"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": false,
+      "format_type": null,
+      "message_keys": []
+    },
+    "embedding_strategy": {
+      "strategy": "combine_text_columns",
+      "description": "Combine identified text columns",
+      "columns_to_combine": [
+        "responses_create_params",
+        "dataset"
+      ],
+      "example": "dataset: nano_v3_sft_profiled_workbench"
+    },
+    "split_details": {
+      "train": {
+        "split_name": "train",
+        "num_rows": 93244,
+        "num_files": 1,
+        "columns": [
+          "id",
+          "responses_create_params",
+          "ground_truth",
+          "category",
+          "environment_name",
+          "agent_ref",
+          "pass_rate",
+          "pass_rate_total",
+          "pass_rate_passed",
+          "dataset"
+        ],
+        "num_columns": 10,
+        "string_columns": [
+          "category",
+          "environment_name",
+          "dataset"
+        ],
+        "text_columns": [
+          "responses_create_params",
+          "dataset"
+        ],
+        "column_analysis": {
+          "id": {
+            "type": "int",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "317"
+          },
+          "responses_create_params": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'input': [{'role': 'system', 'content': \"Today's date is Thursday, 2023-11-30 and the current time is 23:59:00. Remember the current date and time when answering queries. Meetings must not start befo"
+          },
+          "ground_truth": {
+            "type": "list<dict keys=['name', 'arguments']>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[{'name': 'email_delete_email', 'arguments': '{\"email_id\": \"00000259\"}'}]"
+          },
+          "category": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "workbench_email"
+          },
+          "environment_name": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "workbench"
+          },
+          "agent_ref": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "{'type': 'responses_api_agents', 'name': 'workplace_assistant_simple_agent'}"
+          },
+          "pass_rate": {
+            "type": "float",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "0.75"
+          },
+          "pass_rate_total": {
+            "type": "int",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "8"
+          },
+          "pass_rate_passed": {
+            "type": "int",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "6"
+          },
+          "dataset": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "nano_v3_sft_profiled_workbench"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": false,
+          "format_type": null,
+          "message_keys": []
+        },
+        "format": "jsonl"
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Agentic-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Agentic-v1",
+    "format": "jsonl",
+    "splits": [
+      "interactive_agent",
+      "tool_calling"
+    ],
+    "split_sizes": {
+      "interactive_agent": 19028,
+      "tool_calling": 316094
+    },
+    "total_rows": 335122,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "reasoning"
+    ],
+    "num_columns": 6,
+    "string_columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "reasoning"
+    ],
+    "text_columns": [
+      "messages"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "ff6ab2b0-7551-468c-8606-a7c3b0c75b68"
+      },
+      "messages": {
+        "type": "list<dict keys=['role', 'content']>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': 'You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> "
+      },
+      "license": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "used_in": {
+        "type": "list<str>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "list<dict keys=['type', 'function']>",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[{'type': 'function', 'function': {'name': 'place_order', 'description': 'Create a new food delivery order', 'parameters': {'properties': {'user_id': {'type': 'string'}, 'restaurants': {'items': {'pro"
+      },
+      "reasoning": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "on"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role",
+        "tool_call_id",
+        "tool_calls"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> and </policy> tags.\n\nIn each tur\nuser: \n\nHello, I'm trying to update my order (ORD1058) with a new payment method. My user ID is SECURE1. When I attempt to add my new VISA 5555 card during the modification process, the system says it's not\nassistant: "
+    },
+    "split_details": {
+      "interactive_agent": {
+        "split_name": "interactive_agent",
+        "num_rows": 19028,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "reasoning"
+        ],
+        "num_columns": 6,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "reasoning"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "ff6ab2b0-7551-468c-8606-a7c3b0c75b68"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': 'You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> "
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<dict keys=['type', 'function']>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[{'type': 'function', 'function': {'name': 'place_order', 'description': 'Create a new food delivery order', 'parameters': {'properties': {'user_id': {'type': 'string'}, 'restaurants': {'items': {'pro"
+          },
+          "reasoning": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "on"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role",
+            "tool_call_id",
+            "tool_calls"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "tool_calling": {
+        "split_name": "tool_calling",
+        "num_rows": 316094,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "e4f44d64-735f-43eb-9232-2e209a722b56"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"I found an old Bitcoin wallet address in my late brother's belongings. Could you check the balance for me? The address is 1A1zP1eP5QGef"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<dict keys=['type', 'function']>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[{'type': 'function', 'function': {'name': 'get_1inch_balance_from_specific_network', 'description': 'Retrieves the 1INCH token balance for a specified blockchain address on a specific network. This f"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "jsonl"
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Competitive-Programming-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Competitive-Programming-v1",
+    "format": "jsonl",
+    "splits": [
+      "competitive_coding_cpp.part_00",
+      "competitive_coding_cpp.part_01",
+      "competitive_coding_python.part_00",
+      "competitive_coding_python.part_01",
+      "infinibyte.part_00",
+      "infinibyte.part_01"
+    ],
+    "split_sizes": {
+      "competitive_coding_cpp.part_00": 466006,
+      "competitive_coding_cpp.part_01": 466006,
+      "competitive_coding_python.part_00": 910639,
+      "competitive_coding_python.part_01": 910639,
+      "infinibyte.part_00": 587347,
+      "infinibyte.part_01": 587347
+    },
+    "total_rows": 3927984,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "dataset",
+      "split",
+      "index",
+      "source",
+      "difficulty",
+      "question_id"
+    ],
+    "num_columns": 11,
+    "string_columns": [
+      "uuid",
+      "messages",
+      "license",
+      "dataset",
+      "split",
+      "index",
+      "source",
+      "difficulty",
+      "question_id"
+    ],
+    "text_columns": [
+      "messages",
+      "question_id"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "7e737db2ed76d76cc1305bcf31ff825a"
+      },
+      "messages": {
+        "type": "list<dict keys=['role', 'content']>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': \"You are a helpful and harmless assistant. You should think step-by-step before responding to the instruction below.\\n\\nPlease use c++ programming language only.\\n\\nYou mu"
+      },
+      "license": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      },
+      "used_in": {
+        "type": "list",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[]"
+      },
+      "tools": {
+        "type": "list",
+        "is_string_type": false,
+        "is_text": false,
+        "sample": "[]"
+      },
+      "dataset": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "code_contests"
+      },
+      "split": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "train"
+      },
+      "index": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "10493"
+      },
+      "source": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "atcoder"
+      },
+      "difficulty": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "0"
+      },
+      "question_id": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "93ef7fb30a7f69a53417e1c8f2d1c982"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: You are a helpful and harmless assistant. You should think step-by-step before responding to the instruction below.\n\nPlease use c++ programming language only.\n\nYou must use ```cpp for just the final s\nassistant: [reasoning] We are given integers a, b, x. The bottle is a rectangular prism with a square base of side a cm and height b cm. We pour x cm\u00b3 of water.\n\nWe need to compute the maximum angle \u03b8 (in degree"
+    },
+    "split_details": {
+      "competitive_coding_cpp.part_00": {
+        "split_name": "competitive_coding_cpp.part_00",
+        "num_rows": 466006,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "num_columns": 11,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "text_columns": [
+          "messages",
+          "question_id"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "7e737db2ed76d76cc1305bcf31ff825a"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"You are a helpful and harmless assistant. You should think step-by-step before responding to the instruction below.\\n\\nPlease use c++ programming language only.\\n\\nYou mu"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "dataset": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "code_contests"
+          },
+          "split": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "train"
+          },
+          "index": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "10493"
+          },
+          "source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "atcoder"
+          },
+          "difficulty": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "0"
+          },
+          "question_id": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "93ef7fb30a7f69a53417e1c8f2d1c982"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "competitive_coding_cpp.part_01": {
+        "split_name": "competitive_coding_cpp.part_01",
+        "num_rows": 466006,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "num_columns": 11,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "text_columns": [
+          "messages",
+          "question_id"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "1738e8184fdf066efa6297a2c55c316e"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"You are a helpful and harmless assistant. You should think step-by-step before responding to the instruction below.\\n\\nPlease use c++ programming language only.\\n\\nYou mu"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "dataset": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "code_contests"
+          },
+          "split": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "train"
+          },
+          "index": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "9906"
+          },
+          "source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "codeforces"
+          },
+          "difficulty": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "2200"
+          },
+          "question_id": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "660baaa6e65330f57953816e89adefaf"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "competitive_coding_python.part_00": {
+        "split_name": "competitive_coding_python.part_00",
+        "num_rows": 910639,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "num_columns": 11,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "text_columns": [
+          "messages",
+          "question_id"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "e50e6e27ab80d625d56a2bc8fdadc7be"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '-'}, {'role': 'assistant', 'content': 'To solve this problem, we need to find the highest power of 2 (denoted as \\\\( r \\\\)) that divides at least one number in a given se"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "dataset": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "apps"
+          },
+          "split": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "test"
+          },
+          "index": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "412"
+          },
+          "source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "codeforces"
+          },
+          "difficulty": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "interview"
+          },
+          "question_id": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "d4c3f307c229da82412143992850e556"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "competitive_coding_python.part_01": {
+        "split_name": "competitive_coding_python.part_01",
+        "num_rows": 910639,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "num_columns": 11,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "dataset",
+          "split",
+          "index",
+          "source",
+          "difficulty",
+          "question_id"
+        ],
+        "text_columns": [
+          "messages",
+          "question_id"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "b8ff0b2006d2313aa7a39ce9f90e06c7"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': '-'}, {'role': 'assistant', 'content': 'To solve this problem, we need to find the maximum length of a contiguous subarray in an array where the product of all elements in"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "dataset": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "apps"
+          },
+          "split": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "test"
+          },
+          "index": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "2528"
+          },
+          "source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "codechef"
+          },
+          "difficulty": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "interview"
+          },
+          "question_id": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "c5818ad6418bbf568624299d838170c9"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "infinibyte.part_00": {
+        "split_name": "infinibyte.part_00",
+        "num_rows": 587347,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "9f6c6d1e-0124-4ab0-a9ee-9940e6c9ca7b"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"I decided to plant vegetables in the garden, sowing one seed each day for n days starting from the right. While studying for my calculus final, I computed the integral of"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "infinibyte.part_01": {
+        "split_name": "infinibyte.part_01",
+        "num_rows": 587347,
+        "num_files": 1,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools"
+        ],
+        "num_columns": 5,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in"
+        ],
+        "text_columns": [
+          "messages"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "8c9ced18-3c94-450a-88fc-ef3b27ed8e5e"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': \"Raju is in an elevator in a nuclear facility. The elevator's movement is controlled by fission events of uranium-235 followed by beta decays of the fission fragments. For"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[]"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      }
+    }
+  },
+  {
+    "name": "nvidia/Nemotron-Math-v2",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-Math-v2",
+    "format": "jsonl",
+    "splits": [
+      "high.part_00",
+      "high.part_01",
+      "high.part_02",
+      "low",
+      "medium"
+    ],
+    "split_sizes": {
+      "high.part_00": 695908,
+      "high.part_01": 1071924,
+      "high.part_02": 1097543,
+      "low": 1718159,
+      "medium": 2502305
+    },
+    "total_rows": 7085839,
+    "columns": [
+      "expected_answer",
+      "problem",
+      "original_expected_answer",
+      "changed_answer_to_majority",
+      "data_source",
+      "messages",
+      "used_in",
+      "metadata",
+      "license"
+    ],
+    "num_columns": 9,
+    "string_columns": [
+      "expected_answer",
+      "problem",
+      "original_expected_answer",
+      "data_source",
+      "messages",
+      "used_in",
+      "license"
+    ],
+    "text_columns": [
+      "expected_answer",
+      "problem",
+      "original_expected_answer",
+      "changed_answer_to_majority",
+      "messages",
+      "metadata"
+    ],
+    "column_analysis": {
+      "expected_answer": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "$f'(x)=\\frac{x}{\\sqrt {1+x^2}}$"
+      },
+      "problem": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "Beginning with simplification of the expressions, calculate the derivatives of the following functions. $f(x)=\\left(\\sqrt {1-x^4}+1\\right): \\left(\\frac{1}{\\sqrt {1+x^2}}+\\sqrt {1-x^2}\\right)$."
+      },
+      "original_expected_answer": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "$f'(x)=\\frac{x}{\\sqrt {1+x^2}}$"
+      },
+      "changed_answer_to_majority": {
+        "type": "bool",
+        "is_string_type": false,
+        "is_text": true,
+        "sample": "False"
+      },
+      "data_source": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "aops"
+      },
+      "messages": {
+        "type": "list<dict keys=['role', 'content']>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nBeginning with simplification of the expressions, calculate the deriv"
+      },
+      "used_in": {
+        "type": "list<str>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "metadata": {
+        "type": "dict",
+        "is_string_type": false,
+        "is_text": true,
+        "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 3, 'accuracy': 0.375}, 'reason_low_no_tool': {'count': 8, 'pass': 0, 'accuracy': 0.0}, 'reason_medium_with_tool': {'count': 8, 'pass': 6, 'accuracy': 0.75"
+      },
+      "license": {
+        "type": "str",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "cc-by-4.0"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "reasoning_content",
+        "role"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "user: Solve the following math problem. Make sure to put the answer (and only answer) inside \\boxed{}.\n\nBeginning with simplification of the expressions, calculate the derivatives of the following functions\nassistant: [reasoning] We need to parse: \"Beginning with simplification of the expressions, calculate the derivatives of the following functions. $f(x)=\\left(\\sqrt {1-x^4}+1\\right): \\left(\\frac{1}{\\sqrt {1+x^2}}"
+    },
+    "split_details": {
+      "high.part_00": {
+        "split_name": "high.part_00",
+        "num_rows": 695908,
+        "num_files": 1,
+        "columns": [
+          "expected_answer",
+          "problem",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "data_source",
+          "messages",
+          "used_in",
+          "metadata",
+          "license"
+        ],
+        "num_columns": 9,
+        "string_columns": [
+          "expected_answer",
+          "problem",
+          "original_expected_answer",
+          "data_source",
+          "messages",
+          "used_in",
+          "license"
+        ],
+        "text_columns": [
+          "expected_answer",
+          "problem",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "$f'(x)=\\frac{x}{\\sqrt {1+x^2}}$"
+          },
+          "problem": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Beginning with simplification of the expressions, calculate the derivatives of the following functions. $f(x)=\\left(\\sqrt {1-x^4}+1\\right): \\left(\\frac{1}{\\sqrt {1+x^2}}+\\sqrt {1-x^2}\\right)$."
+          },
+          "original_expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "$f'(x)=\\frac{x}{\\sqrt {1+x^2}}$"
+          },
+          "changed_answer_to_majority": {
+            "type": "bool",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "False"
+          },
+          "data_source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aops"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nBeginning with simplification of the expressions, calculate the deriv"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "metadata": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 3, 'accuracy': 0.375}, 'reason_low_no_tool': {'count': 8, 'pass': 0, 'accuracy': 0.0}, 'reason_medium_with_tool': {'count': 8, 'pass': 6, 'accuracy': 0.75"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "high.part_01": {
+        "split_name": "high.part_01",
+        "num_rows": 1071924,
+        "num_files": 1,
+        "columns": [
+          "expected_answer",
+          "problem",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "data_source",
+          "messages",
+          "tools",
+          "used_in",
+          "metadata",
+          "license"
+        ],
+        "num_columns": 10,
+        "string_columns": [
+          "expected_answer",
+          "problem",
+          "data_source",
+          "messages",
+          "used_in",
+          "license"
+        ],
+        "text_columns": [
+          "expected_answer",
+          "problem",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "\\;\n    \\int\\sqrt{\\cos x}\\,dx\n        =\\sin x\\;{}_2F_{1}\\!\\Big(\\frac12,\\frac14;\\frac32;\\sin^{2}x\\Big)+C\n        =\\frac12\\,B_{\\sin^{2}x}\\!\\Big(\\frac12,\\frac14\\Big)+C\n   \\;"
+          },
+          "problem": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Find the integral $\\int \\sqrt{\\cos(x)} \\, dx$."
+          },
+          "original_expected_answer": {
+            "type": "unknown",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": null
+          },
+          "changed_answer_to_majority": {
+            "type": "bool",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "True"
+          },
+          "data_source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aops"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nFind the integral $\\\\int \\\\sqrt{\\\\cos(x)} \\\\, dx$.'}, {'role': 'assis"
+          },
+          "tools": {
+            "type": "list<dict keys=['type', 'function']>",
+            "is_string_type": false,
+            "is_text": false,
+            "sample": "[{'type': 'function', 'function': {'name': 'stateful_python_code_exec', 'description': 'Call this function to execute Python code in a stateful Jupyter notebook environment. Python will respond with t"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "metadata": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 0, 'accuracy': 0.0}, 'reason_low_no_tool': {'count': 7, 'pass': 0, 'accuracy': 0.0}, 'reason_medium_with_tool': {'count': 8, 'pass': 0, 'accuracy': 0.0}, "
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "name",
+            "reasoning_content",
+            "role",
+            "tool_call_id",
+            "tool_calls"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "high.part_02": {
+        "split_name": "high.part_02",
+        "num_rows": 1097543,
+        "num_files": 1,
+        "columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "data_source",
+          "messages",
+          "url",
+          "user_url",
+          "user_name",
+          "used_in",
+          "license",
+          "metadata"
+        ],
+        "num_columns": 12,
+        "string_columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "data_source",
+          "messages",
+          "url",
+          "user_url",
+          "user_name",
+          "used_in",
+          "license"
+        ],
+        "text_columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "problem": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Consider a static zero-sum game with two players and a payoff matrix \\( U \\) such that \\( \\sum_{i \\neq j} u_{i,j} = u_{i,i} \\) for all \\( i \\in \\{1, \\ldots, n\\} \\). Player 1 and Player 2 choose number"
+          },
+          "expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "0"
+          },
+          "original_expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "0"
+          },
+          "changed_answer_to_majority": {
+            "type": "bool",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "False"
+          },
+          "data_source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "stackflow"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nConsider a static zero-sum game with two players and a payoff matrix "
+          },
+          "url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "https://math.stackexchange.com/questions/4703851/find-value-of-a-game"
+          },
+          "user_url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "https://math.stackexchange.com/users/1058163/nobody"
+          },
+          "user_name": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "Nobody"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-sa-4.0"
+          },
+          "metadata": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 4, 'accuracy': 0.5}, 'reason_low_no_tool': {'count': 8, 'pass': 3, 'accuracy': 0.375}, 'reason_medium_with_tool': {'count': 8, 'pass': 6, 'accuracy': 0.75"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "low": {
+        "split_name": "low",
+        "num_rows": 1718159,
+        "num_files": 1,
+        "columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "data_source",
+          "messages",
+          "metadata",
+          "license",
+          "used_in",
+          "uuid",
+          "url",
+          "user_url",
+          "user_name"
+        ],
+        "num_columns": 13,
+        "string_columns": [
+          "problem",
+          "expected_answer",
+          "data_source",
+          "messages",
+          "license",
+          "used_in",
+          "uuid",
+          "url",
+          "user_url",
+          "user_name"
+        ],
+        "text_columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "problem": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Let \\(a, b, c, d\\) be four positive integers. The integer \\(n\\) is the smallest positive integer such that the sum of every rational number of the form \\(\\frac{1}{a^2 + b^3 + c^8 + d^n}\\) does not exc"
+          },
+          "expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "25"
+          },
+          "original_expected_answer": {
+            "type": "unknown",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": null
+          },
+          "changed_answer_to_majority": {
+            "type": "bool",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "True"
+          },
+          "data_source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aops"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nLet \\\\(a, b, c, d\\\\) be four positive integers. The integer \\\\(n\\\\) i"
+          },
+          "metadata": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 1, 'accuracy': 0.125}, 'reason_low_no_tool': {'count': 8, 'pass': 6, 'accuracy': 0.75}, 'reason_medium_with_tool': {'count': 8, 'pass': 6, 'accuracy': 0.7"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "307c2636-ee59-0de3-3d3d-42364eb91df4"
+          },
+          "url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          },
+          "user_url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          },
+          "user_name": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      },
+      "medium": {
+        "split_name": "medium",
+        "num_rows": 2502305,
+        "num_files": 1,
+        "columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "data_source",
+          "messages",
+          "metadata",
+          "license",
+          "used_in",
+          "uuid",
+          "url",
+          "user_url",
+          "user_name"
+        ],
+        "num_columns": 13,
+        "string_columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "data_source",
+          "messages",
+          "license",
+          "used_in",
+          "uuid",
+          "url",
+          "user_url",
+          "user_name"
+        ],
+        "text_columns": [
+          "problem",
+          "expected_answer",
+          "original_expected_answer",
+          "changed_answer_to_majority",
+          "messages",
+          "metadata"
+        ],
+        "column_analysis": {
+          "problem": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "Let \\( X \\) be a set with \\( n \\) elements, where \\( n \\ge 1 \\). Denote \\( \\mathscr{P}(X) \\) as the set of all subsets of \\( X \\). Find the greatest number \\( m \\) such that for any function \\( f: \\ma"
+          },
+          "expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "\\( n \\)"
+          },
+          "original_expected_answer": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "\\( n \\)"
+          },
+          "changed_answer_to_majority": {
+            "type": "bool",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "False"
+          },
+          "data_source": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "aops"
+          },
+          "messages": {
+            "type": "list<dict keys=['role', 'content']>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nLet \\\\( X \\\\) be a set with \\\\( n \\\\) elements, where \\\\( n \\\\ge 1 \\\\"
+          },
+          "metadata": {
+            "type": "dict",
+            "is_string_type": false,
+            "is_text": true,
+            "sample": "{'reason_low_with_tool': {'count': 8, 'pass': 4, 'accuracy': 0.5}, 'reason_low_no_tool': {'count': 8, 'pass': 3, 'accuracy': 0.375}, 'reason_medium_with_tool': {'count': 8, 'pass': 7, 'accuracy': 0.87"
+          },
+          "license": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "cc-by-4.0"
+          },
+          "used_in": {
+            "type": "list<str>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "uuid": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "1ace9a53-eb72-6030-05ac-627aeb2576d0"
+          },
+          "url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          },
+          "user_url": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          },
+          "user_name": {
+            "type": "str",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": ""
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "reasoning_content",
+            "role"
+          ]
+        },
+        "format": "jsonl"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-SWE-v1",
-    "status": "error",
-    "error": "must be called with a dataclass type or instance"
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-SWE-v1",
+    "format": "arrow",
+    "splits": [
+      "r2e_gym"
+    ],
+    "split_sizes": {
+      "r2e_gym": 51030
+    },
+    "total_rows": 51030,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "dataset",
+      "repo"
+    ],
+    "num_columns": 7,
+    "string_columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "dataset",
+      "repo"
+    ],
+    "text_columns": [
+      "messages",
+      "dataset"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "0f947bda-1297-d15d-28ba-9d3db236582a"
+      },
+      "messages": {
+        "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<function: struct<arguments: string, name: string>, id: string, type: string>>, id: string>>",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': 'You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\\n\\n<ROLE>\\nYour primary role is to assist users by executing commands,"
+      },
+      "license": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "BSD-3-Clause"
+      },
+      "used_in": {
+        "type": "list<item: string>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "list<item: struct<type: string, function: struct<name: string, description: string, parameters: struct<type: string, properties: struct<command: struct<type: string, description: string, enum: list<item: string>>, is_input: struct<type: string, description: string, enum: list<item: string>>, timeout: struct<type: string, description: string>, thought: struct<type: string, description: string>, message: struct<type: string, description: string>, path: struct<description: string, type: string>, file_text: struct<description: string, type: string>, old_str: struct<description: string, type: string>, new_str: struct<description: string, type: string>, insert_line: struct<description: string, type: string>, view_range: struct<description: string, items: struct<type: string>, type: string>>, required: list<item: string>>>>>",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "[{'type': 'function', 'function': {'name': 'execute_bash', 'description': 'Execute a bash command in the terminal within a persistent shell session.\\n\\n\\n### Command Execution\\n* One command at a time"
+      },
+      "dataset": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": true,
+        "sample": "R2E-Gym/R2E-Gym-Subset"
+      },
+      "repo": {
+        "type": "string",
+        "is_string_type": true,
+        "is_text": false,
+        "sample": "pandas-dev/pandas"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "id",
+        "role",
+        "tool_calls"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\n\n<ROLE>\nYour primary role is to assist users by executing commands, modifying code, and solving techni\nuser: <uploaded_files>\n/workspace/pandas-dev__pandas__1.0\n</uploaded_files>\n\nI've uploaded a python code repository in the directory pandas-dev__pandas__1.0. Consider the following issue description:\n\n<issu\nassistant: I'll help you implement the necessary changes to fix the DataFrame constructor issue with single-element datetime data. Let's start by following the phases you outlined.\n\n## Phase 1. READING: Understa"
+    },
+    "split_details": {
+      "r2e_gym": {
+        "split_name": "r2e_gym",
+        "num_rows": 51030,
+        "num_files": 21,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "repo"
+        ],
+        "num_columns": 7,
+        "string_columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "repo"
+        ],
+        "text_columns": [
+          "messages",
+          "dataset"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "0f947bda-1297-d15d-28ba-9d3db236582a"
+          },
+          "messages": {
+            "type": "list<item: struct<role: string, content: string, tool_calls: list<item: struct<function: struct<arguments: string, name: string>, id: string, type: string>>, id: string>>",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': 'You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\\n\\n<ROLE>\\nYour primary role is to assist users by executing commands,"
+          },
+          "license": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "BSD-3-Clause"
+          },
+          "used_in": {
+            "type": "list<item: string>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "list<item: struct<type: string, function: struct<name: string, description: string, parameters: struct<type: string, properties: struct<command: struct<type: string, description: string, enum: list<item: string>>, is_input: struct<type: string, description: string, enum: list<item: string>>, timeout: struct<type: string, description: string>, thought: struct<type: string, description: string>, message: struct<type: string, description: string>, path: struct<description: string, type: string>, file_text: struct<description: string, type: string>, old_str: struct<description: string, type: string>, new_str: struct<description: string, type: string>, insert_line: struct<description: string, type: string>, view_range: struct<description: string, items: struct<type: string>, type: string>>, required: list<item: string>>>>>",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "[{'type': 'function', 'function': {'name': 'execute_bash', 'description': 'Execute a bash command in the terminal within a persistent shell session.\\n\\n\\n### Command Execution\\n* One command at a time"
+          },
+          "dataset": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": true,
+            "sample": "R2E-Gym/R2E-Gym-Subset"
+          },
+          "repo": {
+            "type": "string",
+            "is_string_type": true,
+            "is_text": false,
+            "sample": "pandas-dev/pandas"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "id",
+            "role",
+            "tool_calls"
+          ]
+        },
+        "format": "arrow"
+      }
+    }
   },
   {
     "name": "nvidia/Nemotron-CC-Code-v1",
