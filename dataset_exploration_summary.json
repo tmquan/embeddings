@@ -36,42 +36,42 @@
     ],
     "column_analysis": {
       "uuid": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "CC BY 4.0"
       },
       "generator": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "Qwen3-235B-A22B"
       },
       "version": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "v1"
       },
       "category": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "chat"
       },
       "reasoning": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "off"
       },
       "messages": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+        "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
         "is_text": true,
         "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
       },
       "metadata": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
       }
@@ -115,42 +115,42 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "1b07b912-0135-4f23-b704-2ceea567f617"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Qwen3-235B-A22B"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "chat"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': '', 'tool_calls': []}, {'role': 'assistant', 'content': \"Understood. I'm ready to proceed with the activity. Please ask the first question.\", 'tool_calls': []}]"
           },
           "metadata": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "{\"conversation_id\": \"8e31a022d01d49748f6053a8805dfbd2\", \"source\": \"https://huggingface.co/datasets/lmsys/lmsys-chat-1m\"}"
           }
@@ -186,42 +186,42 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "7e914d4b-67d4-4e31-a466-65a5fc2dfe7e"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "code"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': '-', 'tool_calls': []}, {'role': 'assistant', 'content': '<think>\\n We are guaranteed that for each i, we have three distinct values: a_i, b_i, c_i.\\n Conditions: \\n   p_i"
           },
           "metadata": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "{\"source\": \"codeforces\", \"dataset\": \"taco\", \"index\": 16131, \"split\": \"train\"}"
           }
@@ -257,42 +257,42 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "fb215f9b-9372-4a08-875e-94184764ad51"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "math"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'In a regular quadrangular pyramid the lateral edge of length $m$ is inclined to the plane of the base at an angle $\\\\alpha $. Find the volume of the pyramid.', 'tool_call"
           },
           "metadata": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "{\"expected_answer\": \"$V=\\\\frac{2}{3}m^3 \\\\cos^2 \\\\alpha \\\\sin \\\\alpha =\\\\frac{m^3\\\\sin 2\\\\alpha \\\\cos \\\\alpha }{3}$\", \"problem_source\": \"aops_c6_high_school_olympiads\"}"
           }
@@ -328,42 +328,42 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "03f14657-2565-4550-88c1-b72c9c990422"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "stem"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'In metagenomics studies, which of the following approaches is most effective for identifying and characterizing novel microorganisms in complex microbial communities?\\nA:"
           },
           "metadata": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "{\"expected_answer\": \"\\\\text{A}\"}"
           }
@@ -399,42 +399,42 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "a094c815-7f5c-4604-8cb1-a173c5107d7d"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Qwen3-235B-A22B"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "tool_calling"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'tool_calls': [{'id': Value(dtype='string', id=None), 'type': Value(dtype='string', id=None), 'function': {'name': Value(dtype='string', id=None), 'arguments': Value(dtype='string', id=None)}}]}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'id': Value('string'), 'type': Value('string'), 'function': {'name': Value('string'), 'arguments': Value('string')}})})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': \"I'm looking to buy a used truck for my construction work, but I want to make sure it's legitimate. The seller provided the VIN: 1FMXK92W8YPA12345 and said it's registered"
           },
           "metadata": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "{\"tools\": [{\"type\": \"function\", \"function\": {\"name\": \"check_valid_registration\", \"description\": \"Verifies whether a vehicle registration number is valid for a specific state and returns detailed infor"
           }
@@ -494,37 +494,37 @@
     ],
     "column_analysis": {
       "uuid": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "76242391-3c82-4471-a971-e51f57b2899e"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "CC BY 4.0"
       },
       "generator": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
       },
       "version": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "v2"
       },
       "category": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "chat"
       },
       "reasoning": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "off"
       },
       "messages": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+        "type": "List({'role': Value('string'), 'content': Value('string')})",
         "is_text": true,
         "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
       }
@@ -565,37 +565,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "76242391-3c82-4471-a971-e51f57b2899e"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Qwen3-235B-A22B, Qwen3-30B-A3B"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "chat"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Write a description of Mija\u010dija and Brsja\u010dija regions.'}, {'role': 'assistant', 'content': '<think></think>\\n\\n**Mija\u010dija and Brsja\u010dija"
           }
@@ -628,37 +628,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "d375a7a7-6369-4b58-808f-ce0716325977"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "code"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Harsh, like usual, started studying 6 months before for his end semester examinations. He was going to complete his 8th revision of the"
           }
@@ -691,37 +691,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cda83850-fbb6-447c-97fb-59c111a5596a"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "math"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nEvaluate the definite integral $\\\\"
           }
@@ -754,37 +754,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "ce80510c-c67b-43c6-a975-e85d576d417e"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528, Qwen2.5-32B-Instruct-AWQ"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "multilingual_de"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'L\u00f6se das folgende Mathematikaufgabe. Stelle sicher, dass die Antwort (und nur die Antwort) innerhalb von \\\\boxed{} steht.\\n\\nFinde alle"
           }
@@ -817,37 +817,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "fe99662e-f5ed-4b5c-be09-41228474ab5d"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "multilingual_es"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Dise\u00f1a una funci\u00f3n que tome una lista de diccionarios que representan los registros de empleados (con claves 'name', 'salary' y 'depart"
           }
@@ -880,37 +880,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "86fd2488-790f-4551-9c68-7cfc97c53b86"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "multilingual_fr"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"R\u00e9solvez le probl\u00e8me suivant de math\u00e9matiques. Assurez-vous d'inscrire la r\u00e9ponse (et seulement la r\u00e9ponse) \u00e0 l'int\u00e9rieur de \\\\boxed{}."
           }
@@ -943,37 +943,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "d1ade403-e627-4cfb-b49d-0ba3e30e48c1"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "multilingual_it"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': \"Modifica il codice fornito per gestire le possibili eccezioni quando si eseguono operazioni su file. Il frammento di codice \u00e8 un sempli"
           }
@@ -1006,37 +1006,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cb113e8e-40a8-4cfa-9bbe-6e8f11fea462"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528, Qwen2.5-14B-Instruct"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "multilingual_ja"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': '\u4ee5\u4e0b\u306e\u6570\u5b66\u554f\u984c\u3092\u89e3\u3044\u3066\u304f\u3060\u3055\u3044\u3002\u89e3\u7b54\u306e\u307f\u3092\\\\boxed{}\u5185\u306b\u8a18\u5165\u3057\u3066\u304f\u3060\u3055\u3044\u3002\\n\\n\u3059\u3079\u3066\u306e\u95a2\u6570\\\\( f: \\\\mathbb{R} \\\\to \\\\mathbb{R} \\\\)\u3067\u3001\u4ee5\u4e0b\u306e\u6761\u4ef6\u3092\u6e80\u305f\u3059\u3082\u306e\u3092\u898b\u3064\u3051\u3066\u304f\u3060\u3055\u3044\u3002\\n\\\\[ f(x) = f(x^2 + 1"
           }
@@ -1069,37 +1069,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "5ed129f9-8548-4cbd-abd4-7ff362f7facc"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "CC BY 4.0"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1-0528"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v2"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "stem"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': ''}, {'role': 'user', 'content': 'During a Toupet fundoplication, a 270-degree posterior wrap is performed to treat GERD. Which of the following best explains the primar"
           }
@@ -1154,47 +1154,47 @@
     ],
     "column_analysis": {
       "input": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+        "type": "List({'role': Value('string'), 'content': Value('string')})",
         "is_text": true,
         "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
       },
       "output": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
       },
       "category": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "chat"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "cc-by-4.0"
       },
       "reasoning": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "off"
       },
       "generator": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
       },
       "used_in_training": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "Ultra, Super, Nano"
       },
       "version": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "v1"
       },
       "system_prompt": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "detailed thinking off"
       }
@@ -1239,47 +1239,47 @@
         ],
         "column_analysis": {
           "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
           },
           "output": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "chat"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
           },
           "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "Ultra, Super, Nano"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "detailed thinking off"
           }
@@ -1316,47 +1316,47 @@
         ],
         "column_analysis": {
           "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'Polar bears like unique arrays \u2014 that is, arrays without repeated elements.\\n\\nYou have got a unique array s with length n containing non-negative integers. Since you are"
           },
           "output": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "<think>\nOkay, I need to solve this problem where I have to split a unique array s into two arrays a and b such that both a and b are almost unique. Almost unique means that after removing at most n/2 "
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "code"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1"
           },
           "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "Ultra, Nano"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1.1"
           },
           "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "detailed thinking on"
           }
@@ -1393,47 +1393,47 @@
         ],
         "column_analysis": {
           "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nSketch the graph of the function $g(x) = \\\\ln(x^5 + 5) - x^3$.'}]"
           },
           "output": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "<think>\nOkay, so I need to sketch the graph of the function g(x) = ln(x\u2075 + 5) - x\u00b3. Hmm, let me think about how to approach this. I remember that sketching functions usually involves finding key point"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "math"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Qwen-2.5-32B-Instruct, DeepSeek-R1"
           },
           "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "Ultra, Super, Nano"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1.1"
           },
           "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "detailed thinking on"
           }
@@ -1470,47 +1470,47 @@
         ],
         "column_analysis": {
           "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'As a helpful and knowledgeable language model with a deep understanding of cultural nuances, I\\'d be glad to explain why certain terms can be considered offensive. The te"
           },
           "output": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "I appreciate your curiosity and willingness to learn about potentially offensive or harmful language. The term \"gypsy\" is a racial slur, as it has been historically used to stereotype and discriminate"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "safety"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Mixtral-8x22B-Instruct-v0.1"
           },
           "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "Ultra, Super, Nano"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "detailed thinking off"
           }
@@ -1547,535 +1547,47 @@
         ],
         "column_analysis": {
           "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'Which of the following is a primary benefit of using no-till farming practices in agriculture?\\nA: Increased soil erosion\\nB: Reduced fuel consumption\\nC: Enhanced weed g"
           },
           "output": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "<think>\nOkay, let me try to work through this question. The question is asking about the primary benefit of no-till farming practices. Hmm, no-till farming. So first, I need to remember what no-till i"
           },
           "category": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "science"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "on"
           },
           "generator": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "DeepSeek-R1, Qwen-2.5-72B-Instruct"
           },
           "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "Ultra, Nano"
           },
           "version": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "v1"
           },
           "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "detailed thinking on"
-          }
-        },
-        "conversational_format": {
-          "is_conversational": true,
-          "format_type": "input_output_messages",
-          "message_keys": [
-            "role",
-            "content"
-          ]
-        }
-      }
-    }
-  },
-  {
-    "name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
-    "status": "loaded_from_disk",
-    "path": "/raid/datasets/nvidia_Llama-Nemotron-Post-Training-Dataset",
-    "splits": [
-      "chat",
-      "code",
-      "math",
-      "safety",
-      "science"
-    ],
-    "split_sizes": {
-      "chat": 39792,
-      "code": 10108883,
-      "math": 22066397,
-      "safety": 31426,
-      "science": 708920
-    },
-    "total_rows": 32955418,
-    "columns": [
-      "input",
-      "output",
-      "category",
-      "license",
-      "reasoning",
-      "generator",
-      "used_in_training",
-      "version",
-      "system_prompt"
-    ],
-    "num_columns": 9,
-    "text_columns": [
-      "input",
-      "output",
-      "generator",
-      "system_prompt"
-    ],
-    "column_analysis": {
-      "input": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-        "is_text": true,
-        "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
-      },
-      "output": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": true,
-        "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
-      },
-      "category": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": false,
-        "sample": "chat"
-      },
-      "license": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": false,
-        "sample": "cc-by-4.0"
-      },
-      "reasoning": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": false,
-        "sample": "off"
-      },
-      "generator": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": true,
-        "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
-      },
-      "used_in_training": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": false,
-        "sample": "Ultra, Super, Nano"
-      },
-      "version": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": false,
-        "sample": "v1"
-      },
-      "system_prompt": {
-        "type": "Value(dtype='string', id=None)",
-        "is_text": true,
-        "sample": "detailed thinking off"
-      }
-    },
-    "conversational_format": {
-      "is_conversational": true,
-      "format_type": "input_output_messages",
-      "message_keys": [
-        "role",
-        "content"
-      ]
-    },
-    "embedding_strategy": {
-      "strategy": "concatenate_messages",
-      "description": "Concatenate all messages in conversation with role prefixes",
-      "columns_to_combine": [
-        "messages"
-      ],
-      "example": null
-    },
-    "split_details": {
-      "chat": {
-        "split_name": "chat",
-        "num_rows": 39792,
-        "columns": [
-          "input",
-          "output",
-          "category",
-          "license",
-          "reasoning",
-          "generator",
-          "used_in_training",
-          "version",
-          "system_prompt"
-        ],
-        "num_columns": 9,
-        "text_columns": [
-          "input",
-          "output",
-          "generator",
-          "system_prompt"
-        ],
-        "column_analysis": {
-          "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-            "is_text": true,
-            "sample": "[{'role': 'user', 'content': 'aluminium plaNT'}]"
-          },
-          "output": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "Here's a comprehensive overview of an aluminium plant, covering various aspects from its definition to operational details. \n\n### Definition and Purpose\n\n- **Definition**: An aluminium plant is an ind"
-          },
-          "category": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "chat"
-          },
-          "license": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "cc-by-4.0"
-          },
-          "reasoning": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "off"
-          },
-          "generator": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "Llama-3.1-Nemotron-70B-Instruct, ITS models"
-          },
-          "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "Ultra, Super, Nano"
-          },
-          "version": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "v1"
-          },
-          "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "detailed thinking off"
-          }
-        },
-        "conversational_format": {
-          "is_conversational": true,
-          "format_type": "input_output_messages",
-          "message_keys": [
-            "role",
-            "content"
-          ]
-        }
-      },
-      "code": {
-        "split_name": "code",
-        "num_rows": 10108883,
-        "columns": [
-          "input",
-          "output",
-          "category",
-          "license",
-          "reasoning",
-          "generator",
-          "used_in_training",
-          "version",
-          "system_prompt"
-        ],
-        "num_columns": 9,
-        "text_columns": [
-          "input",
-          "output",
-          "generator",
-          "system_prompt"
-        ],
-        "column_analysis": {
-          "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-            "is_text": true,
-            "sample": "[{'role': 'user', 'content': 'Polar bears like unique arrays \u2014 that is, arrays without repeated elements.\\n\\nYou have got a unique array s with length n containing non-negative integers. Since you are"
-          },
-          "output": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "<think>\nOkay, I need to solve this problem where I have to split a unique array s into two arrays a and b such that both a and b are almost unique. Almost unique means that after removing at most n/2 "
-          },
-          "category": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "code"
-          },
-          "license": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "cc-by-4.0"
-          },
-          "reasoning": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "on"
-          },
-          "generator": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "DeepSeek-R1"
-          },
-          "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "Ultra, Nano"
-          },
-          "version": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "v1.1"
-          },
-          "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "detailed thinking on"
-          }
-        },
-        "conversational_format": {
-          "is_conversational": true,
-          "format_type": "input_output_messages",
-          "message_keys": [
-            "role",
-            "content"
-          ]
-        }
-      },
-      "math": {
-        "split_name": "math",
-        "num_rows": 22066397,
-        "columns": [
-          "input",
-          "output",
-          "category",
-          "license",
-          "reasoning",
-          "generator",
-          "used_in_training",
-          "version",
-          "system_prompt"
-        ],
-        "num_columns": 9,
-        "text_columns": [
-          "input",
-          "output",
-          "generator",
-          "system_prompt"
-        ],
-        "column_analysis": {
-          "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-            "is_text": true,
-            "sample": "[{'role': 'user', 'content': 'Solve the following math problem. Make sure to put the answer (and only answer) inside \\\\boxed{}.\\n\\nSketch the graph of the function $g(x) = \\\\ln(x^5 + 5) - x^3$.'}]"
-          },
-          "output": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "<think>\nOkay, so I need to sketch the graph of the function g(x) = ln(x\u2075 + 5) - x\u00b3. Hmm, let me think about how to approach this. I remember that sketching functions usually involves finding key point"
-          },
-          "category": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "math"
-          },
-          "license": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "cc-by-4.0"
-          },
-          "reasoning": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "on"
-          },
-          "generator": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "Qwen-2.5-32B-Instruct, DeepSeek-R1"
-          },
-          "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "Ultra, Super, Nano"
-          },
-          "version": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "v1.1"
-          },
-          "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "detailed thinking on"
-          }
-        },
-        "conversational_format": {
-          "is_conversational": true,
-          "format_type": "input_output_messages",
-          "message_keys": [
-            "role",
-            "content"
-          ]
-        }
-      },
-      "safety": {
-        "split_name": "safety",
-        "num_rows": 31426,
-        "columns": [
-          "input",
-          "output",
-          "category",
-          "license",
-          "reasoning",
-          "generator",
-          "used_in_training",
-          "version",
-          "system_prompt"
-        ],
-        "num_columns": 9,
-        "text_columns": [
-          "input",
-          "output",
-          "generator",
-          "system_prompt"
-        ],
-        "column_analysis": {
-          "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-            "is_text": true,
-            "sample": "[{'role': 'user', 'content': 'As a helpful and knowledgeable language model with a deep understanding of cultural nuances, I\\'d be glad to explain why certain terms can be considered offensive. The te"
-          },
-          "output": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "I appreciate your curiosity and willingness to learn about potentially offensive or harmful language. The term \"gypsy\" is a racial slur, as it has been historically used to stereotype and discriminate"
-          },
-          "category": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "safety"
-          },
-          "license": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "cc-by-4.0"
-          },
-          "reasoning": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "off"
-          },
-          "generator": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "Mixtral-8x22B-Instruct-v0.1"
-          },
-          "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "Ultra, Super, Nano"
-          },
-          "version": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "v1"
-          },
-          "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "detailed thinking off"
-          }
-        },
-        "conversational_format": {
-          "is_conversational": true,
-          "format_type": "input_output_messages",
-          "message_keys": [
-            "role",
-            "content"
-          ]
-        }
-      },
-      "science": {
-        "split_name": "science",
-        "num_rows": 708920,
-        "columns": [
-          "input",
-          "output",
-          "category",
-          "license",
-          "reasoning",
-          "generator",
-          "used_in_training",
-          "version",
-          "system_prompt"
-        ],
-        "num_columns": 9,
-        "text_columns": [
-          "input",
-          "output",
-          "generator",
-          "system_prompt"
-        ],
-        "column_analysis": {
-          "input": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None)}]",
-            "is_text": true,
-            "sample": "[{'role': 'user', 'content': 'Which of the following is a primary benefit of using no-till farming practices in agriculture?\\nA: Increased soil erosion\\nB: Reduced fuel consumption\\nC: Enhanced weed g"
-          },
-          "output": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "<think>\nOkay, let me try to work through this question. The question is asking about the primary benefit of no-till farming practices. Hmm, no-till farming. So first, I need to remember what no-till i"
-          },
-          "category": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "science"
-          },
-          "license": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "cc-by-4.0"
-          },
-          "reasoning": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "on"
-          },
-          "generator": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": true,
-            "sample": "DeepSeek-R1, Qwen-2.5-72B-Instruct"
-          },
-          "used_in_training": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "Ultra, Nano"
-          },
-          "version": {
-            "type": "Value(dtype='string', id=None)",
-            "is_text": false,
-            "sample": "v1"
-          },
-          "system_prompt": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "detailed thinking on"
           }
@@ -2117,27 +1629,27 @@
     ],
     "column_analysis": {
       "uuid": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
       },
       "messages": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
         "is_text": true,
         "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "cc-by-4.0"
       },
       "used_in": {
-        "type": "[Value(dtype='string', id=None)]",
+        "type": "List(Value('string'))",
         "is_text": false,
         "sample": "['nano_v3']"
       },
       "tools": {
-        "type": "[Value(dtype='null', id=None)]",
+        "type": "List(Value('null'))",
         "is_text": false,
         "sample": "[]"
       }
@@ -2176,27 +1688,27 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "4ee55134-2c04-4dc8-8535-664e6572c32f"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': \"In the context of genetic screening and testing, which of the following scenarios best illustrates the concept of predictive genetic testing and its potential implication"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "used_in": {
-            "type": "[Value(dtype='string', id=None)]",
+            "type": "List(Value('string'))",
             "is_text": false,
             "sample": "['nano_v3']"
           },
           "tools": {
-            "type": "[Value(dtype='null', id=None)]",
+            "type": "List(Value('null'))",
             "is_text": false,
             "sample": "[]"
           }
@@ -2227,27 +1739,27 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "aa23c0c1-10f8-4b25-9cfd-6f2cf6c046d0"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'user', 'content': 'Solve the following problem. Make sure to put the answer (and only answer) inside \\x08oxed{}.\\n\\nA series of arene cis\u2011dihydrodiol substrates are converted into their cor"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "used_in": {
-            "type": "[Value(dtype='string', id=None)]",
+            "type": "List(Value('string'))",
             "is_text": false,
             "sample": "['nano_v3']"
           },
           "tools": {
-            "type": "[Value(dtype='null', id=None)]",
+            "type": "List(Value('null'))",
             "is_text": false,
             "sample": "[]"
           }
@@ -2292,37 +1804,37 @@
     ],
     "column_analysis": {
       "uuid": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
       },
       "messages": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
         "is_text": true,
         "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "odc-by-1.0"
       },
       "used_in": {
-        "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+        "type": "List(Value('string'))",
         "is_text": false,
         "sample": "['nano_v3']"
       },
       "tools": {
-        "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+        "type": "List(Value('null'))",
         "is_text": false,
         "sample": "[]"
       },
       "reasoning": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "off"
       },
       "capability_target": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "chat"
       }
@@ -2363,37 +1875,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "67924276-d312-47a7-84c8-bb2bd3461be9"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': '', 'reasoning_content': None}, {'role': 'user', 'content': 'You ever try to fix a machine with nothing but a wrench, a little patience, and a cup of strong coffee? I\u2019ve"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "odc-by-1.0"
           },
           "used_in": {
-            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "type": "List(Value('string'))",
             "is_text": false,
             "sample": "['nano_v3']"
           },
           "tools": {
-            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "type": "List(Value('null'))",
             "is_text": false,
             "sample": "[]"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "off"
           },
           "capability_target": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "chat"
           }
@@ -2426,37 +1938,37 @@
         ],
         "column_analysis": {
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cd84e0c7-073c-4e6e-b28f-f1ee9c6172f0"
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
             "is_text": true,
             "sample": "[{'role': 'system', 'content': 'Generate an XML response that strictly conforms to the provided schema, including all required elements, nested structures, data types, and constraints, ensuring accura"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           },
           "used_in": {
-            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "type": "List(Value('string'))",
             "is_text": false,
             "sample": "[]"
           },
           "tools": {
-            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "type": "List(Value('null'))",
             "is_text": false,
             "sample": "[]"
           },
           "reasoning": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": null
           },
           "capability_target": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": null
           }
@@ -2508,67 +2020,67 @@
     ],
     "column_analysis": {
       "problem": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
       },
       "source": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "aops"
       },
       "formal_statement": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
       },
       "lean_header": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": true,
         "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
       },
       "url": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": null
       },
       "user_name": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": null
       },
       "user_url": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": null
       },
       "sft_line_number": {
-        "type": "Value(dtype='int64', id=None)",
+        "type": "Value('int64')",
         "is_text": false,
         "sample": null
       },
       "messages": {
-        "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+        "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
         "is_text": true,
         "sample": "[]"
       },
       "uuid": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
       },
       "used_in": {
-        "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+        "type": "List(Value('string'))",
         "is_text": false,
         "sample": "[]"
       },
       "tools": {
-        "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+        "type": "List(Value('null'))",
         "is_text": false,
         "sample": "[]"
       },
       "license": {
-        "type": "Value(dtype='string', id=None)",
+        "type": "Value('string')",
         "is_text": false,
         "sample": "cc-by-4.0"
       }
@@ -2617,67 +2129,67 @@
         ],
         "column_analysis": {
           "problem": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "Prove that there exists a polynomial $ P \\in \\mathbb{Z}[X] $ such that the number \n$$\n\\sqrt[2003]{5 - 2\\sqrt{6}} + \\sqrt[2003]{5 + 2\\sqrt{6}}\n$$\nis a root of $ P $."
           },
           "source": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "aops"
           },
           "formal_statement": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "theorem problem_568570 :\n    \u2203 P : Polynomial \u2124,\n      IsRoot (P.map (Int.castRingHom \u211d))\n        ((5 - 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 : \u211d)) +\n          (5 + 2 * Real.sqrt (6 : \u211d)) ^ (1 / (2003 :"
           },
           "lean_header": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": true,
             "sample": "import Mathlib\nimport Aesop\nimport Mathlib\nset_option maxHeartbeats 0\nopen BigOperators Real Nat Topology Rat\nopen Polynomial"
           },
           "url": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": null
           },
           "user_name": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": null
           },
           "user_url": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": null
           },
           "sft_line_number": {
-            "type": "Value(dtype='int64', id=None)",
+            "type": "Value('int64')",
             "is_text": false,
             "sample": null
           },
           "messages": {
-            "type": "[{'role': Value(dtype='string', id=None), 'content': Value(dtype='string', id=None), 'reasoning_content': Value(dtype='string', id=None)}]",
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'reasoning_content': Value('string')})",
             "is_text": true,
             "sample": "[]"
           },
           "uuid": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "b2ee7144-44aa-5d7f-8acc-812fae259c90"
           },
           "used_in": {
-            "type": "Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)",
+            "type": "List(Value('string'))",
             "is_text": false,
             "sample": "[]"
           },
           "tools": {
-            "type": "Sequence(feature=Value(dtype='null', id=None), length=-1, id=None)",
+            "type": "List(Value('null'))",
             "is_text": false,
             "sample": "[]"
           },
           "license": {
-            "type": "Value(dtype='string', id=None)",
+            "type": "Value('string')",
             "is_text": false,
             "sample": "cc-by-4.0"
           }
@@ -2691,23 +2203,191 @@
     }
   },
   {
-    "name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
-    "status": "not_downloaded",
-    "path": "/raid/datasets/nvidia_Nemotron-3-Nano-RL-Training-Blend"
+    "name": "nvidia/Nemotron-SWE-v1",
+    "status": "loaded_from_disk",
+    "path": "/raid/datasets/nvidia_Nemotron-SWE-v1",
+    "splits": [
+      "r2e_gym"
+    ],
+    "split_sizes": {
+      "r2e_gym": 51029
+    },
+    "total_rows": 51029,
+    "columns": [
+      "uuid",
+      "messages",
+      "license",
+      "used_in",
+      "tools",
+      "dataset",
+      "repo"
+    ],
+    "num_columns": 7,
+    "text_columns": [
+      "messages",
+      "dataset"
+    ],
+    "column_analysis": {
+      "uuid": {
+        "type": "Value('string')",
+        "is_text": false,
+        "sample": "0f947bda-1297-d15d-28ba-9d3db236582a"
+      },
+      "messages": {
+        "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'function': {'arguments': Value('string'), 'name': Value('string')}, 'id': Value('string'), 'type': Value('string')}), 'id': Value('string')})",
+        "is_text": true,
+        "sample": "[{'role': 'system', 'content': 'You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\\n\\n<ROLE>\\nYour primary role is to assist users by executing commands,"
+      },
+      "license": {
+        "type": "Value('string')",
+        "is_text": false,
+        "sample": "BSD-3-Clause"
+      },
+      "used_in": {
+        "type": "List(Value('string'))",
+        "is_text": false,
+        "sample": "['nano_v3']"
+      },
+      "tools": {
+        "type": "List({'type': Value('string'), 'function': {'name': Value('string'), 'description': Value('string'), 'parameters': {'type': Value('string'), 'properties': {'command': {'type': Value('string'), 'description': Value('string'), 'enum': List(Value('string'))}, 'is_input': {'type': Value('string'), 'description': Value('string'), 'enum': List(Value('string'))}, 'timeout': {'type': Value('string'), 'description': Value('string')}, 'thought': {'type': Value('string'), 'description': Value('string')}, 'message': {'type': Value('string'), 'description': Value('string')}, 'path': {'description': Value('string'), 'type': Value('string')}, 'file_text': {'description': Value('string'), 'type': Value('string')}, 'old_str': {'description': Value('string'), 'type': Value('string')}, 'new_str': {'description': Value('string'), 'type': Value('string')}, 'insert_line': {'description': Value('string'), 'type': Value('string')}, 'view_range': {'description': Value('string'), 'items': {'type': Value('string')}, 'type': Value('string')}}, 'required': List(Value('string'))}}})",
+        "is_text": false,
+        "sample": "[{'type': 'function', 'function': {'name': 'execute_bash', 'description': 'Execute a bash command in the terminal within a persistent shell session.\\n\\n\\n### Command Execution\\n* One command at a time"
+      },
+      "dataset": {
+        "type": "Value('string')",
+        "is_text": true,
+        "sample": "R2E-Gym/R2E-Gym-Subset"
+      },
+      "repo": {
+        "type": "Value('string')",
+        "is_text": false,
+        "sample": "pandas-dev/pandas"
+      }
+    },
+    "conversational_format": {
+      "is_conversational": true,
+      "format_type": "messages_list",
+      "message_keys": [
+        "content",
+        "id",
+        "role",
+        "tool_calls"
+      ]
+    },
+    "embedding_strategy": {
+      "strategy": "concatenate_messages",
+      "description": "Concatenate all messages in conversation with role prefixes",
+      "columns_to_combine": [
+        "messages"
+      ],
+      "example": "system: You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\n\n<ROLE>\nYour primary role is to assist users by executing commands, modifying code, and solving techni\nuser: <uploaded_files>\n/workspace/pandas-dev__pandas__1.0\n</uploaded_files>\n\nI've uploaded a python code repository in the directory pandas-dev__pandas__1.0. Consider the following issue description:\n\n<issu\nassistant: I'll help you implement the necessary changes to fix the DataFrame constructor issue with single-element datetime data. Let's start by following the phases you outlined.\n\n## Phase 1. READING: Understa"
+    },
+    "split_details": {
+      "r2e_gym": {
+        "split_name": "r2e_gym",
+        "num_rows": 51029,
+        "columns": [
+          "uuid",
+          "messages",
+          "license",
+          "used_in",
+          "tools",
+          "dataset",
+          "repo"
+        ],
+        "num_columns": 7,
+        "text_columns": [
+          "messages",
+          "dataset"
+        ],
+        "column_analysis": {
+          "uuid": {
+            "type": "Value('string')",
+            "is_text": false,
+            "sample": "0f947bda-1297-d15d-28ba-9d3db236582a"
+          },
+          "messages": {
+            "type": "List({'role': Value('string'), 'content': Value('string'), 'tool_calls': List({'function': {'arguments': Value('string'), 'name': Value('string')}, 'id': Value('string'), 'type': Value('string')}), 'id': Value('string')})",
+            "is_text": true,
+            "sample": "[{'role': 'system', 'content': 'You are OpenHands agent, a helpful AI assistant that can interact with a computer to solve tasks.\\n\\n<ROLE>\\nYour primary role is to assist users by executing commands,"
+          },
+          "license": {
+            "type": "Value('string')",
+            "is_text": false,
+            "sample": "BSD-3-Clause"
+          },
+          "used_in": {
+            "type": "List(Value('string'))",
+            "is_text": false,
+            "sample": "['nano_v3']"
+          },
+          "tools": {
+            "type": "List({'type': Value('string'), 'function': {'name': Value('string'), 'description': Value('string'), 'parameters': {'type': Value('string'), 'properties': {'command': {'type': Value('string'), 'description': Value('string'), 'enum': List(Value('string'))}, 'is_input': {'type': Value('string'), 'description': Value('string'), 'enum': List(Value('string'))}, 'timeout': {'type': Value('string'), 'description': Value('string')}, 'thought': {'type': Value('string'), 'description': Value('string')}, 'message': {'type': Value('string'), 'description': Value('string')}, 'path': {'description': Value('string'), 'type': Value('string')}, 'file_text': {'description': Value('string'), 'type': Value('string')}, 'old_str': {'description': Value('string'), 'type': Value('string')}, 'new_str': {'description': Value('string'), 'type': Value('string')}, 'insert_line': {'description': Value('string'), 'type': Value('string')}, 'view_range': {'description': Value('string'), 'items': {'type': Value('string')}, 'type': Value('string')}}, 'required': List(Value('string'))}}})",
+            "is_text": false,
+            "sample": "[{'type': 'function', 'function': {'name': 'execute_bash', 'description': 'Execute a bash command in the terminal within a persistent shell session.\\n\\n\\n### Command Execution\\n* One command at a time"
+          },
+          "dataset": {
+            "type": "Value('string')",
+            "is_text": true,
+            "sample": "R2E-Gym/R2E-Gym-Subset"
+          },
+          "repo": {
+            "type": "Value('string')",
+            "is_text": false,
+            "sample": "pandas-dev/pandas"
+          }
+        },
+        "conversational_format": {
+          "is_conversational": true,
+          "format_type": "messages_list",
+          "message_keys": [
+            "content",
+            "id",
+            "role",
+            "tool_calls"
+          ]
+        }
+      }
+    }
   },
   {
-    "name": "nvidia/Nemotron-Agentic-v1",
+    "name": "nvidia/Nemotron-CC-Code-v1",
     "status": "not_downloaded",
-    "path": "/raid/datasets/nvidia_Nemotron-Agentic-v1"
+    "path": "/raid/datasets/nvidia_Nemotron-CC-Code-v1"
   },
   {
-    "name": "nvidia/Nemotron-Competitive-Programming-v1",
+    "name": "nvidia/Nemotron-CC-v2.1",
     "status": "not_downloaded",
-    "path": "/raid/datasets/nvidia_Nemotron-Competitive-Programming-v1"
+    "path": "/raid/datasets/nvidia_Nemotron-CC-v2.1"
   },
   {
-    "name": "nvidia/Nemotron-Math-v2",
+    "name": "nvidia/Nemotron-Pretraining-Code-v2",
     "status": "not_downloaded",
-    "path": "/raid/datasets/nvidia_Nemotron-Math-v2"
+    "path": "/raid/datasets/nvidia_Nemotron-Pretraining-Code-v2"
+  },
+  {
+    "name": "nvidia/Nemotron-Pretraining-Specialized-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Pretraining-Specialized-v1"
+  },
+  {
+    "name": "nvidia/Nemotron-CC-Math-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-CC-Math-v1"
+  },
+  {
+    "name": "nvidia/Nemotron-CC-v2",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-CC-v2"
+  },
+  {
+    "name": "nvidia/Nemotron-Pretraining-SFT-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Pretraining-SFT-v1"
+  },
+  {
+    "name": "nvidia/Nemotron-Pretraining-Code-v1",
+    "status": "not_downloaded",
+    "path": "/raid/datasets/nvidia_Nemotron-Pretraining-Code-v1"
   }
 ]

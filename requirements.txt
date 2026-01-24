@@ -1,0 +1,39 @@
+# Nemotron Embeddings Pipeline Requirements
+# Python version: 3.10, 3.11, or 3.12 (avoid 3.14 - too new for some packages)
+#
+# INSTALLATION:
+#   conda activate emb
+#   pip install -r requirements.txt
+#
+# NOTE: RAPIDS packages (cudf, cuml, etc.) and nemo-curator are OPTIONAL
+#       They are imported conditionally and not required for embedding extraction
+
+# Core dependencies for dataset handling
+# IMPORTANT: Version pinning for compatibility with downloaded datasets
+datasets==2.19.2
+huggingface_hub[cli]>=0.20.0
+pyarrow==15.0.2
+
+# Model and inference
+torch>=2.0.0
+transformers==4.45.2
+
+# Distributed processing
+ray[default]>=2.8.0
+
+# Utilities
+numpy==1.26.4
+tqdm>=4.65.0
+pandas>=2.0,<3.0  # pandas 3.0 incompatible with RAPIDS
+
+# Optional: Flash Attention 2 (requires compatible GPU and CUDA)
+# Uncomment if you have NVIDIA GPU with compute capability >= 8.0 (A100, H100, RTX 3090+)
+# flash-attn>=2.3.0
+
+# Optional: For better performance
+# accelerate>=0.24.0
+# bitsandbytes>=0.41.0  # For quantization
+
+# NOTE: RAPIDS packages (cudf-cu13, cuml-cu13, cugraph-cu13, cupy-cuda13x, cuvs-cu13)
+#       are already installed in the deploy environment via conda.
+#       Do not try to install them via pip as it may cause conflicts.

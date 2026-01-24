@@ -8,7 +8,7 @@ echo ""
 
 # Activate nemotron environment
 source ~/anaconda3/etc/profile.d/conda.sh
-conda activate nemotron
+conda activate embeddings
 
 # Test on a small dataset (Nemotron-Science-v1, smallest one)
 python 02_extract_nemotron_embeddings.py \

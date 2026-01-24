@@ -38,18 +38,6 @@ def extract_text_nvidia_llama_nemotron_post_training_dataset(example):
     return '\n'.join(text_parts)
 
 
-def extract_text_nvidia_llama_nemotron_post_training_dataset(example):
-    """Extract embeddable text from nvidia/Llama-Nemotron-Post-Training-Dataset"""
-    # Conversational format - concatenate messages
-    messages = example['messages']
-    text_parts = []
-    for msg in messages:
-        role = msg.get('role', 'unknown')
-        content = msg.get('content', '')
-        text_parts.append(f'{role}: {content}')
-    return '\n'.join(text_parts)
-
-
 def extract_text_nvidia_nemotron_science_v1(example):
     """Extract embeddable text from nvidia/Nemotron-Science-v1"""
     # Conversational format - concatenate messages
@@ -93,4 +81,16 @@ def extract_text_nvidia_nemotron_math_proofs_v1(example):
     if example.get('messages'):
         parts.append(f'Messages: {example["messages"]}')
     return '\n'.join(parts)
+
+
+def extract_text_nvidia_nemotron_swe_v1(example):
+    """Extract embeddable text from nvidia/Nemotron-SWE-v1"""
+    # Conversational format - concatenate messages
+    messages = example['messages']
+    text_parts = []
+    for msg in messages:
+        role = msg.get('role', 'unknown')
+        content = msg.get('content', '')
+        text_parts.append(f'{role}: {content}')
+    return '\n'.join(text_parts)
 

@@ -47,15 +47,21 @@ def is_text_column(column_name: str, sample_value: Any, column_type: str) -> boo
     Returns:
         True if column should be considered for embedding extraction
     """
-    # Skip metadata columns
+    # Skip metadata columns (but not 'metadata' itself for pretraining datasets)
     skip_columns = {'uuid', 'license', 'version', 'category', 'reasoning', 
                     'source', 'used_in', 'used_in_training', 'tools', 'url',
-                    'user_name', 'user_url', 'sft_line_number'}
+                    'user_name', 'user_url', 'sft_line_number', 'id', 'timestamp',
+                    'language', 'language_score', 'quality_score'}
     
     if column_name in skip_columns:
         return False
     
-    # Check for text-like columns
+    # Primary text columns for pretraining datasets
+    primary_text_columns = ['text', 'content', 'document', 'passage']
+    if column_name.lower() in primary_text_columns:
+        return True
+    
+    # Check for text-like columns (including metadata for pretraining datasets)
     text_indicators = ['text', 'content', 'message', 'output', 'input', 
                        'prompt', 'response', 'statement', 'problem', 
                        'generator', 'metadata']
@@ -218,7 +224,23 @@ def determine_embedding_strategy(split_info: Dict[str, Any]) -> Dict[str, Any]:
         }
     
     elif text_columns:
-        # Combine multiple text columns
+        # Check if this is a simple pretraining dataset (just 'text' column)
+        if len(text_columns) == 1 and text_columns[0] in ['text', 'content', 'document']:
+            example = None
+            if split_info["sample_rows"]:
+                sample = split_info["sample_rows"][0]
+                text_val = sample.get(text_columns[0], '')
+                if isinstance(text_val, str):
+                    example = text_val[:200]
+            
+            return {
+                "strategy": "direct_text",
+                "description": f"Direct text extraction from '{text_columns[0]}' column (pretraining format)",
+                "columns_to_combine": text_columns,
+                "example": example
+            }
+        
+        # Multiple text columns - combine them
         example = None
         if split_info["sample_rows"]:
             sample = split_info["sample_rows"][0]
@@ -371,6 +393,12 @@ def generate_extraction_functions(datasets_info: List[Dict[str, Any]]) -> str:
                 code_lines.append("        text_parts.append(f'{role}: {content}')")
                 code_lines.append("    return '\\n'.join(text_parts)")
         
+        elif strategy["strategy"] == "direct_text":
+            # Pretraining datasets with single text column
+            text_col = strategy["columns_to_combine"][0]
+            code_lines.append(f"    # Pretraining format - direct text extraction")
+            code_lines.append(f"    return str(example.get('{text_col}', ''))")
+        
         elif strategy["strategy"] == "combine_text_columns":
             code_lines.append("    # Combine text columns")
             code_lines.append("    parts = []")
@@ -404,13 +432,19 @@ def main():
         return
     
     # Get list of datasets to explore (only downloaded ones)
-    datasets_to_explore = []
+    # Use a dict to deduplicate datasets (e.g., Llama-Nemotron has both SFT and RL configs)
+    datasets_dict = {}
     for key, config in DATASET_CONFIGS.items():
         dataset_name = config["hf_name"]
         dataset_path = datasets_dir / dataset_name.replace("/", "_")
-        datasets_to_explore.append((dataset_name, dataset_path))
+        # Only add if not already in dict (avoids duplicates)
+        if dataset_name not in datasets_dict:
+            datasets_dict[dataset_name] = dataset_path
     
-    logger.info(f"Exploring {len(datasets_to_explore)} datasets\n")
+    # Convert to list
+    datasets_to_explore = list(datasets_dict.items())
+    
+    logger.info(f"Exploring {len(datasets_to_explore)} unique datasets\n")
     
     # Explore each dataset
     all_results = []

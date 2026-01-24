@@ -18,18 +18,30 @@ import torch
 import numpy as np
 from tqdm import tqdm
 
-# NeMo Curator imports
-from nemo_curator.datasets import DocumentDataset
-from nemo_curator.utils.distributed_utils import get_client, get_num_workers
-from nemo_curator.utils.file_utils import expand_outdir_and_mkdir
-import dask
-import dask.dataframe as dd
-from dask.distributed import Client, LocalCluster
+# Ray for distributed processing
 import ray
+
+# NeMo Curator imports (optional - not used in current implementation)
+try:
+    from nemo_curator.datasets import DocumentDataset
+    from nemo_curator.utils.distributed_utils import get_client, get_num_workers
+    from nemo_curator.utils.file_utils import expand_outdir_and_mkdir
+    import dask
+    import dask.dataframe as dd
+    from dask.distributed import Client, LocalCluster
+    NEMO_CURATOR_AVAILABLE = True
+except (ImportError, RuntimeError) as e:
+    # NeMo Curator not available or CUDA issues
+    # This is fine - we don't actually use it in the current implementation
+    NEMO_CURATOR_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.debug(f"NeMo Curator not available (not required): {e}")
 
 # HuggingFace for datasets and embeddings
 from datasets import load_from_disk, Dataset
 from transformers import AutoTokenizer, AutoModel
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 # Local imports
 from config import (
@@ -115,13 +127,13 @@ class NemotronEmbeddingExtractor:
             "trust_remote_code": True,
         }
         
-        # Set dtype (use 'dtype' instead of deprecated 'torch_dtype')
+        # Set torch_dtype (some models don't support 'dtype' parameter yet)
         if self.dtype == "bfloat16":
-            model_kwargs["dtype"] = torch.bfloat16
+            model_kwargs["torch_dtype"] = torch.bfloat16
         elif self.dtype == "float16":
-            model_kwargs["dtype"] = torch.float16
+            model_kwargs["torch_dtype"] = torch.float16
         
-        # Try Flash Attention 2 first, fallback to sdpa, then eager
+        # Try Flash Attention 2 first, fallback to eager (this model doesn't support SDPA)
         if self.use_flash_attention:
             try:
                 model_kwargs["attn_implementation"] = "flash_attention_2"
@@ -131,27 +143,18 @@ class NemotronEmbeddingExtractor:
                     **model_kwargs
                 )
                 logger.info("✓ Using Flash Attention 2")
-            except (ImportError, Exception) as e:
+            except (ImportError, AssertionError, Exception) as e:
                 logger.warning(f"Flash Attention 2 not available: {e}")
-                logger.info("Falling back to SDPA attention...")
-                model_kwargs["attn_implementation"] = "sdpa"
-                try:
-                    self.model = AutoModel.from_pretrained(
-                        self.model_id,
-                        **model_kwargs
-                    )
-                    logger.info("✓ Using SDPA attention")
-                except Exception as e2:
-                    logger.warning(f"SDPA not available: {e2}")
-                    logger.info("Falling back to eager attention...")
-                    model_kwargs["attn_implementation"] = "eager"
-                    self.model = AutoModel.from_pretrained(
-                        self.model_id,
-                        **model_kwargs
-                    )
-                    logger.info("✓ Using eager attention")
+                logger.info("Falling back to eager attention...")
+                # This model only supports flash_attention_2 or eager, not sdpa
+                model_kwargs["attn_implementation"] = "eager"
+                self.model = AutoModel.from_pretrained(
+                    self.model_id,
+                    **model_kwargs
+                )
+                logger.info("✓ Using eager attention")
         else:
-            # Use default (eager) attention
+            # Use eager attention
             model_kwargs["attn_implementation"] = "eager"
             self.model = AutoModel.from_pretrained(
                 self.model_id,
@@ -178,6 +181,26 @@ class NemotronEmbeddingExtractor:
         # Normalize dataset name
         dataset_key = dataset_name.replace("/", "_").replace("-", "_").lower()
         
+        # 1. PRETRAINING DATASETS (simple text format)
+        # These typically just have 'text' column with raw content
+        if 'pretraining' in dataset_name.lower() or 'cc' in dataset_name.lower():
+            # Direct text extraction for pretraining data
+            if 'text' in example and example['text']:
+                text = example['text']
+                # Some pretraining datasets may have metadata we want to include
+                if example.get('metadata'):
+                    metadata = example['metadata']
+                    if isinstance(metadata, dict):
+                        # Add domain/source info if available
+                        domain = metadata.get('domain', metadata.get('source', ''))
+                        if domain:
+                            return f"[{domain}]\n{text}"
+                return text
+            # Fallback for pretraining with other column names
+            if 'content' in example and example['content']:
+                return str(example['content'])
+        
+        # 2. POST-TRAINING DATASETS (conversational/instruction formats)
         # For conversational formats with messages
         if 'messages' in example and example['messages']:
             messages = example['messages']
@@ -222,8 +245,9 @@ class NemotronEmbeddingExtractor:
                 parts.append(f"Lean Header: {example['lean_header']}")
             return '\n'.join(parts)
         
-        # Fallback: concatenate all text fields
-        text_fields = ['text', 'content', 'prompt', 'response']
+        # 3. GENERIC FALLBACK for any dataset
+        # Try common text field names
+        text_fields = ['text', 'content', 'prompt', 'response', 'document', 'passage']
         for field in text_fields:
             if field in example and example[field]:
                 return str(example[field])
@@ -353,7 +377,76 @@ def process_split_distributed(
     
     # Load split
     split_path = dataset_path / split_name
-    dataset = load_from_disk(str(split_path))
+    
+    try:
+        # Try to load normally first
+        dataset = load_from_disk(str(split_path))
+    except (TypeError, ValueError, RuntimeError) as e:
+        logger.warning(f"  Standard load failed: {type(e).__name__}: {str(e)[:100]}")
+        logger.info(f"  Attempting alternative load methods...")
+        
+        # Try loading with HuggingFace dataset builder (ignores cached metadata)
+        try:
+            from datasets import load_dataset
+            
+            logger.info(f"  Trying HuggingFace load_dataset with 'arrow' format...")
+            # This loads the arrow files fresh without relying on cached metadata
+            dataset = load_dataset(
+                "arrow",
+                data_files=str(split_path / "*.arrow"),
+                split="train"
+            )
+            logger.info(f"  ✓ Loaded {len(dataset)} samples using arrow format loader")
+            
+        except Exception as load_error:
+            logger.warning(f"  Arrow format load failed: {load_error}")
+            
+            # Last resort: manually read and reconstruct
+            logger.info(f"  Attempting manual reconstruction...")
+            
+            # Find data files
+            arrow_files = sorted(split_path.glob("*.arrow"))
+            if not arrow_files:
+                arrow_files = sorted(split_path.glob("*.parquet"))
+            
+            if not arrow_files:
+                raise FileNotFoundError(f"No data files found in {split_path}")
+            
+            logger.info(f"  Reading {len(arrow_files)} files...")
+            
+            # Try different read methods
+            tables = []
+            for arrow_file in arrow_files:
+                try:
+                    # Try Arrow IPC format
+                    with pa.memory_map(str(arrow_file), 'r') as source:
+                        table = pa.ipc.open_file(source).read_all()
+                        tables.append(table)
+                except pa.lib.ArrowInvalid:
+                    # Try Arrow stream format
+                    try:
+                        with pa.memory_map(str(arrow_file), 'r') as source:
+                            reader = pa.ipc.open_stream(source)
+                            table = reader.read_all()
+                            tables.append(table)
+                    except:
+                        # Try Parquet
+                        try:
+                            table = pq.read_table(str(arrow_file))
+                            tables.append(table)
+                        except:
+                            logger.error(f"  Failed to read {arrow_file.name}")
+                            continue
+            
+            if not tables:
+                raise RuntimeError(f"Could not read any data files from {split_path}")
+            
+            # Concatenate and create dataset
+            full_table = pa.concat_tables(tables)
+            dataset = Dataset(pa.table({
+                col: full_table[col] for col in full_table.column_names
+            }))
+            logger.info(f"  ✓ Manually loaded {len(dataset)} samples")
     
     num_samples = len(dataset)
     logger.info(f"  Total samples: {num_samples:,}")
@@ -445,17 +538,29 @@ def process_split_distributed(
     return metadata
 
 
-def create_dask_dataset_from_hf(hf_dataset, text_column: str = 'text') -> DocumentDataset:
+def create_dask_dataset_from_hf(hf_dataset, text_column: str = 'text'):
     """
     Convert HuggingFace dataset to NeMo Curator DocumentDataset.
+    
+    NOTE: This function is currently not used in the pipeline.
+    Kept for potential future integration with NeMo Curator.
     
     Args:
         hf_dataset: HuggingFace dataset
         text_column: Name of the text column
     
     Returns:
-        DocumentDataset for NeMo Curator pipeline
+        DocumentDataset for NeMo Curator pipeline (if available)
+    
+    Raises:
+        RuntimeError: If NeMo Curator is not available
     """
+    if not NEMO_CURATOR_AVAILABLE:
+        raise RuntimeError(
+            "NeMo Curator is not available. "
+            "This function is not used in the current pipeline."
+        )
+    
     # Convert to pandas DataFrame
     df = hf_dataset.to_pandas()
     
@@ -616,18 +721,28 @@ def main():
         logger.info("-" * 80)
         
         try:
-            # Find splits
-            splits = [d.name for d in dataset_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
+            # Find valid splits (directories with .arrow files or dataset_info.json)
+            splits = []
+            for d in dataset_path.iterdir():
+                if d.is_dir() and not d.name.startswith('.'):
+                    # Check if it's a valid dataset split directory
+                    has_arrow = any(d.glob("*.arrow"))
+                    has_dataset_info = (d / "dataset_info.json").exists()
+                    has_state = (d / "state.json").exists()
+                    
+                    if has_arrow or has_dataset_info or has_state:
+                        splits.append(d.name)
             
             # Filter splits if specified
             if args.splits:
                 splits = [s for s in splits if s in args.splits]
             
             if not splits:
-                logger.warning(f"  No splits found for {dataset_name}")
+                logger.warning(f"  No valid splits found for {dataset_name}")
+                logger.warning(f"  Check directory: {dataset_path}")
                 continue
             
-            logger.info(f"  Found {len(splits)} splits: {splits}")
+            logger.info(f"  Found {len(splits)} valid splits: {splits}")
             
             # Create dataset output directory
             dataset_output_dir = args.output_dir / config["subdir"]
