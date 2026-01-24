@@ -36,9 +36,9 @@ MODEL_MAX_TOKENS = 32768  # per model card: max input sequence length is 32768 t
 # Default runtime configuration (kept together for easy tuning)
 DEFAULT_DATASETS_DIR = "/raid/datasets"
 DEFAULT_EMBEDDINGS_DIR = "/raid/embeddings"
-DEFAULT_BATCH_SIZE = 8
+DEFAULT_BATCH_SIZE = 1  # Reduced to prevent OOM on large datasets
 DEFAULT_MAX_LENGTH = MODEL_MAX_TOKENS
-DEFAULT_CHUNK_SIZE = 10000
+DEFAULT_CHUNK_SIZE = 100 # Smaller chunks = better load balancing across GPUs
 DEFAULT_DTYPE = "bfloat16"  # "bfloat16" or "float16"
-DEFAULT_NUM_WORKERS = 0
-DEFAULT_PREFETCH_FACTOR = 8
+DEFAULT_NUM_WORKERS = 4
+DEFAULT_PREFETCH_FACTOR = 4

@@ -515,29 +515,3 @@ If you use these embeddings, please cite the original Nemotron datasets:
   url={https://huggingface.co/collections/nvidia}
 }
 ```
-
-## Additional Documentation
-
-### Setup and Getting Started
-- [`SETUP.md`](SETUP.md) - **Environment setup guide** (Python, conda, pip, dependencies)
-- [`requirements.txt`](requirements.txt) - Python package dependencies (compatible versions)
-
-### Dataset Guides
-- [`doc/POST_TRAINING_COMMANDS.md`](doc/POST_TRAINING_COMMANDS.md) - **Complete guide for Post-Training datasets** (download, verify, explore, extract)
-- [`doc/QUICK_REFERENCE.md`](doc/QUICK_REFERENCE.md) - Quick command reference and workflow
-- [`doc/README.md`](doc/README.md) - Dataset distribution overview with sizes in rows, bytes, chars, tokens
-
-### Technical Documentation
-- [`doc/PRETRAINING_DATASETS_UPDATE.md`](doc/PRETRAINING_DATASETS_UPDATE.md) - Pretraining datasets update details
-- [`doc/CHANGES_SUMMARY.md`](doc/CHANGES_SUMMARY.md) - Complete change log
-- [`doc/SHARD_FORMAT.md`](doc/SHARD_FORMAT.md) - Shard format documentation
-- [`doc/00_download_nemotron_datasets.md`](doc/00_download_nemotron_datasets.md) - Download script documentation
-- [`doc/01_explore_nemotron_datasets.md`](doc/01_explore_nemotron_datasets.md) - Exploration script documentation
-
-## Support
-
-For issues or questions:
-1. Check [`doc/PRETRAINING_DATASETS_UPDATE.md`](doc/PRETRAINING_DATASETS_UPDATE.md) for recent changes
-2. Review [`doc/QUICK_REFERENCE.md`](doc/QUICK_REFERENCE.md) for troubleshooting tips
-3. Review exploration outputs for dataset-specific details
-4. Examine extraction logs for processing errors

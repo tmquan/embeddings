@@ -1,60 +1,33 @@
 #!/usr/bin/env python3
 """
-Extract embeddings from Nemotron datasets using NeMo Curator pipeline architecture.
-Uses nvidia/llama-embed-nemotron-8b model with distributed multi-GPU processing.
+Nemotron Embedding Extraction Pipeline
 
-Based on NVIDIA NeMo Curator: https://github.com/NVIDIA-NeMo/Curator
+Scans /raid/datasets for downloaded Nemotron datasets, collects statistics,
+and extracts embeddings using llama-embed-nemotron-8b with 32K max_length.
+
+Supports three data formats:
+- Arrow (HuggingFace datasets): load_from_disk
+- JSONL: Iterative line-by-line processing
+- Parquet: PyArrow iter_batches
+
+Outputs:
+- Per-dataset statistics JSON
+- Embeddings as numpy float32 shards
 """
 
 import os
+import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import argparse
-from functools import partial
+from pathlib import Path
+from typing import Dict, List, Any, Optional, Iterator, Tuple, Union
+from dataclasses import dataclass, field, asdict
+from enum import Enum
+import gc
 
-import torch
 import numpy as np
 from tqdm import tqdm
-
-# Ray for distributed processing
-import ray
-
-# NeMo Curator imports (optional - not used in current implementation)
-try:
-    from nemo_curator.datasets import DocumentDataset
-    from nemo_curator.utils.distributed_utils import get_client, get_num_workers
-    from nemo_curator.utils.file_utils import expand_outdir_and_mkdir
-    import dask
-    import dask.dataframe as dd
-    from dask.distributed import Client, LocalCluster
-    NEMO_CURATOR_AVAILABLE = True
-except (ImportError, RuntimeError) as e:
-    # NeMo Curator not available or CUDA issues
-    # This is fine - we don't actually use it in the current implementation
-    NEMO_CURATOR_AVAILABLE = False
-    logger = logging.getLogger(__name__)
-    logger.debug(f"NeMo Curator not available (not required): {e}")
-
-# HuggingFace for datasets and embeddings
-from datasets import load_from_disk, Dataset
-from transformers import AutoTokenizer, AutoModel
-import pyarrow as pa
-import pyarrow.parquet as pq
-
-# Local imports
-from config import (
-    DATASET_CONFIGS,
-    DEFAULT_DTYPE,
-    DEFAULT_BATCH_SIZE,
-    DEFAULT_CHUNK_SIZE,
-    DEFAULT_DATASETS_DIR,
-    DEFAULT_EMBEDDINGS_DIR,
-    MODEL_ID_DEFAULT,
-    MODEL_EMBED_SIZE,
-    MODEL_MAX_TOKENS,
-)
 
 # Setup logging
 logging.basicConfig(
@@ -63,744 +36,1542 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Import configuration
+from config import (
+    DATASET_CONFIGS,
+    DEFAULT_DATASETS_DIR,
+    DEFAULT_EMBEDDINGS_DIR,
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_MAX_LENGTH,
+    DEFAULT_CHUNK_SIZE,
+    DEFAULT_DTYPE,
+    MODEL_ID_DEFAULT,
+    MODEL_EMBED_SIZE,
+)
 
-@ray.remote(num_gpus=1)
-class NemotronEmbeddingExtractor:
-    """
-    Embedding extractor using NeMo Curator pipeline patterns.
-    Distributed across multiple GPUs using Ray.
-    Each instance runs on a single GPU (Ray assigns GPU automatically).
-    """
+
+# =============================================================================
+# Data Structures
+# =============================================================================
+
+class DatasetFormat(Enum):
+    """Supported dataset formats."""
+    ARROW = "arrow"
+    JSONL = "jsonl"
+    PARQUET = "parquet"
+    UNKNOWN = "unknown"
+
+
+@dataclass
+class SplitInfo:
+    """Information about a dataset split."""
+    name: str
+    rows: int
+    files: List[str] = field(default_factory=list)
+
+
+@dataclass
+class DatasetInfo:
+    """Information about a discovered dataset."""
+    name: str
+    path: str
+    format: DatasetFormat
+    total_rows: int = 0
+    splits: Dict[str, SplitInfo] = field(default_factory=dict)
+    columns: List[str] = field(default_factory=list)
+    text_columns: List[str] = field(default_factory=list)
+    embedding_strategy: str = "unknown"
     
-    def __init__(
-        self,
-        model_id: str = MODEL_ID_DEFAULT,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        max_length: int = DEFAULT_CHUNK_SIZE,
-        dtype: str = DEFAULT_DTYPE,
-        use_flash_attention: bool = True
-    ):
-        """
-        Initialize the embedding extractor.
-        Ray automatically assigns this actor to a GPU.
-        
-        Args:
-            model_id: HuggingFace model ID
-            batch_size: Batch size for inference
-            max_length: Maximum sequence length
-            dtype: Data type (bfloat16/float16/float32)
-            use_flash_attention: Whether to use Flash Attention 2
-        """
-        self.model_id = model_id
-        self.batch_size = batch_size
-        self.max_length = max_length
-        self.dtype = dtype
-        self.use_flash_attention = use_flash_attention
-        
-        # Ray automatically sets CUDA_VISIBLE_DEVICES for this actor
-        # Get the GPU ID that Ray assigned
-        self.device = "cuda"  # Will use the GPU Ray assigned via CUDA_VISIBLE_DEVICES
-        self.gpu_id = int(os.environ.get('CUDA_VISIBLE_DEVICES', '0').split(',')[0])
-        
-        logger.info(f"Initializing Nemotron Embedding Extractor")
-        logger.info(f"  Ray assigned GPU: {self.gpu_id}")
-        logger.info(f"  Model: {model_id}")
-        logger.info(f"  Device: {self.device}")
-        logger.info(f"  Dtype: {dtype}")
-        logger.info(f"  Batch size: {batch_size}")
-        logger.info(f"  Max length: {max_length}")
-        
-        # Load model and tokenizer
-        self._load_model()
-    
-    def _load_model(self):
-        """Load the embedding model and tokenizer."""
-        logger.info("Loading tokenizer...")
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
-        
-        # Set padding token if not set
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-        
-        logger.info("Loading model...")
-        model_kwargs = {
-            "trust_remote_code": True,
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "name": self.name,
+            "path": self.path,
+            "format": self.format.value,
+            "total_rows": self.total_rows,
+            "splits": {
+                k: {"name": v.name, "rows": v.rows, "files": v.files}
+                for k, v in self.splits.items()
+            },
+            "columns": self.columns,
+            "text_columns": self.text_columns,
+            "embedding_strategy": self.embedding_strategy,
         }
+
+
+# =============================================================================
+# Dataset Discovery
+# =============================================================================
+
+def detect_format(dataset_path: Path) -> DatasetFormat:
+    """
+    Detect the format of a dataset directory.
+    
+    Priority:
+    1. Arrow files in subdirectories (HuggingFace format)
+    2. JSONL files in data/ subdirectory or root directory
+    3. Parquet files
+    """
+    # Check for HuggingFace Arrow format (subdirs with .arrow files)
+    for subdir in dataset_path.iterdir():
+        if subdir.is_dir() and not subdir.name.startswith('.'):
+            arrow_files = list(subdir.glob("*.arrow"))
+            if arrow_files:
+                return DatasetFormat.ARROW
+    
+    # Check for JSONL in data/ subdirectory
+    data_dir = dataset_path / "data"
+    if data_dir.exists():
+        jsonl_files = list(data_dir.glob("*.jsonl"))
+        if jsonl_files:
+            return DatasetFormat.JSONL
+    
+    # Check for JSONL files directly in root directory
+    jsonl_files = list(dataset_path.glob("*.jsonl"))
+    if jsonl_files:
+        return DatasetFormat.JSONL
+    
+    # Check for Parquet files (including in subdirectories)
+    parquet_files = list(dataset_path.rglob("*.parquet"))
+    if parquet_files:
+        return DatasetFormat.PARQUET
+    
+    return DatasetFormat.UNKNOWN
+
+
+def discover_datasets(datasets_dir: str) -> List[DatasetInfo]:
+    """
+    Scan the datasets directory and discover all Nemotron datasets.
+    
+    Args:
+        datasets_dir: Path to the datasets directory
         
-        # Set torch_dtype (some models don't support 'dtype' parameter yet)
-        if self.dtype == "bfloat16":
-            model_kwargs["torch_dtype"] = torch.bfloat16
-        elif self.dtype == "float16":
-            model_kwargs["torch_dtype"] = torch.float16
-        
-        # Try Flash Attention 2 first, fallback to eager (this model doesn't support SDPA)
-        if self.use_flash_attention:
+    Returns:
+        List of DatasetInfo objects for discovered datasets
+    """
+    datasets_path = Path(datasets_dir)
+    discovered = []
+    
+    if not datasets_path.exists():
+        logger.error(f"Datasets directory not found: {datasets_dir}")
+        return discovered
+    
+    # Look for nvidia_* directories
+    for item in sorted(datasets_path.iterdir()):
+        if item.is_dir() and item.name.startswith("nvidia_"):
+            dataset_name = item.name.replace("nvidia_", "nvidia/")
+            format_type = detect_format(item)
+            
+            if format_type != DatasetFormat.UNKNOWN:
+                info = DatasetInfo(
+                    name=dataset_name,
+                    path=str(item),
+                    format=format_type,
+                )
+                discovered.append(info)
+                logger.info(f"Discovered: {dataset_name} ({format_type.value})")
+            else:
+                logger.warning(f"Unknown format for: {dataset_name}")
+    
+    return discovered
+
+
+# =============================================================================
+# Statistics Collection
+# =============================================================================
+
+def get_arrow_statistics(dataset_path: Path) -> Tuple[Dict[str, SplitInfo], List[str], int]:
+    """
+    Get statistics for an Arrow (HuggingFace) format dataset.
+    
+    Uses PyArrow directly to read arrow files for better compatibility.
+    Falls back to datasets library if needed.
+    
+    Returns:
+        Tuple of (splits_dict, columns_list, total_rows)
+    """
+    import pyarrow as pa
+    import pyarrow.ipc as ipc
+    
+    splits = {}
+    columns = []
+    total_rows = 0
+    
+    # Find all split directories
+    for subdir in sorted(dataset_path.iterdir()):
+        if subdir.is_dir() and not subdir.name.startswith('.'):
+            arrow_files = sorted(subdir.glob("*.arrow"))
+            if arrow_files:
+                try:
+                    # Read arrow files directly with PyArrow for row count
+                    split_rows = 0
+                    for arrow_file in arrow_files:
+                        try:
+                            # Open as IPC stream reader
+                            with pa.memory_map(str(arrow_file), 'r') as source:
+                                reader = ipc.open_stream(source)
+                                table = reader.read_all()
+                                split_rows += table.num_rows
+                                
+                                # Get columns from first file
+                                if not columns:
+                                    columns = table.column_names
+                        except Exception:
+                            # Try as IPC file format instead of stream
+                            try:
+                                with pa.memory_map(str(arrow_file), 'r') as source:
+                                    reader = ipc.open_file(source)
+                                    table = reader.read_all()
+                                    split_rows += table.num_rows
+                                    if not columns:
+                                        columns = table.column_names
+                            except Exception as inner_e:
+                                logger.debug(f"PyArrow error on {arrow_file.name}: {inner_e}")
+                                continue
+                    
+                    if split_rows > 0:
+                        splits[subdir.name] = SplitInfo(
+                            name=subdir.name,
+                            rows=split_rows,
+                            files=[f.name for f in arrow_files]
+                        )
+                        total_rows += split_rows
+                        
+                except Exception as e:
+                    logger.warning(f"Error loading split {subdir.name}: {e}")
+    
+    # Fallback: try using datasets library if PyArrow didn't work
+    if not splits:
+        try:
+            from datasets import load_from_disk
+            
+            # Try loading as DatasetDict from parent
             try:
-                model_kwargs["attn_implementation"] = "flash_attention_2"
-                logger.info("Attempting to use Flash Attention 2...")
-                self.model = AutoModel.from_pretrained(
-                    self.model_id,
-                    **model_kwargs
-                )
-                logger.info("✓ Using Flash Attention 2")
-            except (ImportError, AssertionError, Exception) as e:
-                logger.warning(f"Flash Attention 2 not available: {e}")
-                logger.info("Falling back to eager attention...")
-                # This model only supports flash_attention_2 or eager, not sdpa
-                model_kwargs["attn_implementation"] = "eager"
-                self.model = AutoModel.from_pretrained(
-                    self.model_id,
-                    **model_kwargs
-                )
-                logger.info("✓ Using eager attention")
-        else:
-            # Use eager attention
-            model_kwargs["attn_implementation"] = "eager"
-            self.model = AutoModel.from_pretrained(
-                self.model_id,
-                **model_kwargs
+                dataset_dict = load_from_disk(str(dataset_path))
+                if hasattr(dataset_dict, 'keys'):
+                    for split_name in dataset_dict.keys():
+                        split_data = dataset_dict[split_name]
+                        num_rows = len(split_data)
+                        splits[split_name] = SplitInfo(
+                            name=split_name,
+                            rows=num_rows,
+                            files=[]
+                        )
+                        total_rows += num_rows
+                        if not columns:
+                            columns = split_data.column_names
+            except Exception:
+                pass
+        except ImportError:
+            pass
+    
+    return splits, columns, total_rows
+
+
+def get_jsonl_statistics(dataset_path: Path) -> Tuple[Dict[str, SplitInfo], List[str], int]:
+    """
+    Get statistics for a JSONL format dataset.
+    
+    Checks both data/ subdirectory and root directory for JSONL files.
+    Uses fast subprocess line counting for large files.
+    
+    Returns:
+        Tuple of (splits_dict, columns_list, total_rows)
+    """
+    import subprocess
+    
+    splits = {}
+    columns = []
+    total_rows = 0
+    
+    # Collect JSONL files from data/ subdirectory and root directory
+    jsonl_files = []
+    
+    data_dir = dataset_path / "data"
+    if data_dir.exists():
+        jsonl_files.extend(sorted(data_dir.glob("*.jsonl")))
+    
+    # Also check root directory for JSONL files
+    root_jsonl_files = sorted(dataset_path.glob("*.jsonl"))
+    jsonl_files.extend(root_jsonl_files)
+    
+    if not jsonl_files:
+        return splits, columns, total_rows
+    
+    for jsonl_file in jsonl_files:
+        # Get columns from first line only
+        if not columns:
+            with open(jsonl_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline()
+                try:
+                    data = json.loads(first_line)
+                    columns = list(data.keys())
+                except json.JSONDecodeError:
+                    pass
+        
+        # Fast line counting using wc -l
+        try:
+            result = subprocess.run(
+                ['wc', '-l', str(jsonl_file)],
+                capture_output=True,
+                text=True,
+                timeout=60
             )
-            logger.info("✓ Using eager attention")
+            row_count = int(result.stdout.split()[0])
+        except Exception:
+            # Fallback to Python counting if wc fails
+            row_count = 0
+            with open(jsonl_file, 'r', encoding='utf-8') as f:
+                for _ in f:
+                    row_count += 1
         
-        self.model.to(self.device)
-        self.model.eval()
+        # Use filename (without extension) as split name
+        split_name = jsonl_file.stem
+        if split_name not in splits:
+            splits[split_name] = SplitInfo(
+                name=split_name,
+                rows=row_count,
+                files=[jsonl_file.name]
+            )
+        else:
+            splits[split_name].rows += row_count
+            splits[split_name].files.append(jsonl_file.name)
         
-        logger.info(f"Model loaded successfully on {self.device}")
+        total_rows += row_count
     
-    def extract_text_from_example(self, example: Dict[str, Any], dataset_name: str) -> str:
-        """
-        Extract text from a dataset example using dataset-specific logic.
-        
-        Args:
-            example: Dataset example
-            dataset_name: Name of the dataset
-        
-        Returns:
-            Extracted text string
-        """
-        # Normalize dataset name
-        dataset_key = dataset_name.replace("/", "_").replace("-", "_").lower()
-        
-        # 1. PRETRAINING DATASETS (simple text format)
-        # These typically just have 'text' column with raw content
-        if 'pretraining' in dataset_name.lower() or 'cc' in dataset_name.lower():
-            # Direct text extraction for pretraining data
-            if 'text' in example and example['text']:
-                text = example['text']
-                # Some pretraining datasets may have metadata we want to include
-                if example.get('metadata'):
-                    metadata = example['metadata']
-                    if isinstance(metadata, dict):
-                        # Add domain/source info if available
-                        domain = metadata.get('domain', metadata.get('source', ''))
-                        if domain:
-                            return f"[{domain}]\n{text}"
-                return text
-            # Fallback for pretraining with other column names
-            if 'content' in example and example['content']:
-                return str(example['content'])
-        
-        # 2. POST-TRAINING DATASETS (conversational/instruction formats)
-        # For conversational formats with messages
-        if 'messages' in example and example['messages']:
-            messages = example['messages']
-            if isinstance(messages, list):
-                text_parts = []
-                for msg in messages:
-                    if isinstance(msg, dict):
-                        role = msg.get('role', 'unknown')
-                        content = msg.get('content', '')
-                        
-                        # Include reasoning_content if available
-                        if msg.get('reasoning_content'):
-                            content = f"[reasoning] {msg['reasoning_content']}\n{content}"
-                        
-                        text_parts.append(f"{role}: {content}")
-                return '\n'.join(text_parts)
-        
-        # For Llama-Nemotron format with input/output
-        if 'output' in example and example['output']:
-            parts = []
-            if example.get('system_prompt'):
-                parts.append(f"System: {example['system_prompt']}")
-            if example.get('input'):
-                # Input is usually a list of messages
-                input_val = example['input']
-                if isinstance(input_val, list):
-                    for msg in input_val:
-                        if isinstance(msg, dict):
-                            parts.append(f"{msg.get('role', 'user')}: {msg.get('content', '')}")
-                else:
-                    parts.append(f"Input: {input_val}")
-            parts.append(f"Output: {example['output']}")
-            return '\n'.join(parts)
-        
-        # For Math-Proofs format
-        if 'problem' in example and example['problem']:
-            parts = []
-            parts.append(f"Problem: {example['problem']}")
-            if example.get('formal_statement'):
-                parts.append(f"Formal Statement: {example['formal_statement']}")
-            if example.get('lean_header'):
-                parts.append(f"Lean Header: {example['lean_header']}")
-            return '\n'.join(parts)
-        
-        # 3. GENERIC FALLBACK for any dataset
-        # Try common text field names
-        text_fields = ['text', 'content', 'prompt', 'response', 'document', 'passage']
-        for field in text_fields:
-            if field in example and example[field]:
-                return str(example[field])
-        
-        # Last resort: stringify the example
-        return str(example)
+    return splits, columns, total_rows
+
+
+def get_parquet_statistics(dataset_path: Path) -> Tuple[Dict[str, SplitInfo], List[str], int]:
+    """
+    Get statistics for a Parquet format dataset.
     
-    @torch.no_grad()
-    def embed_texts(self, texts: List[str]) -> np.ndarray:
-        """
-        Embed a batch of texts.
+    Returns:
+        Tuple of (splits_dict, columns_list, total_rows)
+    """
+    import pyarrow.parquet as pq
+    
+    splits = {}
+    columns = []
+    total_rows = 0
+    
+    # Find all parquet files (including in subdirectories)
+    parquet_files = sorted(dataset_path.rglob("*.parquet"))
+    
+    for pq_file in parquet_files:
+        try:
+            # Get schema and row count from metadata
+            pq_metadata = pq.read_metadata(pq_file)
+            row_count = pq_metadata.num_rows
+            
+            # Get columns from schema
+            if not columns:
+                schema = pq.read_schema(pq_file)
+                columns = schema.names
+            
+            # Use parent directory name as split name (or 'default')
+            split_name = pq_file.parent.name if pq_file.parent != dataset_path else "default"
+            
+            if split_name not in splits:
+                splits[split_name] = SplitInfo(
+                    name=split_name,
+                    rows=row_count,
+                    files=[str(pq_file.relative_to(dataset_path))]
+                )
+            else:
+                splits[split_name].rows += row_count
+                splits[split_name].files.append(str(pq_file.relative_to(dataset_path)))
+            
+            total_rows += row_count
+            
+        except Exception as e:
+            logger.warning(f"Error reading parquet {pq_file}: {e}")
+    
+    return splits, columns, total_rows
+
+
+def identify_text_columns(columns: List[str], dataset_name: str) -> Tuple[List[str], str]:
+    """
+    Identify text columns and embedding strategy based on column names and dataset.
+    
+    Returns:
+        Tuple of (text_columns, embedding_strategy)
+    """
+    dataset_lower = dataset_name.lower()
+    
+    # Dataset-specific handling (check before generic patterns)
+    
+    # Math-Proofs: prioritize problem/formal_statement over messages
+    if 'math-proofs' in dataset_lower or 'math_proofs' in dataset_lower:
+        if 'problem' in columns and 'formal_statement' in columns:
+            text_cols = ['problem', 'formal_statement']
+            if 'lean_header' in columns:
+                text_cols.append('lean_header')
+            return text_cols, 'combine_columns'
+    
+    # Input/output format (Llama-Nemotron)
+    if 'input' in columns and 'output' in columns:
+        return ['input', 'output'], 'input_output'
+    
+    # Standard messages format
+    if 'messages' in columns:
+        return ['messages'], 'concatenate_messages'
+    
+    # Direct text column (pretraining datasets)
+    if 'text' in columns:
+        return ['text'], 'direct_text'
+    
+    # Math proofs format (generic check)
+    if 'problem' in columns and 'formal_statement' in columns:
+        text_cols = ['problem', 'formal_statement']
+        if 'lean_header' in columns:
+            text_cols.append('lean_header')
+        return text_cols, 'combine_columns'
+    
+    # Fallback: look for common text column names
+    text_indicators = ['text', 'content', 'document', 'passage', 'prompt', 'response']
+    text_cols = [c for c in columns if any(ind in c.lower() for ind in text_indicators)]
+    
+    if text_cols:
+        return text_cols, 'combine_columns'
+    
+    return [], 'unknown'
+
+
+def collect_statistics(dataset_info: DatasetInfo) -> DatasetInfo:
+    """
+    Collect detailed statistics for a dataset.
+    
+    Args:
+        dataset_info: Basic dataset info with path and format
         
-        Args:
-            texts: List of text strings
+    Returns:
+        Updated DatasetInfo with statistics
+    """
+    dataset_path = Path(dataset_info.path)
+    
+    if dataset_info.format == DatasetFormat.ARROW:
+        splits, columns, total_rows = get_arrow_statistics(dataset_path)
+    elif dataset_info.format == DatasetFormat.JSONL:
+        splits, columns, total_rows = get_jsonl_statistics(dataset_path)
+    elif dataset_info.format == DatasetFormat.PARQUET:
+        splits, columns, total_rows = get_parquet_statistics(dataset_path)
+    else:
+        return dataset_info
+    
+    dataset_info.splits = splits
+    dataset_info.columns = columns
+    dataset_info.total_rows = total_rows
+    
+    # Identify text columns and strategy
+    text_cols, strategy = identify_text_columns(columns, dataset_info.name)
+    dataset_info.text_columns = text_cols
+    dataset_info.embedding_strategy = strategy
+    
+    return dataset_info
+
+
+# =============================================================================
+# Data Iterators
+# =============================================================================
+
+def iter_arrow_dataset(
+    dataset_path: Path,
+    split_name: str,
+    chunk_size: int = 100
+) -> Iterator[List[Dict[str, Any]]]:
+    """
+    Iterate over an Arrow dataset split in chunks.
+    
+    Uses PyArrow directly for better compatibility across versions.
+    Falls back to datasets library if PyArrow fails.
+    
+    Args:
+        dataset_path: Path to the dataset
+        split_name: Name of the split to iterate
+        chunk_size: Number of examples per chunk
         
-        Returns:
-            Array of embeddings [batch_size, embed_dim]
-        """
+    Yields:
+        List of examples (dicts)
+    """
+    import pyarrow as pa
+    import pyarrow.ipc as ipc
+    
+    split_path = dataset_path / split_name
+    arrow_files = sorted(split_path.glob("*.arrow"))
+    
+    if not arrow_files:
+        logger.warning(f"No arrow files found in {split_path}")
+        return
+    
+    # Try PyArrow direct reading first
+    pyarrow_success = False
+    
+    for arrow_file in arrow_files:
+        try:
+            # Try as IPC stream
+            with pa.memory_map(str(arrow_file), 'r') as source:
+                try:
+                    reader = ipc.open_stream(source)
+                except Exception:
+                    # Try as IPC file
+                    reader = ipc.open_file(source)
+                
+                table = reader.read_all()
+                pyarrow_success = True
+                
+                # Convert to batches of dicts
+                num_rows = table.num_rows
+                for start_idx in range(0, num_rows, chunk_size):
+                    end_idx = min(start_idx + chunk_size, num_rows)
+                    batch_table = table.slice(start_idx, end_idx - start_idx)
+                    # Convert to list of dicts
+                    batch = batch_table.to_pydict()
+                    # Transform from column-oriented to row-oriented
+                    num_batch_rows = end_idx - start_idx
+                    batch_list = [
+                        {col: batch[col][i] for col in batch.keys()}
+                        for i in range(num_batch_rows)
+                    ]
+                    yield batch_list
+                    
+        except Exception as e:
+            logger.debug(f"PyArrow error on {arrow_file}: {e}")
+            continue
+    
+    # Fallback to datasets library if PyArrow didn't work
+    if not pyarrow_success:
+        try:
+            from datasets import load_from_disk
+            
+            dataset = load_from_disk(str(split_path))
+            
+            for i in range(0, len(dataset), chunk_size):
+                end_idx = min(i + chunk_size, len(dataset))
+                # Convert to list of dicts
+                batch = [dataset[j] for j in range(i, end_idx)]
+                yield batch
+        except Exception as e:
+            logger.error(f"Failed to load {split_path} with both PyArrow and datasets: {e}")
+
+
+def iter_jsonl_file(
+    filepath: Path,
+    chunk_size: int = 100
+) -> Iterator[List[Dict[str, Any]]]:
+    """
+    Iterate over a JSONL file in chunks.
+    
+    Args:
+        filepath: Path to the JSONL file
+        chunk_size: Number of lines per chunk
+        
+    Yields:
+        List of parsed JSON objects
+    """
+    batch = []
+    
+    with open(filepath, 'r', encoding='utf-8') as f:
+        for line in f:
+            try:
+                data = json.loads(line.strip())
+                batch.append(data)
+                
+                if len(batch) >= chunk_size:
+                    yield batch
+                    batch = []
+            except json.JSONDecodeError as e:
+                logger.warning(f"JSON decode error: {e}")
+                continue
+    
+    if batch:
+        yield batch
+
+
+def iter_parquet_file(
+    filepath: Path,
+    chunk_size: int = 100
+) -> Iterator[List[Dict[str, Any]]]:
+    """
+    Iterate over a Parquet file in chunks.
+    
+    Args:
+        filepath: Path to the Parquet file
+        chunk_size: Number of rows per chunk
+        
+    Yields:
+        List of rows as dicts
+    """
+    import pyarrow.parquet as pq
+    
+    parquet_file = pq.ParquetFile(filepath)
+    
+    for batch in parquet_file.iter_batches(batch_size=chunk_size):
+        # Convert to pandas then to list of dicts
+        df = batch.to_pandas()
+        yield df.to_dict('records')
+
+
+# =============================================================================
+# Text Extraction
+# =============================================================================
+
+def extract_text_messages(example: Dict[str, Any]) -> str:
+    """Extract text from messages format (concatenate role: content)."""
+    messages = example.get('messages', [])
+    if not messages:
+        return ""
+    
+    text_parts = []
+    for msg in messages:
+        role = msg.get('role', 'unknown')
+        content = msg.get('content', '')
+        
+        # Include reasoning_content if available
+        if msg.get('reasoning_content'):
+            content = msg['reasoning_content'] + '\n' + content
+        
+        text_parts.append(f'{role}: {content}')
+    
+    return '\n'.join(text_parts)
+
+
+def extract_text_input_output(example: Dict[str, Any]) -> str:
+    """Extract text from input/output format (Llama-Nemotron)."""
+    parts = []
+    
+    # Handle input (can be list of messages or string)
+    input_val = example.get('input', '')
+    if isinstance(input_val, list):
+        for msg in input_val:
+            if isinstance(msg, dict):
+                role = msg.get('role', 'user')
+                content = msg.get('content', '')
+                parts.append(f'{role}: {content}')
+            else:
+                parts.append(str(msg))
+    else:
+        parts.append(f'input: {input_val}')
+    
+    # Handle output
+    output_val = example.get('output', '')
+    if output_val:
+        parts.append(f'assistant: {output_val}')
+    
+    return '\n'.join(parts)
+
+
+def extract_text_direct(example: Dict[str, Any], column: str = 'text') -> str:
+    """Extract text directly from a column."""
+    return str(example.get(column, ''))
+
+
+def extract_text_combine_columns(example: Dict[str, Any], columns: List[str]) -> str:
+    """Combine multiple text columns."""
+    parts = []
+    for col in columns:
+        val = example.get(col)
+        if val:
+            if isinstance(val, list):
+                parts.append(f'{col}: {str(val)}')
+            else:
+                parts.append(f'{col}: {val}')
+    return '\n'.join(parts)
+
+
+def get_text_extractor(strategy: str, text_columns: List[str]):
+    """
+    Get the appropriate text extraction function.
+    
+    Args:
+        strategy: Embedding strategy name
+        text_columns: List of text column names
+        
+    Returns:
+        Function that takes an example dict and returns text string
+    """
+    if strategy == 'concatenate_messages':
+        return extract_text_messages
+    elif strategy == 'input_output':
+        return extract_text_input_output
+    elif strategy == 'direct_text':
+        col = text_columns[0] if text_columns else 'text'
+        return lambda ex: extract_text_direct(ex, col)
+    elif strategy == 'combine_columns':
+        return lambda ex: extract_text_combine_columns(ex, text_columns)
+    else:
+        # Default: try messages, then text, then combine all text columns
+        def default_extractor(ex):
+            if 'messages' in ex:
+                return extract_text_messages(ex)
+            if 'text' in ex:
+                return extract_text_direct(ex, 'text')
+            return extract_text_combine_columns(ex, text_columns)
+        return default_extractor
+
+
+# =============================================================================
+# Model Loading and Embedding Extraction
+# =============================================================================
+
+def load_model_and_tokenizer(
+    model_id: str = MODEL_ID_DEFAULT,
+    max_length: int = DEFAULT_MAX_LENGTH,
+    dtype: str = DEFAULT_DTYPE,
+    device: str = "cuda"
+):
+    """
+    Load the embedding model and tokenizer.
+    
+    Args:
+        model_id: HuggingFace model ID
+        max_length: Maximum sequence length
+        dtype: Model dtype (bfloat16 or float16)
+        device: Device to load model on
+        
+    Returns:
+        Tuple of (model, tokenizer)
+    """
+    import torch
+    from transformers import AutoModel, AutoTokenizer
+    
+    logger.info(f"Loading model: {model_id}")
+    logger.info(f"Max length: {max_length}, dtype: {dtype}")
+    
+    # Determine torch dtype
+    torch_dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float16
+    
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_id,
+        model_max_length=max_length,
+        trust_remote_code=True
+    )
+    
+    # Ensure pad token is set
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    
+    # Determine attention implementation
+    # llama-embed-nemotron-8b only supports flash_attention_2 or eager
+    attn_implementation = "eager"  # Default to eager (works on all GPUs)
+    
+    # Try to use flash_attention_2 if available (faster, requires compatible GPU)
+    try:
+        import flash_attn
+        attn_implementation = "flash_attention_2"
+        logger.info("Using flash_attention_2 for faster inference")
+    except ImportError:
+        logger.info("flash_attn not available, using eager attention")
+    
+    # Load model
+    model = AutoModel.from_pretrained(
+        model_id,
+        torch_dtype=torch_dtype,
+        trust_remote_code=True,
+        device_map=device,
+        attn_implementation=attn_implementation
+    )
+    model.eval()
+    
+    logger.info(f"Model loaded on {device}")
+    return model, tokenizer
+
+
+def extract_embeddings(
+    texts: List[str],
+    model,
+    tokenizer,
+    max_length: int = DEFAULT_MAX_LENGTH,
+    batch_size: int = DEFAULT_BATCH_SIZE
+) -> np.ndarray:
+    """
+    Extract embeddings for a list of texts.
+    
+    Args:
+        texts: List of text strings
+        model: Loaded model
+        tokenizer: Loaded tokenizer
+        max_length: Maximum sequence length
+        batch_size: Batch size for inference
+        
+    Returns:
+        Numpy array of embeddings (float32)
+    """
+    import torch
+    
+    all_embeddings = []
+    
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i + batch_size]
+        
         # Tokenize
-        encoded = self.tokenizer(
-            texts,
+        inputs = tokenizer(
+            batch_texts,
             padding=True,
             truncation=True,
-            max_length=self.max_length,
+            max_length=max_length,
             return_tensors="pt"
         )
         
         # Move to device
-        encoded = {k: v.to(self.device) for k, v in encoded.items()}
+        inputs = {k: v.to(model.device) for k, v in inputs.items()}
         
-        # Get embeddings
-        outputs = self.model(**encoded)
-        
-        # Use mean pooling over sequence length
-        embeddings = outputs.last_hidden_state.mean(dim=1)
-        
-        # Normalize embeddings
-        embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
-        
-        return embeddings.cpu().numpy()
-    
-    def process_chunk(
-        self,
-        examples: List[Dict[str, Any]],
-        dataset_name: str
-    ) -> np.ndarray:
-        """
-        Process a chunk of examples and return embeddings.
-        This method will be called remotely by Ray.
-        
-        Args:
-            examples: List of dataset examples
-            dataset_name: Name of the dataset
-        
-        Returns:
-            Embeddings array
-        """
-        # Extract texts
-        texts = [
-            self.extract_text_from_example(example, dataset_name)
-            for example in examples
-        ]
-        
-        # Process in batches
-        chunk_embeddings = []
-        for i in range(0, len(texts), self.batch_size):
-            batch_texts = texts[i:i + self.batch_size]
-            batch_embeddings = self.embed_texts(batch_texts)
-            chunk_embeddings.append(batch_embeddings)
-        
-        # Concatenate chunk embeddings
-        return np.vstack(chunk_embeddings)
-
-
-def get_shard_info(dataset_path: Path, split_name: str) -> tuple[List[int], int]:
-    """
-    Get shard information from the dataset_info.json file.
-    
-    Args:
-        dataset_path: Path to dataset directory
-        split_name: Name of the split
-    
-    Returns:
-        Tuple of (shard_lengths, total_shards)
-    """
-    dataset_info_path = dataset_path / split_name / "dataset_info.json"
-    
-    if dataset_info_path.exists():
-        with open(dataset_info_path, 'r') as f:
-            info = json.load(f)
+        # Generate embeddings
+        with torch.no_grad():
+            outputs = model(**inputs)
             
-        # Get shard lengths for this split
-        if "splits" in info and split_name in info["splits"]:
-            split_info = info["splits"][split_name]
-            shard_lengths = split_info.get("shard_lengths", [])
-            return shard_lengths, len(shard_lengths)
+            # Use last hidden state with mean pooling over non-padding tokens
+            # For embedding models, [CLS] token or mean pooling is common
+            hidden_states = outputs.last_hidden_state
+            attention_mask = inputs['attention_mask']
+            
+            # Mean pooling
+            mask_expanded = attention_mask.unsqueeze(-1).expand(hidden_states.size()).float()
+            sum_embeddings = torch.sum(hidden_states * mask_expanded, dim=1)
+            sum_mask = torch.clamp(mask_expanded.sum(dim=1), min=1e-9)
+            embeddings = sum_embeddings / sum_mask
+        
+        # Convert to numpy float32
+        embeddings_np = embeddings.cpu().numpy().astype(np.float32)
+        all_embeddings.append(embeddings_np)
+        
+        # Clear CUDA cache periodically
+        if i % (batch_size * 10) == 0:
+            torch.cuda.empty_cache()
     
-    return [], 0
+    return np.vstack(all_embeddings) if all_embeddings else np.array([])
 
 
-def process_split_distributed(
-    dataset_name: str,
-    split_name: str,
-    dataset_path: Path,
+# =============================================================================
+# Shard Saving
+# =============================================================================
+
+def save_shard(
+    embeddings: np.ndarray,
     output_dir: Path,
-    extractors: List,
-    chunk_size: int = DEFAULT_CHUNK_SIZE,
-    num_gpus: int = 8
-) -> Dict[str, Any]:
+    shard_idx: int
+) -> str:
     """
-    Process a single dataset split using distributed multi-GPU processing.
-    Saves embeddings matching the original dataset shard structure.
+    Save embeddings shard as numpy file.
     
     Args:
-        dataset_name: Name of the dataset
-        split_name: Name of the split
-        dataset_path: Path to dataset directory
-        output_dir: Output directory for embeddings
-        extractors: List of Ray actor references (one per GPU)
-        chunk_size: Number of samples to process per chunk (used if no shard info)
-        num_gpus: Number of GPUs to use
+        embeddings: Numpy array of embeddings
+        output_dir: Output directory
+        shard_idx: Shard index
+        
+    Returns:
+        Path to saved file
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"shard_{shard_idx:05d}.npy"
+    filepath = output_dir / filename
+    np.save(filepath, embeddings)
+    return str(filepath)
+
+
+def save_statistics(
+    statistics: Dict[str, Any],
+    output_path: Path
+):
+    """Save statistics to JSON file."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(statistics, f, indent=2)
+    logger.info(f"Statistics saved to: {output_path}")
+
+
+# =============================================================================
+# Main Processing Pipeline
+# =============================================================================
+
+def process_arrow_dataset(
+    dataset_info: DatasetInfo,
+    output_dir: Path,
+    model,
+    tokenizer,
+    max_length: int,
+    batch_size: int,
+    chunk_size: int,
+    shard_size: int,
+    gpu_id: int = 0,
+    num_gpus: int = 1
+) -> Dict[str, int]:
+    """
+    Process an Arrow format dataset.
+    - If #files >= #GPUs: each file becomes one shard (file index = shard index)
+    - If #files < #GPUs: distribute chunks within files across GPUs (shard_size based)
     
     Returns:
-        Dictionary with processing statistics
+        Dictionary of split_name -> embedding_count
     """
-    logger.info(f"Processing {dataset_name} / {split_name} on {num_gpus} GPUs")
+    import torch
+    import pyarrow as pa
+    import pyarrow.ipc as ipc
     
-    # Load split
-    split_path = dataset_path / split_name
+    dataset_path = Path(dataset_info.path)
+    results = {}
     
-    try:
-        # Try to load normally first
-        dataset = load_from_disk(str(split_path))
-    except (TypeError, ValueError, RuntimeError) as e:
-        logger.warning(f"  Standard load failed: {type(e).__name__}: {str(e)[:100]}")
-        logger.info(f"  Attempting alternative load methods...")
+    text_extractor = get_text_extractor(
+        dataset_info.embedding_strategy,
+        dataset_info.text_columns
+    )
+    
+    for split_name, split_info in dataset_info.splits.items():
+        split_path = dataset_path / split_name
+        arrow_files = sorted(split_path.glob("*.arrow"))
         
-        # Try loading with HuggingFace dataset builder (ignores cached metadata)
-        try:
-            from datasets import load_dataset
+        split_output_dir = output_dir / split_name
+        total_embeddings = 0
+        
+        # Choose distribution strategy based on file count vs GPU count
+        if len(arrow_files) >= num_gpus:
+            # Strategy 1: Distribute files across GPUs (1 shard per file)
+            my_files = [(idx, f) for idx, f in enumerate(arrow_files) if idx % num_gpus == gpu_id]
+            logger.info(f"Processing split: {split_name} ({len(arrow_files)} files, {len(my_files)} for GPU {gpu_id}) [file-parallel]")
             
-            logger.info(f"  Trying HuggingFace load_dataset with 'arrow' format...")
-            # This loads the arrow files fresh without relying on cached metadata
-            dataset = load_dataset(
-                "arrow",
-                data_files=str(split_path / "*.arrow"),
-                split="train"
-            )
-            logger.info(f"  ✓ Loaded {len(dataset)} samples using arrow format loader")
+            for file_idx, arrow_file in tqdm(my_files, desc=f"  {split_name}"):
+                try:
+                    with pa.memory_map(str(arrow_file), 'r') as source:
+                        try:
+                            reader = ipc.open_stream(source)
+                        except Exception:
+                            reader = ipc.open_file(source)
+                        table = reader.read_all()
+                    
+                    file_embeddings = []
+                    num_rows = table.num_rows
+                    
+                    for start_idx in range(0, num_rows, chunk_size):
+                        end_idx = min(start_idx + chunk_size, num_rows)
+                        batch_dict = {col: table.column(col).slice(start_idx, end_idx - start_idx).to_pylist() 
+                                      for col in table.column_names}
+                        batch = [{col: batch_dict[col][i] for col in table.column_names}
+                                 for i in range(end_idx - start_idx)]
+                        
+                        texts = [text_extractor(ex) for ex in batch]
+                        texts = [t for t in texts if t.strip()]
+                        
+                        if texts:
+                            embeddings = extract_embeddings(texts, model, tokenizer, max_length, batch_size)
+                            file_embeddings.append(embeddings)
+                    
+                    if file_embeddings:
+                        combined = np.vstack(file_embeddings)
+                        save_shard(combined, split_output_dir, file_idx)
+                        total_embeddings += combined.shape[0]
+                    
+                    torch.cuda.empty_cache()
+                except Exception as e:
+                    logger.error(f"Error processing {arrow_file}: {e}")
+        else:
+            # Strategy 2: All GPUs process all files, distribute chunks (shard_size based)
+            logger.info(f"Processing split: {split_name} ({len(arrow_files)} files < {num_gpus} GPUs) [chunk-parallel]")
             
-        except Exception as load_error:
-            logger.warning(f"  Arrow format load failed: {load_error}")
+            shard_idx = gpu_id
+            accumulated_embeddings = []
+            chunk_idx = 0
             
-            # Last resort: manually read and reconstruct
-            logger.info(f"  Attempting manual reconstruction...")
-            
-            # Find data files
-            arrow_files = sorted(split_path.glob("*.arrow"))
-            if not arrow_files:
-                arrow_files = sorted(split_path.glob("*.parquet"))
-            
-            if not arrow_files:
-                raise FileNotFoundError(f"No data files found in {split_path}")
-            
-            logger.info(f"  Reading {len(arrow_files)} files...")
-            
-            # Try different read methods
-            tables = []
             for arrow_file in arrow_files:
                 try:
-                    # Try Arrow IPC format
                     with pa.memory_map(str(arrow_file), 'r') as source:
-                        table = pa.ipc.open_file(source).read_all()
-                        tables.append(table)
-                except pa.lib.ArrowInvalid:
-                    # Try Arrow stream format
-                    try:
-                        with pa.memory_map(str(arrow_file), 'r') as source:
-                            reader = pa.ipc.open_stream(source)
-                            table = reader.read_all()
-                            tables.append(table)
-                    except:
-                        # Try Parquet
                         try:
-                            table = pq.read_table(str(arrow_file))
-                            tables.append(table)
-                        except:
-                            logger.error(f"  Failed to read {arrow_file.name}")
+                            reader = ipc.open_stream(source)
+                        except Exception:
+                            reader = ipc.open_file(source)
+                        table = reader.read_all()
+                    
+                    num_rows = table.num_rows
+                    pbar = tqdm(total=num_rows, desc=f"  {arrow_file.name}")
+                    
+                    for start_idx in range(0, num_rows, chunk_size):
+                        # Multi-GPU: only process chunks assigned to this GPU
+                        if chunk_idx % num_gpus != gpu_id:
+                            chunk_idx += 1
+                            pbar.update(min(chunk_size, num_rows - start_idx))
                             continue
+                        chunk_idx += 1
+                        
+                        end_idx = min(start_idx + chunk_size, num_rows)
+                        batch_dict = {col: table.column(col).slice(start_idx, end_idx - start_idx).to_pylist() 
+                                      for col in table.column_names}
+                        batch = [{col: batch_dict[col][i] for col in table.column_names}
+                                 for i in range(end_idx - start_idx)]
+                        
+                        texts = [text_extractor(ex) for ex in batch]
+                        texts = [t for t in texts if t.strip()]
+                        
+                        if texts:
+                            embeddings = extract_embeddings(texts, model, tokenizer, max_length, batch_size)
+                            accumulated_embeddings.append(embeddings)
+                            total_embeddings += len(embeddings)
+                            
+                            # Save shard if accumulated enough
+                            total_accumulated = sum(e.shape[0] for e in accumulated_embeddings)
+                            if total_accumulated >= shard_size:
+                                combined = np.vstack(accumulated_embeddings)
+                                save_shard(combined, split_output_dir, shard_idx)
+                                shard_idx += num_gpus
+                                accumulated_embeddings = []
+                                torch.cuda.empty_cache()
+                        
+                        pbar.update(end_idx - start_idx)
+                    
+                    pbar.close()
+                except Exception as e:
+                    logger.error(f"Error processing {arrow_file}: {e}")
             
-            if not tables:
-                raise RuntimeError(f"Could not read any data files from {split_path}")
-            
-            # Concatenate and create dataset
-            full_table = pa.concat_tables(tables)
-            dataset = Dataset(pa.table({
-                col: full_table[col] for col in full_table.column_names
-            }))
-            logger.info(f"  ✓ Manually loaded {len(dataset)} samples")
-    
-    num_samples = len(dataset)
-    logger.info(f"  Total samples: {num_samples:,}")
-    
-    # Create output directory
-    split_output_dir = output_dir / split_name
-    split_output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Get shard information from dataset_info.json
-    shard_lengths, total_shards = get_shard_info(dataset_path, split_name)
-    
-    if shard_lengths and total_shards > 0:
-        # Use original shard structure
-        logger.info(f"  Using original shard structure: {total_shards} shards")
-        num_chunks = total_shards
-        chunk_boundaries = []
-        start_idx = 0
-        for shard_len in shard_lengths:
-            end_idx = start_idx + shard_len
-            chunk_boundaries.append((start_idx, end_idx))
-            start_idx = end_idx
-    else:
-        # Fallback to uniform chunks
-        logger.info(f"  No shard info found, using uniform chunks of size {chunk_size}")
-        num_chunks = (num_samples + chunk_size - 1) // chunk_size
-        total_shards = num_chunks
-        chunk_boundaries = []
-        for chunk_idx in range(num_chunks):
-            start_idx = chunk_idx * chunk_size
-            end_idx = min(start_idx + chunk_size, num_samples)
-            chunk_boundaries.append((start_idx, end_idx))
-    
-    logger.info(f"  Processing {num_chunks} shards across {num_gpus} GPUs")
-    
-    # Distribute shards across GPUs
-    shard_futures = []
-    
-    for shard_idx, (start_idx, end_idx) in enumerate(chunk_boundaries):
-        # Get shard data
-        shard_data = [dataset[i] for i in range(start_idx, end_idx)]
+            # Save remaining embeddings
+            if accumulated_embeddings:
+                combined = np.vstack(accumulated_embeddings)
+                save_shard(combined, split_output_dir, shard_idx)
         
-        # Assign to GPU in round-robin fashion
-        gpu_idx = shard_idx % num_gpus
-        extractor = extractors[gpu_idx]
+        results[split_name] = total_embeddings
+        logger.info(f"  {split_name}: {total_embeddings:,} embeddings saved (GPU {gpu_id})")
         
-        # Submit task to GPU
-        future = extractor.process_chunk.remote(shard_data, dataset_name)
-        shard_futures.append((shard_idx, future, len(shard_data)))
+        gc.collect()
+        torch.cuda.empty_cache()
     
-    # Collect results with progress bar
-    logger.info(f"  Waiting for {len(shard_futures)} shard(s) to complete...")
-    
-    completed = 0
-    with tqdm(total=len(shard_futures), desc=f"  {split_name}") as pbar:
-        for shard_idx, future, shard_size in shard_futures:
-            try:
-                shard_embeddings = ray.get(future)
-                
-                # Save shard with 5-digit zero-padding matching input format
-                # Format: data-{shard_idx:05d}-of-{total_shards:05d}.npy
-                shard_file = split_output_dir / f"data-{shard_idx:05d}-of-{total_shards:05d}.npy"
-                np.save(shard_file, shard_embeddings)
-                
-                completed += 1
-                pbar.update(1)
-            except Exception as e:
-                logger.error(f"  ✗ Error processing shard {shard_idx}: {e}")
-    
-    # Save metadata matching dataset structure
-    metadata = {
-        "dataset_name": dataset_name,
-        "split_name": split_name,
-        "num_samples": num_samples,
-        "num_shards": total_shards,
-        "shards_completed": completed,
-        "shard_lengths": shard_lengths if shard_lengths else [end - start for start, end in chunk_boundaries],
-        "embedding_dim": MODEL_EMBED_SIZE,
-        "model_id": MODEL_ID_DEFAULT,
-        "num_gpus": num_gpus,
-    }
-    
-    metadata_file = split_output_dir / "embedding_metadata.json"
-    with open(metadata_file, 'w') as f:
-        json.dump(metadata, f, indent=2)
-    
-    logger.info(f"  ✓ Processed {completed}/{total_shards} shards ({num_samples:,} samples)")
-    logger.info(f"  ✓ Saved to {split_output_dir}")
-    
-    return metadata
+    return results
 
 
-def create_dask_dataset_from_hf(hf_dataset, text_column: str = 'text'):
+def process_jsonl_dataset(
+    dataset_info: DatasetInfo,
+    output_dir: Path,
+    model,
+    tokenizer,
+    max_length: int,
+    batch_size: int,
+    chunk_size: int,
+    shard_size: int,
+    gpu_id: int = 0,
+    num_gpus: int = 1
+) -> Dict[str, int]:
     """
-    Convert HuggingFace dataset to NeMo Curator DocumentDataset.
-    
-    NOTE: This function is currently not used in the pipeline.
-    Kept for potential future integration with NeMo Curator.
-    
-    Args:
-        hf_dataset: HuggingFace dataset
-        text_column: Name of the text column
+    Process a JSONL format dataset.
     
     Returns:
-        DocumentDataset for NeMo Curator pipeline (if available)
-    
-    Raises:
-        RuntimeError: If NeMo Curator is not available
+        Dictionary of split_name -> embedding_count
     """
-    if not NEMO_CURATOR_AVAILABLE:
-        raise RuntimeError(
-            "NeMo Curator is not available. "
-            "This function is not used in the current pipeline."
+    import torch
+    
+    dataset_path = Path(dataset_info.path)
+    data_dir = dataset_path / "data"
+    results = {}
+    
+    text_extractor = get_text_extractor(
+        dataset_info.embedding_strategy,
+        dataset_info.text_columns
+    )
+    
+    for split_name, split_info in dataset_info.splits.items():
+        gpu_rows = split_info.rows // num_gpus + (1 if gpu_id < split_info.rows % num_gpus else 0)
+        logger.info(f"Processing split: {split_name} ({split_info.rows:,} total rows, ~{gpu_rows:,} for GPU {gpu_id})")
+        
+        # All GPUs write to same split directory with interleaved shard numbers
+        split_output_dir = output_dir / split_name
+        # Each GPU starts at its gpu_id and increments by num_gpus to avoid conflicts
+        shard_idx = gpu_id
+        total_embeddings = 0
+        accumulated_embeddings = []
+        
+        # Process each JSONL file for this split
+        chunk_idx = 0
+        for filename in split_info.files:
+            # Check data/ subdirectory first, then root directory
+            filepath = data_dir / filename
+            if not filepath.exists():
+                filepath = dataset_path / filename
+            
+            pbar = tqdm(desc=f"  {filename}")
+            
+            for batch in iter_jsonl_file(filepath, chunk_size):
+                # Multi-GPU: only process chunks assigned to this GPU
+                if num_gpus > 1 and chunk_idx % num_gpus != gpu_id:
+                    chunk_idx += 1
+                    continue
+                chunk_idx += 1
+                
+                # Extract texts
+                texts = [text_extractor(ex) for ex in batch]
+                texts = [t for t in texts if t.strip()]
+                
+                if not texts:
+                    pbar.update(len(batch))
+                    continue
+                
+                # Extract embeddings
+                embeddings = extract_embeddings(texts, model, tokenizer, max_length, batch_size)
+                accumulated_embeddings.append(embeddings)
+                total_embeddings += len(embeddings)
+                
+                # Save shard if accumulated enough
+                total_accumulated = sum(e.shape[0] for e in accumulated_embeddings)
+                if total_accumulated >= shard_size:
+                    combined = np.vstack(accumulated_embeddings)
+                    save_shard(combined, split_output_dir, shard_idx)
+                    shard_idx += num_gpus  # Increment by num_gpus to avoid conflicts
+                    accumulated_embeddings = []
+                    torch.cuda.empty_cache()
+                
+                pbar.update(len(batch))
+            
+            pbar.close()
+        
+        # Save remaining embeddings
+        if accumulated_embeddings:
+            combined = np.vstack(accumulated_embeddings)
+            save_shard(combined, split_output_dir, shard_idx)
+        
+        results[split_name] = total_embeddings
+        logger.info(f"  {split_name}: {total_embeddings:,} embeddings saved (GPU {gpu_id})")
+        
+        gc.collect()
+        torch.cuda.empty_cache()
+    
+    return results
+
+
+def process_parquet_dataset(
+    dataset_info: DatasetInfo,
+    output_dir: Path,
+    model,
+    tokenizer,
+    max_length: int,
+    batch_size: int,
+    chunk_size: int,
+    shard_size: int,
+    gpu_id: int = 0,
+    num_gpus: int = 1
+) -> Dict[str, int]:
+    """
+    Process a Parquet format dataset.
+    - If #files >= #GPUs: each file becomes one shard (file index = shard index)
+    - If #files < #GPUs: distribute chunks within files across GPUs (shard_size based)
+    
+    Returns:
+        Dictionary of split_name -> embedding_count
+    """
+    import torch
+    import pyarrow.parquet as pq
+    
+    dataset_path = Path(dataset_info.path)
+    results = {}
+    
+    text_extractor = get_text_extractor(
+        dataset_info.embedding_strategy,
+        dataset_info.text_columns
+    )
+    
+    for split_name, split_info in dataset_info.splits.items():
+        parquet_files = [(idx, dataset_path / f) for idx, f in enumerate(split_info.files)]
+        
+        split_output_dir = output_dir / split_name
+        total_embeddings = 0
+        
+        # Choose distribution strategy based on file count vs GPU count
+        if len(parquet_files) >= num_gpus:
+            # Strategy 1: Distribute files across GPUs (1 shard per file)
+            my_files = [(idx, f) for idx, f in parquet_files if idx % num_gpus == gpu_id]
+            logger.info(f"Processing split: {split_name} ({len(parquet_files)} files, {len(my_files)} for GPU {gpu_id}) [file-parallel]")
+            
+            for file_idx, parquet_file in tqdm(my_files, desc=f"  {split_name}"):
+                try:
+                    table = pq.read_table(parquet_file)
+                    file_embeddings = []
+                    num_rows = table.num_rows
+                    
+                    for start_idx in range(0, num_rows, chunk_size):
+                        end_idx = min(start_idx + chunk_size, num_rows)
+                        batch_table = table.slice(start_idx, end_idx - start_idx)
+                        batch = batch_table.to_pandas().to_dict('records')
+                        
+                        texts = [text_extractor(ex) for ex in batch]
+                        texts = [t for t in texts if t.strip()]
+                        
+                        if texts:
+                            embeddings = extract_embeddings(texts, model, tokenizer, max_length, batch_size)
+                            file_embeddings.append(embeddings)
+                    
+                    if file_embeddings:
+                        combined = np.vstack(file_embeddings)
+                        save_shard(combined, split_output_dir, file_idx)
+                        total_embeddings += combined.shape[0]
+                    
+                    torch.cuda.empty_cache()
+                except Exception as e:
+                    logger.error(f"Error processing {parquet_file}: {e}")
+        else:
+            # Strategy 2: All GPUs process all files, distribute chunks (shard_size based)
+            logger.info(f"Processing split: {split_name} ({len(parquet_files)} files < {num_gpus} GPUs) [chunk-parallel]")
+            
+            shard_idx = gpu_id
+            accumulated_embeddings = []
+            chunk_idx = 0
+            
+            for _, parquet_file in parquet_files:
+                try:
+                    table = pq.read_table(parquet_file)
+                    num_rows = table.num_rows
+                    pbar = tqdm(total=num_rows, desc=f"  {parquet_file.name}")
+                    
+                    for start_idx in range(0, num_rows, chunk_size):
+                        # Multi-GPU: only process chunks assigned to this GPU
+                        if chunk_idx % num_gpus != gpu_id:
+                            chunk_idx += 1
+                            pbar.update(min(chunk_size, num_rows - start_idx))
+                            continue
+                        chunk_idx += 1
+                        
+                        end_idx = min(start_idx + chunk_size, num_rows)
+                        batch_table = table.slice(start_idx, end_idx - start_idx)
+                        batch = batch_table.to_pandas().to_dict('records')
+                        
+                        texts = [text_extractor(ex) for ex in batch]
+                        texts = [t for t in texts if t.strip()]
+                        
+                        if texts:
+                            embeddings = extract_embeddings(texts, model, tokenizer, max_length, batch_size)
+                            accumulated_embeddings.append(embeddings)
+                            total_embeddings += len(embeddings)
+                            
+                            # Save shard if accumulated enough
+                            total_accumulated = sum(e.shape[0] for e in accumulated_embeddings)
+                            if total_accumulated >= shard_size:
+                                combined = np.vstack(accumulated_embeddings)
+                                save_shard(combined, split_output_dir, shard_idx)
+                                shard_idx += num_gpus
+                                accumulated_embeddings = []
+                                torch.cuda.empty_cache()
+                        
+                        pbar.update(end_idx - start_idx)
+                    
+                    pbar.close()
+                except Exception as e:
+                    logger.error(f"Error processing {parquet_file}: {e}")
+            
+            # Save remaining embeddings
+            if accumulated_embeddings:
+                combined = np.vstack(accumulated_embeddings)
+                save_shard(combined, split_output_dir, shard_idx)
+        
+        results[split_name] = total_embeddings
+        logger.info(f"  {split_name}: {total_embeddings:,} embeddings saved (GPU {gpu_id})")
+        
+        gc.collect()
+        torch.cuda.empty_cache()
+    
+    return results
+
+
+def process_dataset(
+    dataset_info: DatasetInfo,
+    output_base_dir: Path,
+    model,
+    tokenizer,
+    max_length: int,
+    batch_size: int,
+    chunk_size: int,
+    shard_size: int,
+    gpu_id: int = 0,
+    num_gpus: int = 1
+) -> Dict[str, int]:
+    """
+    Process a single dataset and extract embeddings.
+    
+    Args:
+        dataset_info: Dataset information
+        output_base_dir: Base output directory
+        model: Loaded model
+        tokenizer: Loaded tokenizer
+        max_length: Maximum sequence length
+        batch_size: Batch size for inference
+        chunk_size: Chunk size for iteration
+        shard_size: Number of embeddings per shard
+        gpu_id: GPU ID for data parallelism (0 to num_gpus-1)
+        num_gpus: Total number of GPUs for data parallelism
+        
+    Returns:
+        Dictionary of split_name -> embedding_count
+    """
+    # Create output directory based on dataset name
+    dataset_subdir = dataset_info.name.replace("nvidia/", "").replace("-", "_").lower()
+    output_dir = output_base_dir / dataset_subdir
+    
+    logger.info(f"\n{'='*60}")
+    logger.info(f"Processing: {dataset_info.name}")
+    logger.info(f"Format: {dataset_info.format.value}")
+    logger.info(f"Total rows: {dataset_info.total_rows:,}")
+    logger.info(f"Output: {output_dir}")
+    if num_gpus > 1:
+        logger.info(f"GPU {gpu_id}/{num_gpus} (processing rows {gpu_id}, {gpu_id + num_gpus}, {gpu_id + 2*num_gpus}, ...)")
+    logger.info(f"{'='*60}")
+    
+    if dataset_info.format == DatasetFormat.ARROW:
+        return process_arrow_dataset(
+            dataset_info, output_dir, model, tokenizer,
+            max_length, batch_size, chunk_size, shard_size,
+            gpu_id, num_gpus
         )
-    
-    # Convert to pandas DataFrame
-    df = hf_dataset.to_pandas()
-    
-    # Convert to Dask DataFrame
-    dask_df = dd.from_pandas(df, npartitions=max(1, len(df) // 10000))
-    
-    # Create DocumentDataset
-    return DocumentDataset(dask_df)
+    elif dataset_info.format == DatasetFormat.JSONL:
+        return process_jsonl_dataset(
+            dataset_info, output_dir, model, tokenizer,
+            max_length, batch_size, chunk_size, shard_size,
+            gpu_id, num_gpus
+        )
+    elif dataset_info.format == DatasetFormat.PARQUET:
+        return process_parquet_dataset(
+            dataset_info, output_dir, model, tokenizer,
+            max_length, batch_size, chunk_size, shard_size,
+            gpu_id, num_gpus
+        )
+    else:
+        logger.warning(f"Unsupported format: {dataset_info.format}")
+        return {}
 
 
-def main():
-    """Main execution function."""
+# =============================================================================
+# CLI and Main Entry Point
+# =============================================================================
+
+def parse_args():
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Extract embeddings from Nemotron datasets using NeMo Curator"
+        description="Extract embeddings from Nemotron datasets using llama-embed-nemotron-8b"
     )
+    
     parser.add_argument(
-        "--datasets",
-        nargs="+",
-        default=None,
-        help="Specific datasets to process (default: all)"
+        "--datasets-dir",
+        type=str,
+        default=DEFAULT_DATASETS_DIR,
+        help=f"Path to datasets directory (default: {DEFAULT_DATASETS_DIR})"
     )
+    
     parser.add_argument(
-        "--splits",
-        nargs="+",
-        default=None,
-        help="Specific splits to process (default: all)"
+        "--output-dir",
+        type=str,
+        default=DEFAULT_EMBEDDINGS_DIR,
+        help=f"Path to output embeddings directory (default: {DEFAULT_EMBEDDINGS_DIR})"
     )
+    
     parser.add_argument(
         "--model-id",
+        type=str,
         default=MODEL_ID_DEFAULT,
-        help="HuggingFace model ID"
+        help=f"HuggingFace model ID (default: {MODEL_ID_DEFAULT})"
     )
+    
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=DEFAULT_MAX_LENGTH,
+        help=f"Maximum sequence length (default: {DEFAULT_MAX_LENGTH})"
+    )
+    
     parser.add_argument(
         "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
-        help="Batch size for inference"
+        help=f"Batch size for inference (default: {DEFAULT_BATCH_SIZE})"
     )
+    
     parser.add_argument(
         "--chunk-size",
         type=int,
         default=DEFAULT_CHUNK_SIZE,
-        help="Number of samples per chunk"
+        help=f"Chunk size for data iteration (default: {DEFAULT_CHUNK_SIZE})"
     )
+    
     parser.add_argument(
-        "--device",
-        default="cuda" if torch.cuda.is_available() else "cpu",
-        help="Device to use"
+        "--shard-size",
+        type=int,
+        default=10000,
+        help="Number of embeddings per shard file (default: 10000)"
     )
+    
     parser.add_argument(
         "--dtype",
+        type=str,
         default=DEFAULT_DTYPE,
-        choices=["bfloat16", "float16", "float32"],
-        help="Model dtype"
+        choices=["bfloat16", "float16"],
+        help=f"Model dtype (default: {DEFAULT_DTYPE})"
     )
+    
     parser.add_argument(
-        "--no-flash-attention",
+        "--dataset",
+        type=str,
+        default=None,
+        help="Process only this dataset (by config key, e.g., 'v1', 'llama-sft')"
+    )
+    
+    parser.add_argument(
+        "--stats-only",
         action="store_true",
-        help="Disable Flash Attention 2"
+        help="Only collect and save statistics, don't extract embeddings"
     )
+    
     parser.add_argument(
-        "--datasets-dir",
-        type=Path,
-        default=Path(DEFAULT_DATASETS_DIR),
-        help="Directory containing datasets"
+        "--device",
+        type=str,
+        default="cuda",
+        help="Device to run model on (default: cuda)"
     )
+    
+    # Multi-GPU data parallelism arguments
     parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=Path(DEFAULT_EMBEDDINGS_DIR),
-        help="Output directory for embeddings"
+        "--gpu-id",
+        type=int,
+        default=0,
+        help="GPU ID for data parallelism (0 to num-gpus-1)"
     )
+    
     parser.add_argument(
         "--num-gpus",
         type=int,
-        default=torch.cuda.device_count() if torch.cuda.is_available() else 1,
-        help="Number of GPUs to use (default: all available)"
-    )
-    parser.add_argument(
-        "--ray-address",
-        default=None,
-        help="Ray cluster address (default: start local cluster)"
+        default=1,
+        help="Total number of GPUs for data parallelism"
     )
     
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    """Main entry point."""
+    args = parse_args()
     
-    # Banner
     logger.info("="*80)
-    logger.info("NeMo Curator Multi-GPU Embedding Extraction Pipeline")
+    logger.info("Nemotron Embedding Extraction Pipeline")
     logger.info("="*80)
     logger.info(f"Datasets directory: {args.datasets_dir}")
     logger.info(f"Output directory: {args.output_dir}")
-    logger.info(f"Number of GPUs: {args.num_gpus}")
-    logger.info(f"Batch size per GPU: {args.batch_size}")
-    logger.info(f"Chunk size: {args.chunk_size}")
     logger.info(f"Model: {args.model_id}")
-    logger.info(f"Dtype: {args.dtype}")
-    logger.info("")
+    logger.info(f"Max length: {args.max_length}")
+    logger.info(f"Batch size: {args.batch_size}")
+    logger.info(f"Chunk size: {args.chunk_size}")
+    logger.info(f"Shard size: {args.shard_size}")
     
-    # Create output directory
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    # Step 1: Discover datasets
+    logger.info("\n" + "="*60)
+    logger.info("STEP 1: Discovering datasets...")
+    logger.info("="*60)
     
-    # Initialize Ray
-    if args.ray_address:
-        logger.info(f"Connecting to Ray cluster at {args.ray_address}")
-        ray.init(address=args.ray_address)
-    else:
-        logger.info(f"Starting local Ray cluster with {args.num_gpus} GPUs")
-        ray.init(num_gpus=args.num_gpus)
+    discovered_datasets = discover_datasets(args.datasets_dir)
     
-    logger.info(f"Ray cluster resources: {ray.available_resources()}")
-    logger.info("")
+    if not discovered_datasets:
+        logger.error("No datasets found!")
+        return 1
     
-    # Create extractors (one per GPU)
-    logger.info(f"Initializing {args.num_gpus} embedding extractors (one per GPU)...")
-    extractors = []
+    logger.info(f"Found {len(discovered_datasets)} datasets")
     
-    for i in range(args.num_gpus):
-        extractor = NemotronEmbeddingExtractor.remote(
-            model_id=args.model_id,
-            batch_size=args.batch_size,
-            max_length=MODEL_MAX_TOKENS,
-            dtype=args.dtype,
-            use_flash_attention=not args.no_flash_attention
-        )
-        extractors.append(extractor)
+    # Filter to specific dataset if requested
+    if args.dataset:
+        if args.dataset in DATASET_CONFIGS:
+            target_name = DATASET_CONFIGS[args.dataset]["hf_name"]
+            discovered_datasets = [d for d in discovered_datasets if d.name == target_name]
+            if not discovered_datasets:
+                logger.error(f"Dataset '{args.dataset}' not found in downloaded datasets")
+                return 1
+        else:
+            logger.error(f"Unknown dataset key: {args.dataset}")
+            logger.info(f"Available keys: {list(DATASET_CONFIGS.keys())}")
+            return 1
     
-    # Wait for all extractors to initialize (this loads models on each GPU)
-    logger.info("Waiting for all extractors to load models...")
-    init_results = ray.get([e.__ray_ready__.remote() for e in extractors])
-    logger.info(f"✓ All {len(extractors)} extractors ready!")
-    logger.info("")
+    # Step 2: Collect statistics
+    logger.info("\n" + "="*60)
+    logger.info("STEP 2: Collecting statistics...")
+    logger.info("="*60)
     
-    # Get datasets to process
-    datasets_to_process = []
-    for key, config in DATASET_CONFIGS.items():
-        dataset_name = config["hf_name"]
+    all_statistics = {}
+    
+    for dataset_info in discovered_datasets:
+        logger.info(f"\nCollecting stats for: {dataset_info.name}")
+        dataset_info = collect_statistics(dataset_info)
+        all_statistics[dataset_info.name] = dataset_info.to_dict()
         
-        # Filter by dataset name if specified
-        if args.datasets and dataset_name not in args.datasets:
-            continue
-        
-        dataset_path = args.datasets_dir / dataset_name.replace("/", "_")
-        
-        if not dataset_path.exists():
-            logger.warning(f"Dataset not found: {dataset_name}")
-            continue
-        
-        datasets_to_process.append((dataset_name, dataset_path, config))
+        logger.info(f"  Format: {dataset_info.format.value}")
+        logger.info(f"  Total rows: {dataset_info.total_rows:,}")
+        logger.info(f"  Splits: {list(dataset_info.splits.keys())}")
+        logger.info(f"  Columns: {dataset_info.columns}")
+        logger.info(f"  Text columns: {dataset_info.text_columns}")
+        logger.info(f"  Strategy: {dataset_info.embedding_strategy}")
     
-    logger.info(f"Processing {len(datasets_to_process)} datasets\n")
+    # Save statistics
+    output_path = Path(args.output_dir)
+    stats_file = output_path / "statistics.json"
+    save_statistics(all_statistics, stats_file)
     
-    # Process each dataset
-    all_results = []
+    if args.stats_only:
+        logger.info("\n" + "="*60)
+        logger.info("Statistics collection complete (--stats-only mode)")
+        logger.info("="*60)
+        return 0
     
-    for i, (dataset_name, dataset_path, config) in enumerate(datasets_to_process, 1):
-        logger.info(f"\n[{i}/{len(datasets_to_process)}] {dataset_name}")
-        logger.info("-" * 80)
-        
+    # Step 3: Load model
+    logger.info("\n" + "="*60)
+    logger.info("STEP 3: Loading model...")
+    logger.info("="*60)
+    
+    model, tokenizer = load_model_and_tokenizer(
+        model_id=args.model_id,
+        max_length=args.max_length,
+        dtype=args.dtype,
+        device=args.device
+    )
+    
+    # Step 4: Process datasets
+    logger.info("\n" + "="*60)
+    logger.info("STEP 4: Extracting embeddings...")
+    if args.num_gpus > 1:
+        logger.info(f"Multi-GPU mode: GPU {args.gpu_id} of {args.num_gpus}")
+    logger.info("="*60)
+    
+    total_embeddings = 0
+    results_summary = {}
+    
+    for dataset_info in discovered_datasets:
         try:
-            # Find valid splits (directories with .arrow files or dataset_info.json)
-            splits = []
-            for d in dataset_path.iterdir():
-                if d.is_dir() and not d.name.startswith('.'):
-                    # Check if it's a valid dataset split directory
-                    has_arrow = any(d.glob("*.arrow"))
-                    has_dataset_info = (d / "dataset_info.json").exists()
-                    has_state = (d / "state.json").exists()
-                    
-                    if has_arrow or has_dataset_info or has_state:
-                        splits.append(d.name)
+            results = process_dataset(
+                dataset_info=dataset_info,
+                output_base_dir=output_path,
+                model=model,
+                tokenizer=tokenizer,
+                max_length=args.max_length,
+                batch_size=args.batch_size,
+                chunk_size=args.chunk_size,
+                shard_size=args.shard_size,
+                gpu_id=args.gpu_id,
+                num_gpus=args.num_gpus
+            )
             
-            # Filter splits if specified
-            if args.splits:
-                splits = [s for s in splits if s in args.splits]
-            
-            if not splits:
-                logger.warning(f"  No valid splits found for {dataset_name}")
-                logger.warning(f"  Check directory: {dataset_path}")
-                continue
-            
-            logger.info(f"  Found {len(splits)} valid splits: {splits}")
-            
-            # Create dataset output directory
-            dataset_output_dir = args.output_dir / config["subdir"]
-            dataset_output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Process each split
-            split_results = []
-            for split_name in splits:
-                try:
-                    result = process_split_distributed(
-                        dataset_name=dataset_name,
-                        split_name=split_name,
-                        dataset_path=dataset_path,
-                        output_dir=dataset_output_dir,
-                        extractors=extractors,
-                        chunk_size=args.chunk_size,
-                        num_gpus=args.num_gpus
-                    )
-                    split_results.append(result)
-                except Exception as e:
-                    logger.error(f"  ✗ Error processing split {split_name}: {e}", exc_info=True)
-            
-            # Save dataset summary
-            dataset_result = {
-                "dataset_name": dataset_name,
-                "config_key": key,
-                "subdir": config["subdir"],
-                "num_splits": len(split_results),
-                "splits": split_results,
-                "output_dir": str(dataset_output_dir)
+            dataset_total = sum(results.values())
+            total_embeddings += dataset_total
+            results_summary[dataset_info.name] = {
+                "splits": results,
+                "total": dataset_total,
+                "gpu_id": args.gpu_id
             }
-            all_results.append(dataset_result)
             
         except Exception as e:
-            logger.error(f"  ✗ Error processing dataset: {e}")
+            logger.error(f"Error processing {dataset_info.name}: {e}", exc_info=True)
+            results_summary[dataset_info.name] = {"error": str(e)}
     
-    # Save overall summary
-    summary_file = args.output_dir / "extraction_summary.json"
-    with open(summary_file, 'w') as f:
-        json.dump({
-            "model_id": args.model_id,
-            "embedding_dim": MODEL_EMBED_SIZE,
-            "num_gpus": args.num_gpus,
-            "num_datasets": len(all_results),
-            "datasets": all_results
-        }, f, indent=2)
+    # Save results summary (include GPU ID in filename for multi-GPU)
+    if args.num_gpus > 1:
+        results_file = output_path / f"extraction_results_gpu{args.gpu_id}.json"
+    else:
+        results_file = output_path / "extraction_results.json"
+    save_statistics(results_summary, results_file)
     
-    # Shutdown Ray
-    ray.shutdown()
-    
+    # Final summary
     logger.info("\n" + "="*80)
-    logger.info("EXTRACTION COMPLETE")
+    logger.info(f"EXTRACTION COMPLETE (GPU {args.gpu_id})")
     logger.info("="*80)
-    logger.info(f"Processed {len(all_results)} datasets across {args.num_gpus} GPUs")
-    logger.info(f"Output directory: {args.output_dir}")
-    logger.info(f"Summary saved to: {summary_file}")
+    logger.info(f"Total embeddings extracted: {total_embeddings:,}")
+    logger.info(f"Results saved to: {results_file}")
+    logger.info(f"Statistics saved to: {stats_file}")
+    
+    return 0
 
 
 if __name__ == "__main__":
-    main()
-
+    sys.exit(main())
