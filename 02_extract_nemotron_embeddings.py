@@ -401,13 +401,12 @@ def identify_text_columns(columns: List[str], dataset_name: str) -> Tuple[List[s
     
     # Dataset-specific handling (check before generic patterns)
     
-    # Math-Proofs: prioritize problem/formal_statement over messages
+    # Math-Proofs: includes problem, formal_statement, lean_header AND messages
     if 'math-proofs' in dataset_lower or 'math_proofs' in dataset_lower:
-        if 'problem' in columns and 'formal_statement' in columns:
-            text_cols = ['problem', 'formal_statement']
-            if 'lean_header' in columns:
-                text_cols.append('lean_header')
-            return text_cols, 'combine_columns'
+        if 'problem' in columns or 'formal_statement' in columns:
+            text_cols = ['problem', 'formal_statement', 'lean_header', 'messages']
+            text_cols = [c for c in text_cols if c in columns]
+            return text_cols, 'math_proofs'
     
     # Input/output format (Llama-Nemotron)
     if 'input' in columns and 'output' in columns:
@@ -421,12 +420,14 @@ def identify_text_columns(columns: List[str], dataset_name: str) -> Tuple[List[s
     if 'text' in columns:
         return ['text'], 'direct_text'
     
-    # Math proofs format (generic check)
+    # Math proofs format (generic check - also include messages if present)
     if 'problem' in columns and 'formal_statement' in columns:
         text_cols = ['problem', 'formal_statement']
         if 'lean_header' in columns:
             text_cols.append('lean_header')
-        return text_cols, 'combine_columns'
+        if 'messages' in columns:
+            text_cols.append('messages')
+        return text_cols, 'math_proofs'
     
     # Fallback: look for common text column names
     text_indicators = ['text', 'content', 'document', 'passage', 'prompt', 'response']
@@ -679,6 +680,46 @@ def extract_text_combine_columns(example: Dict[str, Any], columns: List[str]) ->
     return '\n'.join(parts)
 
 
+def extract_text_math_proofs(example: Dict[str, Any]) -> str:
+    """
+    Extract text from math_proofs format.
+    
+    Combines:
+    - problem: The math problem statement
+    - formal_statement: The formal Lean statement
+    - lean_header: Lean imports/setup
+    - messages: Conversation if available (some rows have messages with proofs)
+    """
+    parts = []
+    
+    # Primary structured columns
+    if example.get('problem'):
+        parts.append(f"Problem: {example['problem']}")
+    
+    if example.get('formal_statement'):
+        parts.append(f"Formal Statement:\n{example['formal_statement']}")
+    
+    if example.get('lean_header'):
+        parts.append(f"Lean Header:\n{example['lean_header']}")
+    
+    # Also include messages if present (some rows have proof conversations)
+    messages = example.get('messages')
+    if messages and isinstance(messages, list) and len(messages) > 0:
+        msg_parts = []
+        for msg in messages:
+            if isinstance(msg, dict):
+                role = msg.get('role', 'unknown')
+                content = msg.get('content', '')
+                if msg.get('reasoning_content'):
+                    content = msg['reasoning_content'] + '\n' + content
+                if content:  # Only add if there's actual content
+                    msg_parts.append(f'{role}: {content}')
+        if msg_parts:
+            parts.append("Messages:\n" + '\n'.join(msg_parts))
+    
+    return '\n\n'.join(parts)
+
+
 def get_text_extractor(strategy: str, text_columns: List[str]):
     """
     Get the appropriate text extraction function.
@@ -699,6 +740,8 @@ def get_text_extractor(strategy: str, text_columns: List[str]):
         return lambda ex: extract_text_direct(ex, col)
     elif strategy == 'combine_columns':
         return lambda ex: extract_text_combine_columns(ex, text_columns)
+    elif strategy == 'math_proofs':
+        return extract_text_math_proofs
     else:
         # Default: try messages, then text, then combine all text columns
         def default_extractor(ex):

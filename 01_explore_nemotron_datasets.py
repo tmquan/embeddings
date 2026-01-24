@@ -35,6 +35,69 @@ DETAILED_JSON = Path("dataset_exploration_detailed.json")
 EXTRACTION_FUNCTIONS_PY = Path("embedding_extraction_functions.py")
 
 
+def is_string_or_text_type(column_type: str, sample_value: Any) -> bool:
+    """
+    Check if a column type represents string/text data.
+    
+    Handles HuggingFace feature types like:
+    - Value(dtype='string')
+    - Sequence(feature=Value(dtype='string'), ...)
+    - string (simple)
+    - list<item: string>
+    - large_string
+    
+    Args:
+        column_type: String representation of the column type
+        sample_value: Sample value to verify type
+    
+    Returns:
+        True if the column contains string/text data
+    """
+    col_type_lower = column_type.lower()
+    
+    # Direct string types
+    string_type_patterns = [
+        'string',           # Simple string
+        "dtype='string'",   # HuggingFace Value(dtype='string')
+        'large_string',     # PyArrow large string
+        'utf8',             # PyArrow utf8
+        'str',              # Python str
+    ]
+    
+    for pattern in string_type_patterns:
+        if pattern in col_type_lower:
+            return True
+    
+    # Check if it's a sequence/list containing strings
+    if any(seq in col_type_lower for seq in ['sequence', 'list']):
+        # Check for string elements
+        if any(p in col_type_lower for p in ["dtype='string'", 'string', 'utf8']):
+            return True
+        # Also check if it's a list of dicts (like messages format)
+        if sample_value and isinstance(sample_value, list) and sample_value:
+            first_elem = sample_value[0]
+            if isinstance(first_elem, dict):
+                # Messages format with role/content
+                return 'content' in first_elem or 'role' in first_elem
+            elif isinstance(first_elem, str):
+                return True
+    
+    # Fallback: check actual sample value type
+    if sample_value is not None:
+        if isinstance(sample_value, str):
+            return True
+        if isinstance(sample_value, list) and sample_value:
+            if isinstance(sample_value[0], str):
+                return True
+            if isinstance(sample_value[0], dict):
+                # Check if dict contains string values
+                for v in sample_value[0].values():
+                    if isinstance(v, str) and len(v) > 10:
+                        return True
+    
+    return False
+
+
 def is_text_column(column_name: str, sample_value: Any, column_type: str) -> bool:
     """
     Determine if a column contains meaningful text content for embeddings.
@@ -42,7 +105,7 @@ def is_text_column(column_name: str, sample_value: Any, column_type: str) -> boo
     Args:
         column_name: Name of the column
         sample_value: Sample value from the column
-        column_type: PyArrow data type
+        column_type: PyArrow/HuggingFace data type string
     
     Returns:
         True if column should be considered for embedding extraction
@@ -64,13 +127,15 @@ def is_text_column(column_name: str, sample_value: Any, column_type: str) -> boo
     # Check for text-like columns (including metadata for pretraining datasets)
     text_indicators = ['text', 'content', 'message', 'output', 'input', 
                        'prompt', 'response', 'statement', 'problem', 
-                       'generator', 'metadata']
+                       'generator', 'metadata', 'question', 'answer',
+                       'instruction', 'query', 'context', 'description',
+                       'title', 'body', 'summary', 'conversation']
     
     if any(ind in column_name.lower() for ind in text_indicators):
         return True
     
-    # Check if it's a string or list type
-    if 'string' in column_type.lower() or 'list' in column_type.lower():
+    # Check if it's a string/text type column
+    if is_string_or_text_type(column_type, sample_value):
         if sample_value:
             # Check string length to filter out short metadata strings
             if isinstance(sample_value, str):
@@ -79,6 +144,9 @@ def is_text_column(column_name: str, sample_value: Any, column_type: str) -> boo
                 # Check if it's a list of dicts (messages format)
                 if isinstance(sample_value[0], dict):
                     return 'content' in sample_value[0] or 'role' in sample_value[0]
+                # List of strings
+                elif isinstance(sample_value[0], str):
+                    return len(sample_value[0]) > 10
     
     return False
 
@@ -126,9 +194,240 @@ def detect_conversational_format(sample_rows: List[Dict], columns: List[str]) ->
     return result
 
 
+def explore_arrow_split(split_path: Path) -> Dict[str, Any]:
+    """
+    Explore an Arrow dataset split using PyArrow directly.
+    
+    HuggingFace uses Arrow IPC Stream format (not File format).
+    
+    Args:
+        split_path: Path to the split directory containing .arrow files
+    
+    Returns:
+        Dictionary containing split information
+    """
+    import pyarrow.ipc as ipc
+    
+    arrow_files = sorted(split_path.glob("*.arrow"))
+    if not arrow_files:
+        return None
+    
+    # Read first arrow file to get schema and sample rows
+    # HuggingFace uses Arrow IPC Stream format
+    try:
+        with pa.memory_map(str(arrow_files[0]), 'r') as source:
+            reader = ipc.open_stream(source)
+            table = reader.read_all()
+    except Exception as e:
+        # Fallback: try as IPC file format
+        try:
+            with pa.memory_map(str(arrow_files[0]), 'r') as source:
+                reader = ipc.open_file(source)
+                table = reader.read_all()
+        except Exception as e2:
+            logger.warning(f"Failed to read arrow file {arrow_files[0]}: {e2}")
+            return None
+    
+    columns = table.column_names
+    num_rows_first = table.num_rows
+    
+    # Estimate total rows across all files
+    total_rows = num_rows_first * len(arrow_files)
+    
+    # Get sample rows (up to 10 from first file)
+    sample_size = min(10, num_rows_first)
+    sample_rows = []
+    for i in range(sample_size):
+        row = {col: table.column(col)[i].as_py() for col in columns}
+        sample_rows.append(row)
+    
+    # Analyze columns
+    column_analysis = {}
+    text_columns = []
+    string_columns = []
+    
+    for col_name in columns:
+        col_type = str(table.schema.field(col_name).type)
+        sample_val = sample_rows[0].get(col_name) if sample_rows else None
+        
+        is_string_type = is_string_or_text_type(col_type, sample_val)
+        is_text = is_text_column(col_name, sample_val, col_type)
+        
+        column_analysis[col_name] = {
+            "type": col_type,
+            "is_string_type": is_string_type,
+            "is_text": is_text,
+            "sample": str(sample_val)[:200] if sample_val is not None else None
+        }
+        
+        if is_string_type:
+            string_columns.append(col_name)
+        if is_text:
+            text_columns.append(col_name)
+    
+    conv_format = detect_conversational_format(sample_rows, columns)
+    
+    return {
+        "split_name": split_path.name,
+        "num_rows": total_rows,
+        "num_files": len(arrow_files),
+        "columns": columns,
+        "num_columns": len(columns),
+        "string_columns": string_columns,
+        "text_columns": text_columns,
+        "column_analysis": column_analysis,
+        "conversational_format": conv_format,
+        "sample_rows": sample_rows[:3],
+        "format": "arrow"
+    }
+
+
+def explore_jsonl_split(jsonl_path: Path) -> Dict[str, Any]:
+    """
+    Explore a JSONL file.
+    
+    Args:
+        jsonl_path: Path to the JSONL file
+    
+    Returns:
+        Dictionary containing split information
+    """
+    # Count lines and get sample rows
+    sample_rows = []
+    num_rows = 0
+    
+    with open(jsonl_path, 'r') as f:
+        for i, line in enumerate(f):
+            if i < 10:
+                sample_rows.append(json.loads(line))
+            num_rows += 1
+    
+    if not sample_rows:
+        return None
+    
+    columns = list(sample_rows[0].keys())
+    
+    # Analyze columns
+    column_analysis = {}
+    text_columns = []
+    string_columns = []
+    
+    for col_name in columns:
+        sample_val = sample_rows[0].get(col_name)
+        col_type = type(sample_val).__name__ if sample_val is not None else "unknown"
+        
+        # For lists/dicts, provide more detail
+        if isinstance(sample_val, list) and sample_val:
+            if isinstance(sample_val[0], dict):
+                col_type = f"list<dict keys={list(sample_val[0].keys())[:3]}>"
+            else:
+                col_type = f"list<{type(sample_val[0]).__name__}>"
+        
+        is_string_type = is_string_or_text_type(col_type, sample_val)
+        is_text = is_text_column(col_name, sample_val, col_type)
+        
+        column_analysis[col_name] = {
+            "type": col_type,
+            "is_string_type": is_string_type,
+            "is_text": is_text,
+            "sample": str(sample_val)[:200] if sample_val is not None else None
+        }
+        
+        if is_string_type:
+            string_columns.append(col_name)
+        if is_text:
+            text_columns.append(col_name)
+    
+    conv_format = detect_conversational_format(sample_rows, columns)
+    
+    # Use filename without extension as split name
+    split_name = jsonl_path.stem
+    
+    return {
+        "split_name": split_name,
+        "num_rows": num_rows,
+        "num_files": 1,
+        "columns": columns,
+        "num_columns": len(columns),
+        "string_columns": string_columns,
+        "text_columns": text_columns,
+        "column_analysis": column_analysis,
+        "conversational_format": conv_format,
+        "sample_rows": sample_rows[:3],
+        "format": "jsonl"
+    }
+
+
+def explore_parquet_split(parquet_path: Path) -> Dict[str, Any]:
+    """
+    Explore a Parquet file.
+    
+    Args:
+        parquet_path: Path to the Parquet file
+    
+    Returns:
+        Dictionary containing split information
+    """
+    import pyarrow.parquet as pq
+    
+    table = pq.read_table(parquet_path)
+    columns = table.column_names
+    num_rows = table.num_rows
+    
+    # Get sample rows
+    sample_size = min(10, num_rows)
+    sample_rows = []
+    for i in range(sample_size):
+        row = {col: table.column(col)[i].as_py() for col in columns}
+        sample_rows.append(row)
+    
+    # Analyze columns
+    column_analysis = {}
+    text_columns = []
+    string_columns = []
+    
+    for col_name in columns:
+        col_type = str(table.schema.field(col_name).type)
+        sample_val = sample_rows[0].get(col_name) if sample_rows else None
+        
+        is_string_type = is_string_or_text_type(col_type, sample_val)
+        is_text = is_text_column(col_name, sample_val, col_type)
+        
+        column_analysis[col_name] = {
+            "type": col_type,
+            "is_string_type": is_string_type,
+            "is_text": is_text,
+            "sample": str(sample_val)[:200] if sample_val is not None else None
+        }
+        
+        if is_string_type:
+            string_columns.append(col_name)
+        if is_text:
+            text_columns.append(col_name)
+    
+    conv_format = detect_conversational_format(sample_rows, columns)
+    
+    # Use filename without extension as split name
+    split_name = parquet_path.stem
+    
+    return {
+        "split_name": split_name,
+        "num_rows": num_rows,
+        "num_files": 1,
+        "columns": columns,
+        "num_columns": len(columns),
+        "string_columns": string_columns,
+        "text_columns": text_columns,
+        "column_analysis": column_analysis,
+        "conversational_format": conv_format,
+        "sample_rows": sample_rows[:3],
+        "format": "parquet"
+    }
+
+
 def explore_split(dataset_path: Path, split_name: str) -> Dict[str, Any]:
     """
-    Explore a single dataset split using HuggingFace datasets.
+    Explore a single dataset split using PyArrow directly (avoids HuggingFace schema issues).
     
     Args:
         dataset_path: Path to the dataset directory
@@ -139,55 +438,17 @@ def explore_split(dataset_path: Path, split_name: str) -> Dict[str, Any]:
     """
     split_path = dataset_path / split_name
     
-    # Load HuggingFace dataset split
-    hf_dataset = load_from_disk(str(split_path))
+    # Check if it's a directory with arrow files
+    if split_path.is_dir():
+        return explore_arrow_split(split_path)
     
-    # Get schema and sample rows
-    num_rows = len(hf_dataset)
-    columns = hf_dataset.column_names
+    # Check if split_name is actually a file path
+    if split_path.with_suffix('.jsonl').exists():
+        return explore_jsonl_split(split_path.with_suffix('.jsonl'))
+    if split_path.with_suffix('.parquet').exists():
+        return explore_parquet_split(split_path.with_suffix('.parquet'))
     
-    # Get sample rows (up to 10)
-    sample_size = min(10, num_rows)
-    sample_rows = [hf_dataset[i] for i in range(sample_size)]
-    
-    # Get sample rows (up to 10)
-    sample_size = min(10, num_rows)
-    sample_rows = [hf_dataset[i] for i in range(sample_size)]
-    
-    # Analyze columns
-    column_analysis = {}
-    text_columns = []
-    
-    for col_name in columns:
-        # Get column type from HuggingFace features
-        col_feature = hf_dataset.features[col_name]
-        col_type = str(col_feature)
-        sample_val = sample_rows[0].get(col_name) if sample_rows else None
-        
-        is_text = is_text_column(col_name, sample_val, col_type)
-        
-        column_analysis[col_name] = {
-            "type": col_type,
-            "is_text": is_text,
-            "sample": str(sample_val)[:200] if sample_val is not None else None
-        }
-        
-        if is_text:
-            text_columns.append(col_name)
-    
-    # Detect conversational format
-    conv_format = detect_conversational_format(sample_rows, columns)
-    
-    return {
-        "split_name": split_name,
-        "num_rows": num_rows,
-        "columns": columns,
-        "num_columns": len(columns),
-        "text_columns": text_columns,
-        "column_analysis": column_analysis,
-        "conversational_format": conv_format,
-        "sample_rows": sample_rows[:3]  # Keep 3 samples
-    }
+    return None
 
 
 def determine_embedding_strategy(split_info: Dict[str, Any]) -> Dict[str, Any]:
@@ -292,51 +553,116 @@ def explore_dataset(dataset_name: str, dataset_path: Path) -> Optional[Dict[str,
     logger.info(f"Exploring: {dataset_name}")
     logger.info(f"Path: {dataset_path}")
     
-    # Find all splits (subdirectories with arrow files)
+    # Find all splits
     splits = []
     split_info_map = {}
+    detected_format = None
     
+    # 1. Check for subdirectories with arrow files (HuggingFace format)
     for item in dataset_path.iterdir():
         if item.is_dir() and not item.name.startswith('.'):
-            # Check if it contains arrow files
             arrow_files = list(item.glob("*.arrow"))
             if arrow_files:
-                splits.append(item.name)
+                splits.append(("arrow", item.name, item))
+                detected_format = "arrow"
+    
+    # 2. Check for JSONL files in data/ subdirectory or root
+    if not splits:
+        # Check data/ subdirectory first
+        data_dir = dataset_path / "data"
+        if data_dir.exists():
+            for jsonl_file in data_dir.glob("*.jsonl"):
+                splits.append(("jsonl", jsonl_file.stem, jsonl_file))
+                detected_format = "jsonl"
+        
+        # Also check root directory
+        if not splits:
+            for jsonl_file in dataset_path.glob("*.jsonl"):
+                splits.append(("jsonl", jsonl_file.stem, jsonl_file))
+                detected_format = "jsonl"
+    
+    # 3. Check for Parquet files
+    if not splits:
+        # Check data/ subdirectory first
+        data_dir = dataset_path / "data"
+        if data_dir.exists():
+            parquet_files = list(data_dir.glob("*.parquet"))
+            if parquet_files:
+                # Group parquet files by prefix (e.g., train-00001.parquet -> train)
+                prefixes = set()
+                for pf in parquet_files:
+                    # Extract prefix before any -NNNNN suffix
+                    name = pf.stem
+                    if '-' in name:
+                        parts = name.rsplit('-', 1)
+                        if parts[1].isdigit() or parts[1].startswith('of'):
+                            name = parts[0]
+                    prefixes.add(name)
+                
+                for prefix in prefixes:
+                    # Find all files matching this prefix
+                    matching = [pf for pf in parquet_files if pf.stem.startswith(prefix)]
+                    splits.append(("parquet", prefix, matching[0]))  # Use first file for exploration
+                detected_format = "parquet"
+        
+        # Also check root directory
+        if not splits:
+            for parquet_file in dataset_path.glob("*.parquet"):
+                splits.append(("parquet", parquet_file.stem, parquet_file))
+                detected_format = "parquet"
     
     if not splits:
         logger.warning(f"No splits found in {dataset_path}")
         return None
     
-    splits.sort()
-    logger.info(f"Found {len(splits)} splits: {splits}")
+    splits.sort(key=lambda x: x[1])
+    split_names = [s[1] for s in splits]
+    logger.info(f"Found {len(splits)} splits ({detected_format}): {split_names}")
     
     # Explore each split
     split_sizes = {}
     all_columns = set()
     
-    for split_name in splits:
-        logger.info(f"  Processing split: {split_name}")
-        split_data = explore_split(dataset_path, split_name)
-        split_info_map[split_name] = split_data
-        split_sizes[split_name] = split_data["num_rows"]
-        all_columns.update(split_data["columns"])
+    for fmt, split_name, split_path in splits:
+        logger.info(f"  Processing split: {split_name} ({fmt})")
+        
+        if fmt == "arrow":
+            split_data = explore_arrow_split(split_path)
+        elif fmt == "jsonl":
+            split_data = explore_jsonl_split(split_path)
+        elif fmt == "parquet":
+            split_data = explore_parquet_split(split_path)
+        else:
+            continue
+        
+        if split_data:
+            split_info_map[split_name] = split_data
+            split_sizes[split_name] = split_data["num_rows"]
+            all_columns.update(split_data["columns"])
+    
+    if not split_info_map:
+        logger.warning(f"Failed to explore any splits in {dataset_path}")
+        return None
     
     # Aggregate information
     total_rows = sum(split_sizes.values())
     
     # Use first split for overall analysis
-    first_split = split_info_map[splits[0]]
+    first_split_name = list(split_info_map.keys())[0]
+    first_split = split_info_map[first_split_name]
     
     result = {
         "name": dataset_name,
         "status": "loaded_from_disk",
         "path": str(dataset_path),
-        "splits": splits,
+        "format": detected_format,
+        "splits": list(split_info_map.keys()),
         "split_sizes": split_sizes,
         "total_rows": total_rows,
         "columns": first_split["columns"],
         "num_columns": first_split["num_columns"],
-        "text_columns": first_split["text_columns"],
+        "string_columns": first_split["string_columns"],  # All string-type columns
+        "text_columns": first_split["text_columns"],       # Meaningful text columns
         "column_analysis": first_split["column_analysis"],
         "conversational_format": first_split["conversational_format"],
         "embedding_strategy": determine_embedding_strategy(first_split),
@@ -344,7 +670,8 @@ def explore_dataset(dataset_name: str, dataset_path: Path) -> Optional[Dict[str,
     }
     
     logger.info(f"Total rows: {total_rows:,}")
-    logger.info(f"Text columns: {first_split['text_columns']}")
+    logger.info(f"String columns: {first_split['string_columns']}")
+    logger.info(f"Text columns (for embedding): {first_split['text_columns']}")
     
     return result
 
@@ -479,15 +806,21 @@ def main():
     
     # Print summary table
     logger.info("\nDataset Summary:")
-    logger.info("-" * 80)
+    logger.info("-" * 100)
+    logger.info(f"{'Dataset':<50} {'Rows':>12} {'Splits':>7} {'Cols':>5} {'String':>7} {'Text':>5}")
+    logger.info("-" * 100)
     for result in all_results:
         if result.get("status") == "loaded_from_disk":
             name = result["name"].split("/")[-1]
             rows = result["total_rows"]
             splits = len(result["splits"])
             cols = result["num_columns"]
+            string_cols = len(result.get("string_columns", []))
             text_cols = len(result["text_columns"])
-            logger.info(f"{name:50s} {rows:12,d} rows  {splits:2d} splits  {cols:2d} cols  {text_cols:2d} text")
+            logger.info(f"{name:<50} {rows:>12,d} {splits:>7d} {cols:>5d} {string_cols:>7d} {text_cols:>5d}")
+            # List string columns for reference
+            if result.get("string_columns"):
+                logger.info(f"  -> String columns: {result['string_columns']}")
     
     # Save detailed JSON
     logger.info(f"\nSaving detailed results to: {DETAILED_JSON}")

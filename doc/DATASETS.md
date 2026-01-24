@@ -366,14 +366,109 @@ Generated from `/raid/datasets` on 2026-01-24.
 
 ---
 
+## Column Analysis & Text Extraction
+
+### All Columns vs Key Text Columns Summary
+
+| Dataset | All Columns | Key Text Columns (Combined) | Strategy |
+|---------|-------------|----------------------------|----------|
+| **pretrain-sample** | `id`, `text` | `text` | direct_text |
+| **llama-sft** | `input`, `output`, `category`, `license`, `reasoning`, `generator`, `used_in_training`, `version`, `system_prompt` | `input` + `output` | input_output |
+| **v1** | `uuid`, `license`, `generator`, `version`, `category`, `reasoning`, `messages`, `metadata` | `messages` | concatenate_messages |
+| **v2** | `uuid`, `license`, `generator`, `version`, `category`, `reasoning`, `messages` | `messages` | concatenate_messages |
+| **v3-instruction-chat** | `uuid`, `messages`, `license`, `used_in`, `tools`, `reasoning`, `capability_target` | `messages` | concatenate_messages |
+| **v3-agentic** | `uuid`, `messages`, `license`, `used_in`, `tools`, `reasoning` | `messages` | concatenate_messages |
+| **v3-science** | `uuid`, `messages`, `license`, `used_in`, `tools` | `messages` | concatenate_messages |
+| **v3-math-proofs** | `problem`, `source`, `formal_statement`, `lean_header`, `url`, `user_name`, `user_url`, `sft_line_number`, `messages`, `uuid`, `used_in`, `tools`, `license` | `problem` + `formal_statement` + `lean_header` + `messages` | math_proofs |
+| **v3-math** | `expected_answer`, `problem`, `original_expected_answer`, `changed_answer_to_majority`, `data_source`, `messages`, `tools`, `used_in`, `metadata`, `license`, `uuid`, `url`, `user_url`, `user_name` | `messages` | concatenate_messages |
+| **v3-rl-blend** | `id`, `responses_create_params`, `ground_truth`, `category`, `environment_name`, `agent_ref`, `pass_rate`, `pass_rate_total`, `pass_rate_passed`, `dataset` | `responses_create_params` | combine_columns |
+| **v3-competitive-programming** | `uuid`, `messages`, `license`, `used_in`, `tools`, `dataset`, `split`, `index`, `source`, `difficulty`, `question_id` | `messages` | concatenate_messages |
+| **v3-swe** | `uuid`, `messages`, `license`, `used_in`, `tools`, `dataset`, `repo` | `messages` | concatenate_messages |
+
+---
+
+### Column Classification
+
+| Column Type | Columns | Usage |
+|-------------|---------|-------|
+| **Primary Text** | `messages`, `text`, `input`, `output`, `problem`, `formal_statement` | Main content for embeddings |
+| **Secondary Text** | `lean_header`, `responses_create_params`, `tools` | Additional context (dataset-specific) |
+| **Metadata (skip)** | `uuid`, `license`, `generator`, `version`, `category`, `source`, `data_source`, `url`, `user_url`, `user_name`, `used_in`, `used_in_training`, `split`, `index`, `difficulty`, `question_id`, `sft_line_number`, `repo`, `dataset` | Identifiers, not for embedding |
+| **Flags/Scores** | `reasoning`, `expected_answer`, `original_expected_answer`, `changed_answer_to_majority`, `capability_target`, `ground_truth`, `pass_rate`, `pass_rate_total`, `pass_rate_passed`, `environment_name`, `agent_ref` | Task metadata, not for embedding |
+
+---
+
+### Text Extraction Output Format
+
+#### `concatenate_messages` (Most datasets)
+
+```
+Input: messages = [
+  {role: "system", content: "..."},
+  {role: "user", content: "..."},
+  {role: "assistant", content: "...", reasoning_content: "..."}
+]
+
+Output:
+system: <system content>
+user: <user content>
+assistant: <reasoning_content if exists>
+<assistant content>
+```
+
+#### `math_proofs` (v3-math-proofs)
+
+```
+Input: problem, formal_statement, lean_header, messages (optional)
+
+Output:
+Problem: <problem text>
+
+Formal Statement:
+<formal_statement>
+
+Lean Header:
+<lean_header>
+
+Messages:
+user: ...
+assistant: ...
+```
+
+#### `input_output` (llama-sft)
+
+```
+Input: input (list of messages or string), output (string)
+
+Output:
+user: <input content>
+assistant: <output content>
+```
+
+#### `direct_text` (pretrain-sample)
+
+```
+Output: <raw text from 'text' column>
+```
+
+#### `combine_columns` (v3-rl-blend)
+
+```
+Output:
+<column_name>: <column_value>
+```
+
+---
+
 ## Embedding Extraction Strategies
 
 | Strategy | Description | Datasets |
 |----------|-------------|----------|
-| `concatenate_messages` | Concatenate all messages with `role: content` format | Most post-training datasets |
-| `input_output` | Combine input messages + output | Llama-Nemotron-Post-Training-Dataset |
-| `combine_columns` | Combine multiple text columns | Math-Proofs-v1, RL-Training-Blend |
-| `direct_text` | Direct text extraction from `text` column | Pretraining-Dataset-sample |
+| `concatenate_messages` | Concatenate all messages with `role: content` format | v1, v2, v3-math, v3-instruction-chat, v3-agentic, v3-science, v3-competitive-programming, v3-swe |
+| `input_output` | Combine input messages + output | llama-sft |
+| `math_proofs` | Combine problem, formal_statement, lean_header, AND messages | v3-math-proofs |
+| `combine_columns` | Combine multiple text columns | v3-rl-blend |
+| `direct_text` | Direct text extraction from `text` column | pretrain-sample |
 
 ---
 

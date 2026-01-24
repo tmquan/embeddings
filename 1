@@ -1,0 +1,388 @@
+2026-01-24 19:03:02,716 - INFO - ================================================================================
+2026-01-24 19:03:02,716 - INFO - NeMo Curator Dataset Exploration
+2026-01-24 19:03:02,716 - INFO - ================================================================================
+2026-01-24 19:03:02,716 - INFO - Datasets directory: /raid/datasets
+2026-01-24 19:03:02,716 - INFO - Exploring 20 unique datasets
+
+2026-01-24 19:03:02,716 - INFO - 
+[1/20] nvidia/Nemotron-Post-Training-Dataset-v1
+2026-01-24 19:03:02,716 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,716 - INFO - Exploring: nvidia/Nemotron-Post-Training-Dataset-v1
+2026-01-24 19:03:02,716 - INFO - Path: /raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v1
+2026-01-24 19:03:02,718 - INFO - Found 5 splits: ['chat', 'code', 'math', 'stem', 'tool_calling']
+2026-01-24 19:03:02,718 - INFO -   Processing split: chat
+2026-01-24 19:03:02,732 - ERROR - Error exploring nvidia/Nemotron-Post-Training-Dataset-v1: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,739 - INFO - 
+[2/20] nvidia/Nemotron-Post-Training-Dataset-v2
+2026-01-24 19:03:02,739 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,739 - INFO - Exploring: nvidia/Nemotron-Post-Training-Dataset-v2
+2026-01-24 19:03:02,739 - INFO - Path: /raid/datasets/nvidia_Nemotron-Post-Training-Dataset-v2
+2026-01-24 19:03:02,739 - INFO - Found 9 splits: ['chat', 'code', 'math', 'multilingual_de', 'multilingual_es', 'multilingual_fr', 'multilingual_it', 'multilingual_ja', 'stem']
+2026-01-24 19:03:02,739 - INFO -   Processing split: chat
+2026-01-24 19:03:02,748 - ERROR - Error exploring nvidia/Nemotron-Post-Training-Dataset-v2: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,752 - INFO - 
+[3/20] nvidia/Llama-Nemotron-Post-Training-Dataset
+2026-01-24 19:03:02,752 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,752 - INFO - Exploring: nvidia/Llama-Nemotron-Post-Training-Dataset
+2026-01-24 19:03:02,752 - INFO - Path: /raid/datasets/nvidia_Llama-Nemotron-Post-Training-Dataset
+2026-01-24 19:03:02,753 - INFO - Found 5 splits: ['chat', 'code', 'math', 'safety', 'science']
+2026-01-24 19:03:02,753 - INFO -   Processing split: chat
+2026-01-24 19:03:02,755 - ERROR - Error exploring nvidia/Llama-Nemotron-Post-Training-Dataset: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,755 - INFO - 
+[4/20] nvidia/Nemotron-Science-v1
+2026-01-24 19:03:02,755 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,756 - INFO - Exploring: nvidia/Nemotron-Science-v1
+2026-01-24 19:03:02,756 - INFO - Path: /raid/datasets/nvidia_Nemotron-Science-v1
+2026-01-24 19:03:02,756 - INFO - Found 2 splits: ['MCQ', 'RQA']
+2026-01-24 19:03:02,756 - INFO -   Processing split: MCQ
+2026-01-24 19:03:02,760 - ERROR - Error exploring nvidia/Nemotron-Science-v1: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,762 - INFO - 
+[5/20] nvidia/Nemotron-Instruction-Following-Chat-v1
+2026-01-24 19:03:02,762 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,762 - INFO - Exploring: nvidia/Nemotron-Instruction-Following-Chat-v1
+2026-01-24 19:03:02,762 - INFO - Path: /raid/datasets/nvidia_Nemotron-Instruction-Following-Chat-v1
+2026-01-24 19:03:02,762 - INFO - Found 2 splits: ['chat_if', 'structured_outputs']
+2026-01-24 19:03:02,762 - INFO -   Processing split: chat_if
+2026-01-24 19:03:02,771 - ERROR - Error exploring nvidia/Nemotron-Instruction-Following-Chat-v1: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,775 - INFO - 
+[6/20] nvidia/Nemotron-Math-Proofs-v1
+2026-01-24 19:03:02,775 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,775 - INFO - Exploring: nvidia/Nemotron-Math-Proofs-v1
+2026-01-24 19:03:02,775 - INFO - Path: /raid/datasets/nvidia_Nemotron-Math-Proofs-v1
+2026-01-24 19:03:02,775 - INFO - Found 1 splits: ['lean']
+2026-01-24 19:03:02,775 - INFO -   Processing split: lean
+2026-01-24 19:03:02,803 - ERROR - Error exploring nvidia/Nemotron-Math-Proofs-v1: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,813 - INFO - 
+[7/20] nvidia/Nemotron-3-Nano-RL-Training-Blend
+2026-01-24 19:03:02,813 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,813 - INFO - Exploring: nvidia/Nemotron-3-Nano-RL-Training-Blend
+2026-01-24 19:03:02,813 - INFO - Path: /raid/datasets/nvidia_Nemotron-3-Nano-RL-Training-Blend
+2026-01-24 19:03:02,813 - WARNING - No splits found in /raid/datasets/nvidia_Nemotron-3-Nano-RL-Training-Blend
+2026-01-24 19:03:02,813 - INFO - 
+[8/20] nvidia/Nemotron-Agentic-v1
+2026-01-24 19:03:02,813 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,813 - INFO - Exploring: nvidia/Nemotron-Agentic-v1
+2026-01-24 19:03:02,813 - INFO - Path: /raid/datasets/nvidia_Nemotron-Agentic-v1
+2026-01-24 19:03:02,814 - WARNING - No splits found in /raid/datasets/nvidia_Nemotron-Agentic-v1
+2026-01-24 19:03:02,814 - INFO - 
+[9/20] nvidia/Nemotron-Competitive-Programming-v1
+2026-01-24 19:03:02,814 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,814 - INFO - Exploring: nvidia/Nemotron-Competitive-Programming-v1
+2026-01-24 19:03:02,814 - INFO - Path: /raid/datasets/nvidia_Nemotron-Competitive-Programming-v1
+2026-01-24 19:03:02,814 - WARNING - No splits found in /raid/datasets/nvidia_Nemotron-Competitive-Programming-v1
+2026-01-24 19:03:02,814 - INFO - 
+[10/20] nvidia/Nemotron-Math-v2
+2026-01-24 19:03:02,814 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,814 - INFO - Exploring: nvidia/Nemotron-Math-v2
+2026-01-24 19:03:02,814 - INFO - Path: /raid/datasets/nvidia_Nemotron-Math-v2
+2026-01-24 19:03:02,814 - WARNING - No splits found in /raid/datasets/nvidia_Nemotron-Math-v2
+2026-01-24 19:03:02,814 - INFO - 
+[11/20] nvidia/Nemotron-SWE-v1
+2026-01-24 19:03:02,814 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,814 - INFO - Exploring: nvidia/Nemotron-SWE-v1
+2026-01-24 19:03:02,814 - INFO - Path: /raid/datasets/nvidia_Nemotron-SWE-v1
+2026-01-24 19:03:02,814 - INFO - Found 1 splits: ['r2e_gym']
+2026-01-24 19:03:02,814 - INFO -   Processing split: r2e_gym
+2026-01-24 19:03:02,822 - ERROR - Error exploring nvidia/Nemotron-SWE-v1: must be called with a dataclass type or instance
+Traceback (most recent call last):
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 534, in main
+    result = explore_dataset(dataset_name, dataset_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 394, in explore_dataset
+    split_data = explore_split(dataset_path, split_name)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/embeddings/01_explore_nemotron_datasets.py", line 211, in explore_split
+    hf_dataset = load_from_disk(str(split_path))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/load.py", line 2698, in load_from_disk
+    return Dataset.load_from_disk(dataset_path, keep_in_memory=keep_in_memory, storage_options=storage_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 1773, in load_from_disk
+    dataset = Dataset(
+              ^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/arrow_dataset.py", line 703, in __init__
+    inferred_features = Features.from_arrow_schema(arrow_table.schema)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1712, in from_arrow_schema
+    metadata_features = Features.from_dict(metadata["info"]["features"])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1750, in from_dict
+    obj = generate_from_dict(dic)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1392, in generate_from_dict
+    return {key: generate_from_dict(value) for key, value in obj.items()}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/site-packages/datasets/features/features.py", line 1403, in generate_from_dict
+    field_names = {f.name for f in fields(class_type)}
+                                   ^^^^^^^^^^^^^^^^^^
+  File "/localhome/local-tranminhq/anaconda3/envs/embeddings/lib/python3.12/dataclasses.py", line 1289, in fields
+    raise TypeError('must be called with a dataclass type or instance') from None
+TypeError: must be called with a dataclass type or instance
+2026-01-24 19:03:02,824 - INFO - 
+[12/20] nvidia/Nemotron-Pretraining-Dataset-sample
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - INFO - Exploring: nvidia/Nemotron-Pretraining-Dataset-sample
+2026-01-24 19:03:02,824 - INFO - Path: /raid/datasets/nvidia_Nemotron-Pretraining-Dataset-sample
+2026-01-24 19:03:02,824 - WARNING - No splits found in /raid/datasets/nvidia_Nemotron-Pretraining-Dataset-sample
+2026-01-24 19:03:02,824 - INFO - 
+[13/20] nvidia/Nemotron-CC-Code-v1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-CC-Code-v1
+2026-01-24 19:03:02,824 - INFO - 
+[14/20] nvidia/Nemotron-CC-v2.1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-CC-v2.1
+2026-01-24 19:03:02,824 - INFO - 
+[15/20] nvidia/Nemotron-Pretraining-Code-v2
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-Pretraining-Code-v2
+2026-01-24 19:03:02,824 - INFO - 
+[16/20] nvidia/Nemotron-Pretraining-Specialized-v1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-Pretraining-Specialized-v1
+2026-01-24 19:03:02,824 - INFO - 
+[17/20] nvidia/Nemotron-CC-Math-v1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-CC-Math-v1
+2026-01-24 19:03:02,824 - INFO - 
+[18/20] nvidia/Nemotron-CC-v2
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-CC-v2
+2026-01-24 19:03:02,824 - INFO - 
+[19/20] nvidia/Nemotron-Pretraining-SFT-v1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-Pretraining-SFT-v1
+2026-01-24 19:03:02,824 - INFO - 
+[20/20] nvidia/Nemotron-Pretraining-Code-v1
+2026-01-24 19:03:02,824 - INFO - --------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - WARNING - Dataset not found at /raid/datasets/nvidia_Nemotron-Pretraining-Code-v1
+2026-01-24 19:03:02,824 - INFO - 
+================================================================================
+2026-01-24 19:03:02,824 - INFO - EXPLORATION SUMMARY
+2026-01-24 19:03:02,824 - INFO - ================================================================================
+2026-01-24 19:03:02,824 - INFO - Datasets explored: 15
+2026-01-24 19:03:02,824 - INFO - Successfully loaded: 0
+2026-01-24 19:03:02,824 - INFO - Total rows across all datasets: 0
+2026-01-24 19:03:02,824 - INFO - 
+Dataset Summary:
+2026-01-24 19:03:02,824 - INFO - ----------------------------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - INFO - Dataset                                                    Rows  Splits  Cols  String  Text
+2026-01-24 19:03:02,824 - INFO - ----------------------------------------------------------------------------------------------------
+2026-01-24 19:03:02,824 - INFO - 
+Saving detailed results to: dataset_exploration_detailed.json
+2026-01-24 19:03:02,825 - INFO - Saving summary to: dataset_exploration_summary.json
+2026-01-24 19:03:02,825 - INFO - 
+Generating extraction functions: embedding_extraction_functions.py
+2026-01-24 19:03:02,825 - INFO - 
+================================================================================
+2026-01-24 19:03:02,825 - INFO - EXPLORATION COMPLETE
+2026-01-24 19:03:02,825 - INFO - ================================================================================
+2026-01-24 19:03:02,825 - INFO - 
+Outputs:
+2026-01-24 19:03:02,825 - INFO -   - dataset_exploration_detailed.json (full details with samples)
+2026-01-24 19:03:02,825 - INFO -   - dataset_exploration_summary.json (compact summary)
+2026-01-24 19:03:02,825 - INFO -   - embedding_extraction_functions.py (auto-generated functions)
