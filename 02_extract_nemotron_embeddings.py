@@ -108,18 +108,22 @@ def detect_format(dataset_path: Path) -> DatasetFormat:
     Detect the format of a dataset directory.
     
     Priority:
-    1. Arrow files in subdirectories (HuggingFace format)
+    1. Arrow files in subdirectories (HuggingFace format) - checked recursively
     2. JSONL files in data/ subdirectory or root directory
     3. Parquet files
+    
+    Note: Uses rglob for robust detection across different directory structures.
     """
-    # Check for HuggingFace Arrow format (subdirs with .arrow files)
-    for subdir in dataset_path.iterdir():
-        if subdir.is_dir() and not subdir.name.startswith('.'):
-            arrow_files = list(subdir.glob("*.arrow"))
-            if arrow_files:
+    # Check for HuggingFace Arrow format - search recursively
+    # This handles both simple structures (split/*.arrow) and nested (SFT/split/*.arrow)
+    arrow_files = list(dataset_path.rglob("*.arrow"))
+    if arrow_files:
+        # Verify at least one arrow file is in a subdirectory (not root)
+        for af in arrow_files:
+            if af.parent != dataset_path:
                 return DatasetFormat.ARROW
     
-    # Check for JSONL in data/ subdirectory
+    # Check for JSONL in data/ subdirectory (common pattern)
     data_dir = dataset_path / "data"
     if data_dir.exists():
         jsonl_files = list(data_dir.glob("*.jsonl"))
@@ -128,6 +132,11 @@ def detect_format(dataset_path: Path) -> DatasetFormat:
     
     # Check for JSONL files directly in root directory
     jsonl_files = list(dataset_path.glob("*.jsonl"))
+    if jsonl_files:
+        return DatasetFormat.JSONL
+    
+    # Check for JSONL in any subdirectory (handles nested structures like SFT/code/*.jsonl)
+    jsonl_files = list(dataset_path.rglob("*.jsonl"))
     if jsonl_files:
         return DatasetFormat.JSONL
     
@@ -749,22 +758,59 @@ def iter_parquet_file(
 # Text Extraction
 # =============================================================================
 
+def is_truthy(val) -> bool:
+    """
+    Safely check if a value is truthy, handling numpy arrays.
+    
+    Parquet files can return numpy arrays which raise errors in boolean context.
+    """
+    if val is None:
+        return False
+    # Check for numpy array
+    if hasattr(val, '__len__') and hasattr(val, 'dtype'):
+        # It's a numpy array - check if it has any content
+        return len(val) > 0
+    # Check for empty string/list
+    if isinstance(val, (str, list, dict)):
+        return len(val) > 0
+    # Default Python truthiness
+    return bool(val)
+
+
+def to_string(val) -> str:
+    """
+    Safely convert a value to string, handling numpy arrays and other types.
+    """
+    if val is None:
+        return ''
+    # Handle numpy arrays
+    if hasattr(val, 'tolist'):
+        val = val.tolist()
+    return str(val)
+
+
 def extract_text_messages(example: Dict[str, Any]) -> str:
     """Extract text from messages format (concatenate role: content)."""
     messages = example.get('messages', [])
-    if not messages:
+    if not is_truthy(messages):
         return ""
+    
+    # Handle numpy array
+    if hasattr(messages, 'tolist'):
+        messages = messages.tolist()
     
     text_parts = []
     for msg in messages:
-        role = msg.get('role', 'unknown')
-        content = msg.get('content', '')
-        
-        # Include reasoning_content if available
-        if msg.get('reasoning_content'):
-            content = msg['reasoning_content'] + '\n' + content
-        
-        text_parts.append(f'{role}: {content}')
+        if isinstance(msg, dict):
+            role = msg.get('role', 'unknown')
+            content = to_string(msg.get('content', ''))
+            
+            # Include reasoning_content if available
+            reasoning = msg.get('reasoning_content')
+            if is_truthy(reasoning):
+                content = to_string(reasoning) + '\n' + content
+            
+            text_parts.append(f'{role}: {content}')
     
     return '\n'.join(text_parts)
 
@@ -775,28 +821,33 @@ def extract_text_input_output(example: Dict[str, Any]) -> str:
     
     # Handle input (can be list of messages or string)
     input_val = example.get('input', '')
+    
+    # Handle numpy array
+    if hasattr(input_val, 'tolist'):
+        input_val = input_val.tolist()
+    
     if isinstance(input_val, list):
         for msg in input_val:
             if isinstance(msg, dict):
                 role = msg.get('role', 'user')
-                content = msg.get('content', '')
+                content = to_string(msg.get('content', ''))
                 parts.append(f'{role}: {content}')
             else:
-                parts.append(str(msg))
-    else:
-        parts.append(f'input: {input_val}')
+                parts.append(to_string(msg))
+    elif is_truthy(input_val):
+        parts.append(f'input: {to_string(input_val)}')
     
     # Handle output
     output_val = example.get('output', '')
-    if output_val:
-        parts.append(f'assistant: {output_val}')
+    if is_truthy(output_val):
+        parts.append(f'assistant: {to_string(output_val)}')
     
     return '\n'.join(parts)
 
 
 def extract_text_direct(example: Dict[str, Any], column: str = 'text') -> str:
     """Extract text directly from a column."""
-    return str(example.get(column, ''))
+    return to_string(example.get(column, ''))
 
 
 def extract_text_combine_columns(example: Dict[str, Any], columns: List[str]) -> str:
@@ -804,11 +855,14 @@ def extract_text_combine_columns(example: Dict[str, Any], columns: List[str]) ->
     parts = []
     for col in columns:
         val = example.get(col)
-        if val:
+        if is_truthy(val):
+            # Handle numpy array
+            if hasattr(val, 'tolist'):
+                val = val.tolist()
             if isinstance(val, list):
                 parts.append(f'{col}: {str(val)}')
             else:
-                parts.append(f'{col}: {val}')
+                parts.append(f'{col}: {to_string(val)}')
     return '\n'.join(parts)
 
 
@@ -825,25 +879,34 @@ def extract_text_math_proofs(example: Dict[str, Any]) -> str:
     parts = []
     
     # Primary structured columns
-    if example.get('problem'):
-        parts.append(f"Problem: {example['problem']}")
+    problem = example.get('problem')
+    if is_truthy(problem):
+        parts.append(f"Problem: {to_string(problem)}")
     
-    if example.get('formal_statement'):
-        parts.append(f"Formal Statement:\n{example['formal_statement']}")
+    formal_stmt = example.get('formal_statement')
+    if is_truthy(formal_stmt):
+        parts.append(f"Formal Statement:\n{to_string(formal_stmt)}")
     
-    if example.get('lean_header'):
-        parts.append(f"Lean Header:\n{example['lean_header']}")
+    lean_hdr = example.get('lean_header')
+    if is_truthy(lean_hdr):
+        parts.append(f"Lean Header:\n{to_string(lean_hdr)}")
     
     # Also include messages if present (some rows have proof conversations)
     messages = example.get('messages')
-    if messages and isinstance(messages, list) and len(messages) > 0:
+    
+    # Handle numpy array
+    if hasattr(messages, 'tolist'):
+        messages = messages.tolist()
+    
+    if is_truthy(messages) and isinstance(messages, list):
         msg_parts = []
         for msg in messages:
             if isinstance(msg, dict):
                 role = msg.get('role', 'unknown')
-                content = msg.get('content', '')
-                if msg.get('reasoning_content'):
-                    content = msg['reasoning_content'] + '\n' + content
+                content = to_string(msg.get('content', ''))
+                reasoning = msg.get('reasoning_content')
+                if is_truthy(reasoning):
+                    content = to_string(reasoning) + '\n' + content
                 if content:  # Only add if there's actual content
                     msg_parts.append(f'{role}: {content}')
         if msg_parts:

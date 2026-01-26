@@ -30,9 +30,11 @@ pandas>=2.0,<3.0  # pandas 3.0 incompatible with RAPIDS
 # Uncomment if you have NVIDIA GPU with compute capability >= 8.0 (A100, H100, RTX 3090+)
 # flash-attn>=2.3.0
 
-# Optional: For better performance
-# accelerate>=0.24.0
-# bitsandbytes>=0.41.0  # For quantization
+# Required for device_map and low_cpu_mem_usage in model loading
+accelerate>=0.26.0
+
+# Optional: For quantization
+# bitsandbytes>=0.41.0
 
 # NOTE: RAPIDS packages (cudf-cu13, cuml-cu13, cugraph-cu13, cupy-cuda13x, cuvs-cu13)
 #       are already installed in the deploy environment via conda.
