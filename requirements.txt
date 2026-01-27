@@ -26,6 +26,15 @@ numpy==1.26.4
 tqdm>=4.65.0
 pandas>=2.0,<3.0  # pandas 3.0 incompatible with RAPIDS
 
+# vLLM Embedding Server (for 03_embedding_server.py)
+vllm>=0.6.0
+
+# Async HTTP client for vLLM communication
+httpx>=0.27.0
+
+# Rich progress bars and console output
+rich>=13.0.0
+
 # Optional: Flash Attention 2 (requires compatible GPU and CUDA)
 # Uncomment if you have NVIDIA GPU with compute capability >= 8.0 (A100, H100, RTX 3090+)
 # flash-attn>=2.3.0

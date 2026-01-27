@@ -36,9 +36,20 @@ MODEL_MAX_TOKENS = 32768  # per model card: max input sequence length is 32768 t
 # Default runtime configuration (kept together for easy tuning)
 DEFAULT_DATASETS_DIR = "/raid/datasets"
 DEFAULT_EMBEDDINGS_DIR = "/raid/embeddings"
-DEFAULT_BATCH_SIZE = 1  # Reduced to prevent OOM on large datasets
+DEFAULT_BATCH_SIZE = 1  # Single row per batch for testing (fits 32k context)
 DEFAULT_MAX_LENGTH = MODEL_MAX_TOKENS
-DEFAULT_CHUNK_SIZE = 100 # Smaller chunks = better load balancing across GPUs
+DEFAULT_CHUNK_SIZE = 100_000  # Rows per chunk for files > 1GB
 DEFAULT_DTYPE = "bfloat16"  # "bfloat16" or "float16"
 DEFAULT_NUM_WORKERS = 4
 DEFAULT_PREFETCH_FACTOR = 4
+
+# vLLM Server Configuration
+VLLM_ENDPOINT = "http://localhost:8000/v1/embeddings"
+VLLM_TIMEOUT = 300.0  # 5 minutes timeout for large batches
+
+# File Processing Configuration
+FILE_SIZE_THRESHOLD = 1 * 1024 * 1024 * 1024  # 1GB - files larger than this are chunked
+
+# Retry Configuration
+MAX_RETRIES = 3
+RETRY_DELAY = 5.0  # seconds
