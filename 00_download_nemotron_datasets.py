@@ -40,32 +40,32 @@ logger = logging.getLogger(__name__)
 
 # Post-Training Datasets (12 datasets, ~1.64M rows, ~4.3 GB total)
 POST_TRAINING_DATASETS = [
-    "nvidia/Llama-Nemotron-Post-Training-Dataset",  # ~400k rows, ~800 MB
-    "nvidia/Nemotron-Post-Training-Dataset-v1",     # ~100k rows, ~200 MB
-    "nvidia/Nemotron-Post-Training-Dataset-v2",     # ~200k rows, ~400 MB
+    # "nvidia/Llama-Nemotron-Post-Training-Dataset",  
+    # "nvidia/Nemotron-Post-Training-Dataset-v1",     
+    # "nvidia/Nemotron-Post-Training-Dataset-v2",     
     # From Nemotron Post-Training v3 collection:
-    "nvidia/Nemotron-3-Nano-RL-Training-Blend",     # ~80k rows, ~160 MB
-    "nvidia/Nemotron-Science-v1",                   # ~150k rows, ~450 MB
-    "nvidia/Nemotron-Instruction-Following-Chat-v1",# ~200k rows, ~500 MB
-    "nvidia/Nemotron-Math-Proofs-v1",               # ~50k rows, ~250 MB
-    "nvidia/Nemotron-Agentic-v1",                   # ~100k rows, ~300 MB
-    "nvidia/Nemotron-Competitive-Programming-v1",   # ~60k rows, ~240 MB
-    "nvidia/Nemotron-Math-v2",                      # ~180k rows, ~540 MB
-    "nvidia/Nemotron-SWE-v1",                       # ~120k rows, ~480 MB
+    "nvidia/Nemotron-Science-v1",                   
+    "nvidia/Nemotron-Agentic-v1",                   
+    "nvidia/Nemotron-Math-Proofs-v1",               
+    "nvidia/Nemotron-Math-v2",                      
+    "nvidia/Nemotron-Instruction-Following-Chat-v1",
+    "nvidia/Nemotron-3-Nano-RL-Training-Blend",     
+    "nvidia/Nemotron-Competitive-Programming-v1",   
+    "nvidia/Nemotron-SWE-v1",                       
 ]
 
 # Pretraining Datasets (9 datasets, ~15.1B rows, ~24 TB total)
 # WARNING: These are VERY LARGE! Start with the sample dataset first.
 PRETRAINING_DATASETS = [
-    "nvidia/Nemotron-Pretraining-Dataset-sample",   # 27.7k rows, ~50 MB (TEST FIRST!)
-    # "nvidia/Nemotron-CC-Code-v1",                 # 216M rows, ~350 GB
-    # "nvidia/Nemotron-CC-v2.1",                    # 3.8B rows, ~6 TB (VERY LARGE!)
-    # "nvidia/Nemotron-Pretraining-Code-v2",        # 836M rows, ~1.3 TB
-    # "nvidia/Nemotron-Pretraining-Specialized-v1", # 60.7M rows, ~100 GB
-    # "nvidia/Nemotron-CC-Math-v1",                 # 190M rows, ~310 GB
-    # "nvidia/Nemotron-CC-v2",                      # 8.79B rows, ~14 TB (LARGEST!)
-    # "nvidia/Nemotron-Pretraining-SFT-v1",         # 299M rows, ~480 GB
-    # "nvidia/Nemotron-Pretraining-Code-v1",        # 936M rows, ~1.5 TB
+    # "nvidia/Nemotron-Pretraining-Dataset-sample", 
+    # "nvidia/Nemotron-CC-Code-v1",                 
+    # "nvidia/Nemotron-CC-v2.1",                    
+    # "nvidia/Nemotron-Pretraining-Code-v2",        
+    # "nvidia/Nemotron-Pretraining-Specialized-v1", 
+    # "nvidia/Nemotron-CC-Math-v1",                 
+    # "nvidia/Nemotron-CC-v2",                      
+    # "nvidia/Nemotron-Pretraining-SFT-v1",         
+    # "nvidia/Nemotron-Pretraining-Code-v1",        
 ]
 
 # Combine datasets to download
