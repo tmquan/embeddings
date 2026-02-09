@@ -1,45 +1,34 @@
 # Nemotron Datasets Embedding Extraction Pipeline
 
-A comprehensive pipeline for downloading, exploring, and extracting embeddings from NVIDIA Nemotron datasets using multi-GPU processing.
+A pipeline for downloading, exploring, and extracting dense embeddings from NVIDIA Nemotron post-training datasets using `nvidia/llama-embed-nemotron-8b` with multi-GPU inference.
 
 ## Overview
 
-This pipeline processes **21 Nemotron datasets** (12 post-training + 9 pretraining) and extracts embeddings using the `nvidia/llama-embed-nemotron-8b` model with distributed multi-GPU inference.
+This pipeline processes **8 Nemotron post-training datasets** (~13.2M records, ~380 GB on disk) and extracts 4096-dimensional embeddings using all 8 available GPUs.  Embeddings are saved as chunked `.npy` files in float32 format.
 
-## Features
-
-- ✅ **21 Datasets**: Full Nemotron collection (post-training + pretraining)
-- ✅ **Multi-GPU**: Distributed processing with Ray
-- ✅ **Auto-Detection**: Smart format detection (conversational vs. pretraining)
-- ✅ **Shard-Preserving**: Maintains original dataset shard structure
-- ✅ **Scalable**: Handles datasets from 27k to 8.79B samples
-- ✅ **Flash Attention 2**: Optimized inference (with SDPA fallback)
+| Property | Value |
+|----------|-------|
+| Model | `nvidia/llama-embed-nemotron-8b` (8B params, bidirectional Llama) |
+| Embedding dim | 4096 |
+| Output format | `.npy` float32 |
+| GPUs | 8 x NVIDIA B300 SXM6 AC (275 GB each) |
+| Multi-GPU strategy | `torch.multiprocessing` with LPT scheduling |
+| Attention | Eager (bidirectional, non-causal) |
+| Pooling | Mean pooling with attention mask, L2-normalised |
 
 ## Quick Start
 
-### 0. Setup Environment (First Time Only)
+### 1. Environment Setup
 
-See [SETUP.md](SETUP.md) for detailed environment setup instructions.
-
-**Quick setup:**
 ```bash
-# Using existing embeddings environment
-conda activate embeddings
-
-# Install/update compatible versions
-./check_and_fix_versions.sh
-
-# Or manually install
+conda activate nemotron
 pip install -r requirements.txt
 ```
 
-### 1. Check Dataset Status
-
-```bash
-python 01_verify_nemotron_dataset_status.py
-```
-
-Shows which datasets are already downloaded and their sizes.
+> PyTorch with CUDA must be installed separately:
+> ```bash
+> pip install torch==2.10.0+cu130 torchvision==0.25.0+cu130 --index-url https://download.pytorch.org/whl/cu130
+> ```
 
 ### 2. Download Datasets
 
@@ -47,7 +36,7 @@ Shows which datasets are already downloaded and their sizes.
 python 00_download_nemotron_datasets.py
 ```
 
-**Start small** with the sample dataset first to test the pipeline!
+Downloads 8 post-training datasets from HuggingFace to `/raid/datasets/`.  Already-downloaded datasets are skipped automatically.
 
 ### 3. Explore Datasets
 
@@ -55,463 +44,188 @@ python 00_download_nemotron_datasets.py
 python 01_explore_nemotron_datasets.py
 ```
 
-Generates:
-- `dataset_exploration_summary.json` - Quick overview
-- `dataset_exploration_detailed.json` - Full details with samples
-- `embedding_extraction_functions.py` - Auto-generated extraction functions
+Inspects each dataset's structure, schema, text-length statistics, and generates a markdown report at `doc/dataset_exploration_summary.md`.
 
 ### 4. Extract Embeddings
 
 ```bash
-# Test with sample dataset (27.7k samples) - RECOMMENDED FIRST
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Dataset-sample \
-  --num-gpus 8 \
-  --batch-size 8
+# Dry-run: preview work plan without processing
+python 02_embedding_extraction.py --dry-run
 
-# Process all datasets (WARNING: requires TB of disk space and days of processing!)
-python 02_extract_nemotron_embeddings.py --num-gpus 8 --batch-size 8
+# Process all datasets (8 GPUs, default settings)
+python 02_embedding_extraction.py
+
+# Process a specific dataset
+python 02_embedding_extraction.py --datasets Nemotron-Science-v1
+
+# Tune batch size and sequence length
+python 02_embedding_extraction.py --batch-size 4 --max-length 4096
 ```
 
 ## Dataset Catalog
 
-### Post-Training Datasets (12)
+All 8 datasets are post-training JSONL format, stored at `/raid/datasets/`.
 
-| Dataset | Key | Samples | Description |
-|---------|-----|---------|-------------|
-| Nemotron-Post-Training-Dataset-v1 | `v1` | ~100k | Version 1 |
-| Nemotron-Post-Training-Dataset-v2 | `v2` | ~200k | Version 2 |
-| Llama-Nemotron (SFT) | `llama-sft` | ~300k | Supervised fine-tuning |
-| Llama-Nemotron (RL) | `llama-rl` | ~100k | Reinforcement learning |
-| Nemotron-Science-v1 | `v3-science` | ~150k | Scientific domain |
-| Nemotron-Instruction-Following-Chat-v1 | `v3-instruction-chat` | ~200k | Instruction following |
-| Nemotron-Math-Proofs-v1 | `v3-math-proofs` | ~50k | Mathematical proofs |
-| Nemotron-3-Nano-RL-Training-Blend | `v3-rl-blend` | ~80k | RL training blend |
-| Nemotron-Agentic-v1 | `v3-agentic` | ~100k | Agentic tasks |
-| Nemotron-Competitive-Programming-v1 | `v3-competitive-programming` | ~60k | Programming contests |
-| Nemotron-Math-v2 | `v3-math` | ~180k | Mathematics v2 |
-| Nemotron-SWE-v1 | `v3-swe` | ~120k | Software engineering |
+| Dataset | HuggingFace Repo | Rows | Disk Size | Text Strategy |
+|---------|-----------------|------|-----------|---------------|
+| Nemotron-Science-v1 | `nvidia/Nemotron-Science-v1` | 226K | 2.5 GB | `messages_list` |
+| Nemotron-Instruction-Following-Chat-v1 | `nvidia/Nemotron-Instruction-Following-Chat-v1` | 431K | 6.7 GB | `messages_list` |
+| Nemotron-3-Nano-RL-Training-Blend | `nvidia/Nemotron-3-Nano-RL-Training-Blend` | 93K | 6.5 GB | `rl_blend` |
+| Nemotron-Math-Proofs-v1 | `nvidia/Nemotron-Math-Proofs-v1` | 1.4M | 28 GB | `math_proof` |
+| Nemotron-Agentic-v1 | `nvidia/Nemotron-Agentic-v1` | 335K | 5.4 GB | `agentic` |
+| Nemotron-Competitive-Programming-v1 | `nvidia/Nemotron-Competitive-Programming-v1` | 3.9M | 177 GB | `messages_list` |
+| Nemotron-Math-v2 | `nvidia/Nemotron-Math-v2` | 7.1M | 142 GB | `math_v2` |
+| Nemotron-SWE-v1 | `nvidia/Nemotron-SWE-v1` | 51K | 11 GB | `agentic` |
 
-### Pretraining Datasets (9)
-
-| Dataset | Key | Samples | Description |
-|---------|-----|---------|-------------|
-| Nemotron-Pretraining-Dataset-sample | `pretrain-sample` | 27.7k | **Sample for testing** |
-| Nemotron-CC-Code-v1 | `pretrain-cc-code-v1` | 216M | Code from Common Crawl |
-| Nemotron-CC-v2.1 | `pretrain-cc-v2.1` | 3.8B | Common Crawl v2.1 |
-| Nemotron-Pretraining-Code-v2 | `pretrain-code-v2` | 836M | Code pretraining v2 |
-| Nemotron-Pretraining-Specialized-v1 | `pretrain-specialized-v1` | 60.7M | Specialized domains |
-| Nemotron-CC-Math-v1 | `pretrain-cc-math-v1` | 190M | Math content |
-| Nemotron-CC-v2 | `pretrain-cc-v2` | 8.79B | **Largest dataset!** |
-| Nemotron-Pretraining-SFT-v1 | `pretrain-sft-v1` | 299M | SFT pretraining |
-| Nemotron-Pretraining-Code-v1 | `pretrain-code-v1` | 936M | Code pretraining v1 |
-
-## Dataset-Specific Extraction Commands
-
-### Post-Training Datasets
-
-#### Nemotron v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Post-Training-Dataset-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron v2
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Post-Training-Dataset-v2 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Llama-Nemotron (SFT)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Llama-Nemotron-Post-Training-Dataset \
-  --splits SFT \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Llama-Nemotron (RL)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Llama-Nemotron-Post-Training-Dataset \
-  --splits RL \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Science v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Science-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Instruction-Following Chat v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Instruction-Following-Chat-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Math-Proofs v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Math-Proofs-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron 3 Nano RL Training Blend
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-3-Nano-RL-Training-Blend \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Agentic v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Agentic-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Competitive Programming v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Competitive-Programming-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron Math v2
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Math-v2 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Nemotron SWE v1
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-SWE-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-### Pretraining Datasets
-
-#### Pretraining Sample (⭐ START HERE - 27.7k samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Dataset-sample \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Common Crawl Code v1 (216M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-Code-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Common Crawl v2.1 (3.8B samples - LARGE!)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-v2.1 \
-  --num-gpus 8 --batch-size 8 \
-  --chunk-size 10000
-```
-
-#### Pretraining Code v2 (836M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Code-v2 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Pretraining Specialized v1 (60.7M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Specialized-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Common Crawl Math v1 (190M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-Math-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Common Crawl v2 (8.79B samples - LARGEST!)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-v2 \
-  --num-gpus 8 --batch-size 8 \
-  --chunk-size 10000
-```
-
-#### Pretraining SFT v1 (299M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-SFT-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Pretraining Code v1 (936M samples)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Code-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-### Batch Processing Multiple Datasets
-
-#### All Post-Training Datasets
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets \
-  nvidia/Nemotron-Post-Training-Dataset-v1 \
-  nvidia/Nemotron-Post-Training-Dataset-v2 \
-  nvidia/Llama-Nemotron-Post-Training-Dataset \
-  nvidia/Nemotron-Science-v1 \
-  nvidia/Nemotron-Instruction-Following-Chat-v1 \
-  nvidia/Nemotron-Math-Proofs-v1 \
-  nvidia/Nemotron-3-Nano-RL-Training-Blend \
-  nvidia/Nemotron-Agentic-v1 \
-  nvidia/Nemotron-Competitive-Programming-v1 \
-  nvidia/Nemotron-Math-v2 \
-  nvidia/Nemotron-SWE-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Small Pretraining Datasets (Sample + Specialized)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Dataset-sample \
-            nvidia/Nemotron-Pretraining-Specialized-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Medium Pretraining Datasets (Code + Math)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-Code-v1 \
-            nvidia/Nemotron-CC-Math-v1 \
-            nvidia/Nemotron-Pretraining-SFT-v1 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Large Pretraining Datasets (Code v1 & v2)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Pretraining-Code-v1 \
-            nvidia/Nemotron-Pretraining-Code-v2 \
-  --num-gpus 8 --batch-size 8
-```
-
-#### Very Large Common Crawl Datasets (WARNING: Multi-day processing!)
-```bash
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-CC-v2 \
-            nvidia/Nemotron-CC-v2.1 \
-  --num-gpus 8 --batch-size 8 \
-  --chunk-size 10000
-```
+**Total: ~13.2M records, ~380 GB source data**
 
 ## Pipeline Scripts
 
 ### `00_download_nemotron_datasets.py`
 
-Downloads datasets from HuggingFace to `/raid/datasets`.
+Downloads datasets from HuggingFace using the `hf` CLI to `/raid/datasets/`.
 
-**Features:**
-- Automatic skip if already downloaded
-- Progress logging
-- Error handling and retry
-- Summary report
-
-**Configuration:**
-- Edit `DATASETS_DIR` in script to change download location
-- Comment out datasets you don't need
+- Automatically skips already-downloaded datasets
+- Configurable dataset list (comment/uncomment in script)
+- Pretraining datasets available but commented out (~24 TB)
 
 ### `01_explore_nemotron_datasets.py`
 
-Analyzes dataset structures and generates extraction strategies.
+Analyzes dataset structure and generates extraction strategies.
 
-**What it does:**
-- Scans all splits and columns
-- Identifies text columns
-- Detects conversational formats
-- Determines optimal extraction strategy
-- Generates custom extraction functions
+- Inspects JSONL/parquet schemas and row counts
+- Computes text-length statistics (chars, estimated tokens)
+- Designs per-dataset text concatenation strategies
+- Outputs markdown report to `doc/dataset_exploration_summary.md`
 
-**Outputs:**
-- `dataset_exploration_summary.json`
-- `dataset_exploration_detailed.json`
-- `embedding_extraction_functions.py`
+### `02_embedding_extraction.py`
 
-### `02_extract_nemotron_embeddings.py`
+Extracts embeddings using multi-GPU distributed inference.
 
-Extracts embeddings using multi-GPU distributed processing.
+**Parameters:**
 
-**Key Parameters:**
-- `--datasets`: Filter specific datasets
-- `--splits`: Filter specific splits
-- `--num-gpus`: Number of GPUs (default: all available)
-- `--batch-size`: Batch size per GPU (default: 8)
-- `--chunk-size`: Samples per shard (default: 10000)
-- `--dtype`: Model precision (bfloat16/float16/float32)
-- `--no-flash-attention`: Disable Flash Attention 2
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--datasets` | all | Filter by dataset key substring |
+| `--datasets-dir` | `/raid/datasets` | Source data directory |
+| `--embeddings-dir` | `/raid/embeddings` | Output directory |
+| `--num-gpus` | all available (8) | Number of GPUs |
+| `--batch-size` | 8 | Batch size per GPU |
+| `--max-length` | 8192 | Max tokens (truncation limit) |
+| `--chunk-size` | 50,000 | Records per output `.npy` chunk |
+| `--dtype` | bfloat16 | Model compute dtype (output is always float32) |
+| `--dry-run` | — | Show work plan without processing |
 
-**Example:**
-```bash
-# Process specific datasets with 8 GPUs
-python 02_extract_nemotron_embeddings.py \
-  --datasets nvidia/Nemotron-Science-v1 \
-            nvidia/Nemotron-Math-v2 \
-  --num-gpus 8 \
-  --batch-size 8 \
-  --dtype bfloat16
-```
-
-## Configuration (`config.py`)
-
-Central configuration for all scripts:
-
-```python
-# Model configuration
-MODEL_ID_DEFAULT = "nvidia/llama-embed-nemotron-8b"
-MODEL_EMBED_SIZE = 4096
-MODEL_MAX_TOKENS = 32768
-
-# Storage paths
-DEFAULT_DATASETS_DIR = "/raid/datasets"
-DEFAULT_EMBEDDINGS_DIR = "/raid/embeddings"
-
-# Processing defaults
-DEFAULT_BATCH_SIZE = 8
-DEFAULT_CHUNK_SIZE = 10000
-DEFAULT_DTYPE = "bfloat16"
-```
+**Key features:**
+- **LPT scheduling**: Distributes work units across GPUs using Longest-Processing-Time-first for optimal load balance
+- **Resume-safe**: Existing chunk files are detected and skipped automatically
+- **OOM recovery**: Batch size is automatically halved on CUDA out-of-memory errors
+- **Streaming I/O**: Records are streamed line-by-line, keeping memory bounded
 
 ## Output Format
 
-Embeddings are saved in NumPy format matching the original dataset shard structure:
+Embeddings are saved as chunked NumPy arrays under `/raid/embeddings/`:
 
 ```
 /raid/embeddings/
-├── pretraining/
-│   └── sample/
-│       └── train/
-│           ├── data-00000-of-00003.npy  # [N, 4096] float32
-│           ├── data-00001-of-00003.npy
-│           ├── data-00002-of-00003.npy
-│           └── embedding_metadata.json
-└── nemotron-v3/
-    └── science/
-        └── train/
-            ├── data-00000-of-00010.npy
-            └── ...
+├── Nemotron-Science-v1/
+│   ├── MCQ/
+│   │   ├── embeddings_00000.npy   # [50000, 4096] float32
+│   │   ├── embeddings_00001.npy   # [50000, 4096] float32
+│   │   ├── embeddings_00002.npy   # [remaining, 4096] float32
+│   │   └── metadata.json
+│   └── RQA/
+│       ├── embeddings_00000.npy
+│       └── metadata.json
+├── Nemotron-Math-v2/
+│   ├── low/
+│   ├── medium/
+│   ├── high_part0/
+│   ├── high_part1/
+│   └── high_part2/
+└── ...
 ```
 
-Each `embedding_metadata.json` contains:
+Each `metadata.json` contains:
+
 ```json
 {
-  "dataset_name": "nvidia/Nemotron-Science-v1",
-  "split_name": "train",
-  "num_samples": 150000,
-  "num_shards": 10,
+  "dataset_key": "Nemotron-Science-v1",
+  "hf_name": "nvidia/Nemotron-Science-v1",
+  "sub_label": "MCQ",
+  "total_records": 174200,
+  "num_chunks": 4,
+  "chunk_size": 50000,
   "embedding_dim": 4096,
-  "model_id": "nvidia/llama-embed-nemotron-8b"
+  "model_id": "nvidia/llama-embed-nemotron-8b",
+  "max_length": 8192,
+  "dtype": "float32",
+  "elapsed_seconds": 1234.5,
+  "records_per_second": 141.1
 }
 ```
 
-## Disk Space Requirements
+## Text Extraction Strategies
 
-| Dataset Type | Estimated Size |
-|-------------|----------------|
-| Sample | ~100 MB |
-| Small (60-200M) | 5-20 GB |
-| Medium (300-900M) | 30-100 GB |
-| Large (3.8B) | 500-800 GB |
-| Very Large (8.79B) | 1-2 TB |
+Each dataset has a tailored text concatenation strategy:
 
-**Total for all datasets: ~3-4 TB**
+| Strategy | Datasets | Description |
+|----------|----------|-------------|
+| `messages_list` | Science, Instruction-Following, Competitive-Programming | Flatten `messages` list: `Role: content` blocks joined by newlines |
+| `rl_blend` | Nano-RL-Training-Blend | Extract `input` from nested `responses_create_params` dict, append `ground_truth` |
+| `math_proof` | Math-Proofs-v1 | Concatenate `problem` + `formal_statement` (Lean 4) + `messages` |
+| `math_v2` | Math-v2 | Prefer `messages`, fallback to `problem` field |
+| `agentic` | Agentic-v1, SWE-v1 | Prepend serialised `tools` definitions, then flatten `messages` |
 
-## Processing Time (8 x H100 GPUs)
+## Disk Space & Time Estimates
 
-| Dataset Size | Estimated Time |
-|-------------|----------------|
-| 27.7k | ~5 min |
-| 60M | ~2-4 hours |
-| 300M | ~8-12 hours |
-| 3.8B | ~100+ hours |
-| 8.79B | ~250+ hours |
+**Estimated output sizes** (4096 dim x 4 bytes per record):
 
-## Best Practices
-
-1. **Start Small**: Test with `Nemotron-Pretraining-Dataset-sample` first
-2. **Monitor Resources**: Check disk space and GPU memory
-3. **Process Strategically**: Prioritize important datasets
-4. **Use Checkpointing**: Scripts resume from existing shards
-5. **Validate Output**: Check embedding quality on samples
-
-## Data Formats
-
-### Post-Training (Conversational)
-```json
-{
-  "messages": [
-    {"role": "user", "content": "What is AI?"},
-    {"role": "assistant", "content": "AI is..."}
-  ]
-}
-```
-
-### Pretraining (Simple Text)
-```json
-{
-  "text": "The quick brown fox jumps over the lazy dog...",
-  "metadata": {"domain": "wikipedia", "quality_score": 0.95}
-}
-```
+| Dataset | Records | Output Size |
+|---------|---------|-------------|
+| Nemotron-Science-v1 | 226K | ~3.5 GB |
+| Nemotron-Instruction-Following-Chat-v1 | 431K | ~6.7 GB |
+| Nemotron-3-Nano-RL-Training-Blend | 93K | ~1.5 GB |
+| Nemotron-Math-Proofs-v1 | 1.4M | ~22 GB |
+| Nemotron-Agentic-v1 | 335K | ~5.2 GB |
+| Nemotron-Competitive-Programming-v1 | 3.9M | ~61 GB |
+| Nemotron-Math-v2 | 7.1M | ~110 GB |
+| Nemotron-SWE-v1 | 51K | ~0.8 GB |
+| **Total** | **~13.2M** | **~216 GB** |
 
 ## Troubleshooting
 
-### Out of Memory
-- Reduce `--batch-size` (try 1)
-- Use `--dtype float16` or `bfloat16`
-- Process smaller datasets first
+### CUDA Out of Memory
 
-### Slow Processing
-- Enable Flash Attention 2 (requires compatible GPU)
-- Increase `--num-gpus`
-- Adjust `--chunk-size` for optimal I/O
+- Reduce `--batch-size` (try 4 or 2)
+- Reduce `--max-length` (try 4096)
+- The script automatically halves batch size on OOM and retries
 
-### Disk Space Issues
-- Process datasets selectively using `--datasets`
-- Clean up intermediate files
-- Use external storage for large datasets
+### SWE-v1 Slow Processing
 
-## Recent Updates
+SWE-v1 has very long conversations (median ~34K tokens, 55% exceed 32K).  Use a lower `--max-length` to truncate:
 
-**January 24, 2026**: Added support for 9 pretraining datasets
-- See [`doc/PRETRAINING_DATASETS_UPDATE.md`](doc/PRETRAINING_DATASETS_UPDATE.md) for details
-- Enhanced extraction logic for simple text formats
-- Improved auto-detection capabilities
+```bash
+python 02_embedding_extraction.py --datasets SWE --max-length 4096
+```
+
+### Resume After Interruption
+
+Simply re-run the same command.  Existing `.npy` chunks are detected and skipped.
+
+### Verifying Output
+
+```python
+import numpy as np
+
+emb = np.load("/raid/embeddings/Nemotron-Science-v1/MCQ/embeddings_00000.npy")
+print(emb.shape)   # (50000, 4096)
+print(emb.dtype)   # float32
+print(np.linalg.norm(emb[0]))  # ~1.0 (L2-normalised)
+```
 
 ## License
 
 See `LICENSE` file for dataset and code licensing information.
 
-## Citation
-
-If you use these embeddings, please cite the original Nemotron datasets:
-
-```bibtex
-@misc{nvidia-nemotron-2025,
-  title={Nemotron Training Datasets},
-  author={NVIDIA},
-  year={2025},
-  url={https://huggingface.co/collections/nvidia}
-}
-```
+The embedding model (`nvidia/llama-embed-nemotron-8b`) is released under the customised NSCL v1 license with Meta's Llama 3.1 Community License terms.
