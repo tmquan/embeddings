@@ -70,97 +70,97 @@ logger = logging.getLogger(__name__)
 DATASET_CONFIGS: Dict[str, dict] = {
     # ===== POST-TRAINING DATASETS =====
 
-    "Llama-Nemotron-Post-Training-Dataset": {
-        "hf_name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("SFT/chat", "SFT/chat/chat.jsonl"),
-            ("SFT/code_v1", "SFT/code/code_v1.jsonl"),
-            ("SFT/code_v1.1", "SFT/code/code_v1.1.jsonl"),
-            ("SFT/math_v1", "SFT/math/math_v1.jsonl"),
-            ("SFT/math_v1.1", "SFT/math/math_v1.1.jsonl"),
-            ("SFT/safety", "SFT/safety/safety.jsonl"),
-            ("SFT/science", "SFT/science/science.jsonl"),
-            ("RL/instruction_following", "RL/instruction_following/instruction_following.jsonl"),
-            ("train/when2call_sft", "train/when2call_train_sft.jsonl"),
-            ("train/when2call_pref", "train/when2call_train_pref.jsonl"),
-        ],
-        "text_strategy": {
-            # SFT files: input (list of messages) + output (string)
-            # Concatenate all message contents with role prefixes, then append output
-            "fields": ["input", "output"],
-            "template": "messages_concat",
-            "description": (
-                "Flatten the 'input' message list (role: content pairs) and append "
-                "the 'output' field. Format: 'User: ... \\nAssistant: ...' preserving "
-                "multi-turn structure. For RL/when2call subsets, flatten the 'messages' "
-                "list instead."
-            ),
-            "preprocessing": (
-                "Strip system_prompt if it duplicates the first system message. "
-                "Remove <think> tags for non-reasoning variants if needed."
-            ),
-        },
-    },
+    # "Llama-Nemotron-Post-Training-Dataset": {
+    #     "hf_name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("SFT/chat", "SFT/chat/chat.jsonl"),
+    #         ("SFT/code_v1", "SFT/code/code_v1.jsonl"),
+    #         ("SFT/code_v1.1", "SFT/code/code_v1.1.jsonl"),
+    #         ("SFT/math_v1", "SFT/math/math_v1.jsonl"),
+    #         ("SFT/math_v1.1", "SFT/math/math_v1.1.jsonl"),
+    #         ("SFT/safety", "SFT/safety/safety.jsonl"),
+    #         ("SFT/science", "SFT/science/science.jsonl"),
+    #         ("RL/instruction_following", "RL/instruction_following/instruction_following.jsonl"),
+    #         ("train/when2call_sft", "train/when2call_train_sft.jsonl"),
+    #         ("train/when2call_pref", "train/when2call_train_pref.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         # SFT files: input (list of messages) + output (string)
+    #         # Concatenate all message contents with role prefixes, then append output
+    #         "fields": ["input", "output"],
+    #         "template": "messages_concat",
+    #         "description": (
+    #             "Flatten the 'input' message list (role: content pairs) and append "
+    #             "the 'output' field. Format: 'User: ... \\nAssistant: ...' preserving "
+    #             "multi-turn structure. For RL/when2call subsets, flatten the 'messages' "
+    #             "list instead."
+    #         ),
+    #         "preprocessing": (
+    #             "Strip system_prompt if it duplicates the first system message. "
+    #             "Remove <think> tags for non-reasoning variants if needed."
+    #         ),
+    #     },
+    # },
 
-    "Nemotron-Post-Training-Dataset-v1": {
-        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v1",
-        "category": "post-training",
-        "format": "parquet",
-        "sub_paths": [
-            # Sharded parquet files under data/
-            ("code", "data/code-*.parquet"),
-            ("math", "data/math-*.parquet"),
-            ("stem", "data/stem-*.parquet"),
-            ("tool", "data/tool-*.parquet"),
-            ("chat", "data/chat-*.parquet"),
-        ],
-        "text_strategy": {
-            "fields": ["messages"],
-            "template": "messages_list",
-            "description": (
-                "Flatten the 'messages' column (list of {role, content} dicts) into a "
-                "single text. Format: 'User: ...\\nAssistant: ...' Multi-turn "
-                "conversations are concatenated in order."
-            ),
-            "preprocessing": (
-                "Handle nested tool_calls structs—serialize tool call names/arguments "
-                "as text if present. Skip metadata column (JSON string)."
-            ),
-        },
-    },
+    # "Nemotron-Post-Training-Dataset-v1": {
+    #     "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v1",
+    #     "category": "post-training",
+    #     "format": "parquet",
+    #     "sub_paths": [
+    #         # Sharded parquet files under data/
+    #         ("code", "data/code-*.parquet"),
+    #         ("math", "data/math-*.parquet"),
+    #         ("stem", "data/stem-*.parquet"),
+    #         ("tool", "data/tool-*.parquet"),
+    #         ("chat", "data/chat-*.parquet"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages"],
+    #         "template": "messages_list",
+    #         "description": (
+    #             "Flatten the 'messages' column (list of {role, content} dicts) into a "
+    #             "single text. Format: 'User: ...\\nAssistant: ...' Multi-turn "
+    #             "conversations are concatenated in order."
+    #         ),
+    #         "preprocessing": (
+    #             "Handle nested tool_calls structs—serialize tool call names/arguments "
+    #             "as text if present. Skip metadata column (JSON string)."
+    #         ),
+    #     },
+    # },
 
-    "Nemotron-Post-Training-Dataset-v2": {
-        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v2",
-        "category": "post-training",
-        "format": "parquet",
-        "sub_paths": [
-            ("chat", "data/chat-*.parquet"),
-            ("code", "data/code-*.parquet"),
-            ("math", "data/math-*.parquet"),
-            ("stem", "data/stem-*.parquet"),
-            ("multilingual", "data/multilingual-*.parquet"),
-            ("multilingual_de", "data/multilingual_de-*.parquet"),
-            ("multilingual_es", "data/multilingual_es-*.parquet"),
-            ("multilingual_fr", "data/multilingual_fr-*.parquet"),
-            ("multilingual_it", "data/multilingual_it-*.parquet"),
-            ("multilingual_ja", "data/multilingual_ja-*.parquet"),
-        ],
-        "text_strategy": {
-            "fields": ["messages"],
-            "template": "messages_list",
-            "description": (
-                "Same as v1: flatten 'messages' list into role-prefixed text. "
-                "Includes multilingual subsets (DE, ES, FR, IT, JA)—embeddings will "
-                "capture cross-lingual semantics."
-            ),
-            "preprocessing": (
-                "No tool_calls in v2 schema. Some shards have 'metadata' column "
-                "(string)—ignore for embedding. Handle non-Latin scripts (JA) carefully."
-            ),
-        },
-    },
+    # "Nemotron-Post-Training-Dataset-v2": {
+    #     "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v2",
+    #     "category": "post-training",
+    #     "format": "parquet",
+    #     "sub_paths": [
+    #         ("chat", "data/chat-*.parquet"),
+    #         ("code", "data/code-*.parquet"),
+    #         ("math", "data/math-*.parquet"),
+    #         ("stem", "data/stem-*.parquet"),
+    #         ("multilingual", "data/multilingual-*.parquet"),
+    #         ("multilingual_de", "data/multilingual_de-*.parquet"),
+    #         ("multilingual_es", "data/multilingual_es-*.parquet"),
+    #         ("multilingual_fr", "data/multilingual_fr-*.parquet"),
+    #         ("multilingual_it", "data/multilingual_it-*.parquet"),
+    #         ("multilingual_ja", "data/multilingual_ja-*.parquet"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages"],
+    #         "template": "messages_list",
+    #         "description": (
+    #             "Same as v1: flatten 'messages' list into role-prefixed text. "
+    #             "Includes multilingual subsets (DE, ES, FR, IT, JA)—embeddings will "
+    #             "capture cross-lingual semantics."
+    #         ),
+    #         "preprocessing": (
+    #             "No tool_calls in v2 schema. Some shards have 'metadata' column "
+    #             "(string)—ignore for embedding. Handle non-Latin scripts (JA) carefully."
+    #         ),
+    #     },
+    # },
 
     "Nemotron-3-Nano-RL-Training-Blend": {
         "hf_name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
