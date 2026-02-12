@@ -17,3 +17,7 @@ pyarrow==23.0.0
 
 # Distributed / multi-GPU
 ray==2.53.0
+
+# NeMo Curator pipeline (used by 02_embedding_extraction_nemocurator.py)
+nemo-curator==1.0.0
+loguru==0.7.3

@@ -1,6 +1,6 @@
 # Nemotron Dataset Exploration Summary
 
-*Generated: 2026-02-09 16:28:50*
+*Generated: 2026-02-12 08:24:55*
 
 ## Configuration
 
@@ -21,6 +21,7 @@
 | 6 | Nemotron-Competitive-Programming-v1 | post-training | jsonl | 3.9M | `messages_list` | 1.2K | 0.0% |
 | 7 | Nemotron-Math-v2 | post-training | jsonl | 7.1M | `math_v2` | 697 | 0.0% |
 | 8 | Nemotron-SWE-v1 | post-training | jsonl | 51.0K | `agentic` | 34.0K | 54.9% |
+| 9 | Nemotron-Pretraining-Dataset-sample (NOT FOUND) | pretraining | parquet | 0 | `raw_text` | 0 | 0% |
 
 ---
 
@@ -190,8 +191,13 @@
 **Data quality observations:**
 
 - [low] Field 'original_expected_answer': 100% null values
+- [high_part0] Field 'url': 100% null values
+- [high_part0] Field 'user_name': 100% null values
+- [high_part0] Field 'user_url': 100% null values
 - [high_part1] Field 'original_expected_answer': 100% null values
-- [high_part2] Field 'original_expected_answer': 50% null values
+- [high_part1] Field 'url': 100% null values
+- [high_part1] Field 'user_name': 100% null values
+- [high_part1] Field 'user_url': 100% null values
 
 **Processing recommendation:**
 
@@ -471,6 +477,7 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
   url: str
   user_url: str
   user_name: str
+  tools: list
 ```
 
 **medium:**
@@ -488,6 +495,7 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
   url: str
   user_url: str
   user_name: str
+  tools: list
 ```
 
 **high_part0:**
@@ -501,6 +509,10 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
   used_in: list
   metadata: dict
   license: str
+  tools: list
+  url: NoneType
+  user_name: NoneType
+  user_url: NoneType
 ```
 
 **high_part1:**
@@ -515,6 +527,9 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
   used_in: list
   metadata: dict
   license: str
+  url: NoneType
+  user_name: NoneType
+  user_url: NoneType
 ```
 
 **high_part2:**
@@ -531,6 +546,7 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
   used_in: list
   license: str
   metadata: dict
+  tools: list
 ```
 
 ### Nemotron-SWE-v1
