@@ -9,7 +9,7 @@ Two extraction backends are provided:
 | **Multi-GPU** | Manual `torch.multiprocessing` + LPT scheduling | [NeMo Curator](https://github.com/NVIDIA-NeMo/Curator) Pipeline + Ray executor |
 | **Model loading** | Direct `AutoModel` / `AutoTokenizer` | Managed by `EmbeddingCreatorStage` |
 | **OOM handling** | Automatic batch-size halving | Managed by Curator internals |
-| **Output format** | Chunked `.npy` (float32) | Parquet with `embeddings` column |
+| **Output format** | Chunked `.npy` (float32) | Parquet with `embeddings` column (float32) |
 | **Dependencies** | PyTorch + Transformers only | `nemo-curator[ray]` + Ray |
 
 ## Overview
@@ -85,7 +85,7 @@ python 02_embedding_extraction_nemocurator.py
 python 02_embedding_extraction_nemocurator.py --datasets Nemotron-Science-v1
 
 # Tune batch size and sequence length
-python 02_embedding_extraction_nemocurator.py --batch-size 512 --max-seq-length 4096
+python 02_embedding_extraction_nemocurator.py --batch-size 16 --max-seq-length 4096
 ```
 
 <details>
@@ -98,9 +98,9 @@ python 02_embedding_extraction_nemocurator.py --batch-size 512 --max-seq-length 
 2026-02-12 08:46:55.876 | INFO     |   Model             : nvidia/llama-embed-nemotron-8b
 2026-02-12 08:46:55.876 | INFO     |   Embedding dim     : 4096
 2026-02-12 08:46:55.877 | INFO     |   GPUs              : 8
-2026-02-12 08:46:55.877 | INFO     |   Batch size        : 1024
+2026-02-12 08:46:55.877 | INFO     |   Batch size        : 8
 2026-02-12 08:46:55.877 | INFO     |   Max seq length    : 8192 tokens
-2026-02-12 08:46:55.877 | INFO     |   Chunk size        : 1,000 records
+2026-02-12 08:46:55.877 | INFO     |   Chunk size        : 10,000 records
 2026-02-12 08:46:55.877 | INFO     |   Executor          : ray_data
 2026-02-12 08:46:55.877 | INFO     |   Datasets dir      : /raid/datasets
 2026-02-12 08:46:55.877 | INFO     |   Embeddings dir    : /raid/embeddings_curator
@@ -220,9 +220,10 @@ Source datasets (JSONL/Parquet) are first pre-processed into standardised Parque
 **Key features:**
 - **Ray-distributed**: NeMo Curator + Ray handle GPU scheduling and data distribution automatically
 - **Resume-safe**: Existing preprocessed and embedding directories are detected and skipped
-- **Curator pipeline**: Uses `EmbeddingCreatorStage` with mean pooling and autocast for efficient inference
-- **Parquet output**: Embeddings stored in columnar Parquet format for efficient downstream analytics
-- **Monkey-patched `trust_remote_code`**: Patches NeMo Curator v1.0 to support custom HF models like `nvidia/llama-embed-nemotron-8b`
+- **Curator pipeline**: Uses `EmbeddingCreatorStage` with mean pooling, bfloat16 compute, and autocast for efficient inference
+- **float32 Parquet output**: Embeddings stored as `list<element: float>` in columnar Parquet format (patched from default float64)
+- **Indexed output naming**: Output files are renamed from hash-based names to `part_XXXXX_of_XXXXX.parquet`
+- **Patched NeMo Curator v1.0**: Installed source files patched for `trust_remote_code=True`, `torch_dtype=bfloat16`, and `attn_implementation="eager"` (see [Troubleshooting](#nemo-curator-trust_remote_code-error))
 
 ## Output Format
 
@@ -281,9 +282,10 @@ Embeddings are saved as Parquet files under `/raid/embeddings_curator/`:
 │   │   │   ├── part_000000_of_000018.parquet
 │   │   │   ├── part_000001_of_000018.parquet
 │   │   │   └── ...
-│   │   ├── embeddings/                # Output: Parquet with "embeddings" column
-│   │   │   ├── part_00000.parquet
-│   │   │   └── part_00001.parquet
+│   │   ├── embeddings/                # Output: Parquet with "embeddings" column (float32)
+│   │   │   ├── part_00000_of_00018.parquet
+│   │   │   ├── part_00001_of_00018.parquet
+│   │   │   └── ...
 │   │   └── metadata.json
 │   └── RQA/
 │       ├── preprocessed/
@@ -332,17 +334,16 @@ Each dataset has a tailored text concatenation strategy:
 ### CUDA Out of Memory
 
 - **HuggingFace**: Reduce `--batch-size` (try 4 or 2); the script automatically halves batch size on OOM and retries
-- **NeMo Curator**: Reduce `--batch-size` (try 512 or 256) and/or `--max-seq-length` (try 4096)
-- Reduce `--max-length` / `--max-seq-length` (try 4096)
+- **NeMo Curator**: Reduce `--batch-size` (try 4 or 2) and/or `--max-seq-length` (try 4096); ensure the model loads in bfloat16 (see [patching instructions](#nemo-curator-trust_remote_code-error))
 
 ### NeMo Curator Only Using 1 GPU
 
 Ray Data autoscales GPU actors between `(1, num_gpus)`.  It starts with 1 actor and only scales up when there are enough data blocks flowing through the pipeline.  If your preprocessed Parquet files are too large (few files → few partitions → few blocks), Ray will never spin up additional actors.
 
-**Fix**: Use a smaller `--chunk-size` to create more preprocessed partitions.  The default is 1,000 rows per file.  If you previously ran with a larger chunk size, regenerate the preprocessed data:
+**Fix**: Use a smaller `--chunk-size` to create more preprocessed partitions.  The default is 10,000 rows per file.  If you previously ran with a larger chunk size, regenerate the preprocessed data:
 
 ```bash
-python 02_embedding_extraction_nemocurator.py --force-preprocess --chunk-size 10000
+python 02_embedding_extraction_nemocurator.py --force-preprocess
 ```
 
 Rule of thumb: aim for **at least 2–4× more partitions than GPUs** (e.g. ≥16–32 files for 8 GPUs).
@@ -365,20 +366,36 @@ ValueError: The repository nvidia/llama-embed-nemotron-8b contains custom code w
 to correctly load the model. Please pass the argument `trust_remote_code=True` to allow custom code to be run.
 ```
 
-NeMo Curator v1.0 hard-codes `AutoModel.from_pretrained(...)` without `trust_remote_code=True`, and loads the model in float32 instead of bfloat16. Since Ray workers import the package fresh (monkey-patching in the main process has no effect), you must patch the installed source files directly:
+NeMo Curator v1.0 has several issues with custom HF models like `nvidia/llama-embed-nemotron-8b`:
+
+- `AutoModel.from_pretrained(...)` called without `trust_remote_code=True`
+- Model loads in **float32** instead of bfloat16 (doubles GPU memory)
+- Embeddings written as **float64** instead of float32 (50% wasted disk space)
+
+Since Ray workers import the package fresh (monkey-patching in the main process has no effect), you must patch the installed source files directly:
 
 ```bash
 SITE=$(python -c "import nemo_curator; print(nemo_curator.__file__.rsplit('/', 1)[0])")
 
-# 1. EmbeddingModelStage.setup – add trust_remote_code, bfloat16, eager attention
+# 1. EmbeddingModelStage.setup – trust_remote_code, bfloat16, eager attention
 sed -i 's|self.model = AutoModel.from_pretrained(self.model_identifier, local_files_only=True)|self.model = AutoModel.from_pretrained(\n            self.model_identifier,\n            local_files_only=True,\n            trust_remote_code=True,\n            torch_dtype=torch.bfloat16,\n            attn_implementation="eager",\n        )|' \
   "$SITE/stages/text/embedders/base.py"
 
-# 2. TokenizerStage.load_cfg – AutoConfig.from_pretrained
+# 2. EmbeddingModelStage.collect_outputs – float32 instead of float64
+#    Add "import numpy as np" to imports
+sed -i '/^import torch$/i import numpy as np' "$SITE/stages/text/embedders/base.py"
+#    Replace .tolist() with .float().numpy() to keep float32
+sed -i 's/return torch.cat(processed_outputs, dim=0).numpy().tolist()/return torch.cat(processed_outputs, dim=0).float().numpy()/' \
+  "$SITE/stages/text/embedders/base.py"
+#    Update create_output_dataframe to split 2D array into list of 1D arrays
+sed -i 's/return df_cpu.assign(\*\*{self.embedding_field: collected_output})/embeddings_list = [collected_output[i] for i in range(len(collected_output))]\n        return df_cpu.assign(**{self.embedding_field: embeddings_list})/' \
+  "$SITE/stages/text/embedders/base.py"
+
+# 3. TokenizerStage.load_cfg – AutoConfig.from_pretrained
 sed -i 's/self.model_identifier, cache_dir=self.cache_dir, local_files_only=local_files_only)/self.model_identifier, cache_dir=self.cache_dir, local_files_only=local_files_only, trust_remote_code=True)/' \
   "$SITE/stages/text/models/tokenizer.py"
 
-# 3. TokenizerStage._setup – AutoTokenizer.from_pretrained  (add after local_files_only line)
+# 4. TokenizerStage._setup – AutoTokenizer.from_pretrained
 sed -i '/local_files_only=local_files_only,/{/trust_remote_code/!s/local_files_only=local_files_only,/local_files_only=local_files_only,\n            trust_remote_code=True,/}' \
   "$SITE/stages/text/models/tokenizer.py"
 ```
@@ -404,10 +421,14 @@ print(np.linalg.norm(emb[0]))  # ~1.0 (L2-normalised)
 
 ```python
 import pandas as pd
+import numpy as np
 
 df = pd.read_parquet("/raid/embeddings_curator/Nemotron-Science-v1/MCQ/embeddings/")
 print(len(df))                        # number of embedded records
 print(len(df["embeddings"].iloc[0]))  # 4096
+emb = np.array(df["embeddings"].iloc[0])
+print(emb.dtype)                      # float32
+print(np.linalg.norm(emb))           # ~1.0 (L2-normalised)
 ```
 
 ## License

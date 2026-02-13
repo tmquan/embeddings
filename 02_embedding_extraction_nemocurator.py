@@ -585,6 +585,34 @@ def discover_work_units(
 # ---------------------------------------------------------------------------
 
 
+def _rename_output_files(output_dir: str) -> None:
+    """Rename hash-based Parquet files to sequential indexed names.
+
+    NeMo Curator's ParquetWriter produces filenames like ``1abfc2e27f7c.parquet``
+    (deterministic SHA256 hashes).  This renames them to
+    ``part_00000_of_00006.parquet`` for readability.
+    """
+    parquet_files = sorted(
+        f for f in os.listdir(output_dir)
+        if f.endswith(".parquet") and not f.startswith("part_")
+    )
+    if not parquet_files:
+        return
+
+    total = len(parquet_files)
+    for idx, old_name in enumerate(parquet_files):
+        new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+        os.rename(
+            os.path.join(output_dir, old_name),
+            os.path.join(output_dir, new_name),
+        )
+    logger.info(
+        "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet",
+        total,
+        total,
+    )
+
+
 def run_embedding_pipeline(
     input_files: List[str],
     output_path: str,
@@ -663,6 +691,9 @@ def run_embedding_pipeline(
         task._stage_perf[-1].num_items_processed for task in output_tasks
     )
     throughput = num_docs / run_time if run_time > 0 else 0
+
+    # Rename hash-based output files to sequential indexed names
+    _rename_output_files(output_path)
 
     logger.success(
         "Pipeline completed in {:.2f}s – {:,} documents, {:.1f} docs/s",

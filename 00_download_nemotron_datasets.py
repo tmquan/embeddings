@@ -40,9 +40,9 @@ logger = logging.getLogger(__name__)
 
 # Post-Training Datasets (12 datasets, ~1.64M rows, ~4.3 GB total)
 POST_TRAINING_DATASETS = [
-    # "nvidia/Llama-Nemotron-Post-Training-Dataset",  
-    # "nvidia/Nemotron-Post-Training-Dataset-v1",     
-    # "nvidia/Nemotron-Post-Training-Dataset-v2",     
+    "nvidia/Llama-Nemotron-Post-Training-Dataset",  
+    "nvidia/Nemotron-Post-Training-Dataset-v1",     
+    "nvidia/Nemotron-Post-Training-Dataset-v2",     
     # From Nemotron Post-Training v3 collection:
     "nvidia/Nemotron-Science-v1",                   
     "nvidia/Nemotron-Agentic-v1",                   
@@ -57,15 +57,15 @@ POST_TRAINING_DATASETS = [
 # Pretraining Datasets (9 datasets, ~15.1B rows, ~24 TB total)
 # WARNING: These are VERY LARGE! Start with the sample dataset first.
 PRETRAINING_DATASETS = [
-    # "nvidia/Nemotron-Pretraining-Dataset-sample", 
-    # "nvidia/Nemotron-CC-Code-v1",                 
-    # "nvidia/Nemotron-CC-v2.1",                    
-    # "nvidia/Nemotron-Pretraining-Code-v2",        
-    # "nvidia/Nemotron-Pretraining-Specialized-v1", 
-    # "nvidia/Nemotron-CC-Math-v1",                 
-    # "nvidia/Nemotron-CC-v2",                      
-    # "nvidia/Nemotron-Pretraining-SFT-v1",         
-    # "nvidia/Nemotron-Pretraining-Code-v1",        
+    "nvidia/Nemotron-Pretraining-Dataset-sample", 
+    "nvidia/Nemotron-CC-Code-v1",                 
+    "nvidia/Nemotron-CC-v2.1",                    
+    "nvidia/Nemotron-Pretraining-Code-v2",        
+    "nvidia/Nemotron-Pretraining-Specialized-v1", 
+    "nvidia/Nemotron-CC-Math-v1",                 
+    "nvidia/Nemotron-CC-v2",                      
+    "nvidia/Nemotron-Pretraining-SFT-v1",         
+    "nvidia/Nemotron-Pretraining-Code-v1",        
 ]
 
 # Combine datasets to download
