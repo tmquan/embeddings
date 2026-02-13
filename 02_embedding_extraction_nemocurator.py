@@ -903,6 +903,8 @@ def main() -> None:
         if os.path.isdir(emb_dir) and any(
             f.endswith(".parquet") for f in os.listdir(emb_dir)
         ):
+            # Rename any leftover hash-based files from prior runs
+            _rename_output_files(emb_dir)
             logger.info("  Embeddings already exist in {} – skipping", emb_dir)
             results.append(
                 {
