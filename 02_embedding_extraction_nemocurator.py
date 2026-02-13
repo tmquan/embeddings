@@ -585,29 +585,101 @@ def discover_work_units(
 # ---------------------------------------------------------------------------
 
 
-def _rename_output_files(output_dir: str) -> None:
-    """Rename hash-based Parquet files to sequential indexed names.
+def _rename_output_files(output_dir: str, input_files: Optional[List[str]] = None) -> None:
+    """Rename hash-based Parquet files to indexed names matching preprocessed input order.
 
     NeMo Curator's ParquetWriter produces filenames like ``1abfc2e27f7c.parquet``
-    (deterministic SHA256 hashes).  This renames them to
-    ``part_00000_of_00006.parquet`` for readability.
+    (deterministic SHA256 hashes derived from source file paths).  This renames
+    them to ``part_00000_of_00018.parquet`` so that each embedding file matches
+    the index of its corresponding preprocessed input file.
+
+    Parameters
+    ----------
+    output_dir : str
+        Directory containing the hash-named Parquet files.
+    input_files : list[str] or None
+        Ordered list of preprocessed input file paths.  When provided, the
+        function computes the expected hash for each input and maps output
+        files back to their original index.  When ``None``, falls back to
+        sorting by row count (largest first, partial partition last).
     """
-    parquet_files = sorted(
+    import hashlib
+
+    hash_files = [
         f for f in os.listdir(output_dir)
-        if f.endswith(".parquet") and not f.startswith("part_")
-    )
-    if not parquet_files:
+        if f.endswith(".parquet") and not f.startswith("part_") and not f.startswith(".")
+    ]
+    if not hash_files:
         return
 
-    total = len(parquet_files)
-    for idx, old_name in enumerate(parquet_files):
-        new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+    total = len(hash_files)
+    hash_set = set(hash_files)
+
+    # --- Strategy 1: deterministic hash mapping (matches input order) ---
+    if input_files and len(input_files) == total:
+        def _expected_hash(fpath: str, idx: int) -> str:
+            """Reproduce NeMo Curator's deterministic output filename."""
+            combined = f"{fpath}|file_group_{idx}_processed"
+            return hashlib.sha256(combined.encode()).hexdigest()[:12]
+
+        mapping: Dict[str, int] = {}  # hash_filename → input_index
+        for i, fpath in enumerate(input_files):
+            expected = f"{_expected_hash(fpath, i)}.parquet"
+            if expected in hash_set:
+                mapping[expected] = i
+
+        if len(mapping) == total:
+            # Use temp names to avoid collisions during rename
+            for old_name, idx in mapping.items():
+                tmp_name = f".tmp_emb_{idx:05d}.parquet"
+                os.rename(
+                    os.path.join(output_dir, old_name),
+                    os.path.join(output_dir, tmp_name),
+                )
+            for idx in range(total):
+                tmp_name = f".tmp_emb_{idx:05d}.parquet"
+                new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+                os.rename(
+                    os.path.join(output_dir, tmp_name),
+                    os.path.join(output_dir, new_name),
+                )
+            logger.info(
+                "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet (matched to input order)",
+                total,
+                total,
+            )
+            return
+        else:
+            logger.warning(
+                "  Hash mapping matched only {}/{} files – falling back to row-count sort",
+                len(mapping),
+                total,
+            )
+
+    # --- Strategy 2: fallback – sort by row count (partial partition last) ---
+    def _row_count(fname: str) -> int:
+        try:
+            return pq.ParquetFile(os.path.join(output_dir, fname)).metadata.num_rows
+        except Exception:
+            return 0
+
+    hash_files.sort(key=_row_count, reverse=True)
+
+    for idx, old_name in enumerate(hash_files):
+        tmp_name = f".tmp_emb_{idx:05d}.parquet"
         os.rename(
             os.path.join(output_dir, old_name),
+            os.path.join(output_dir, tmp_name),
+        )
+    for idx in range(total):
+        tmp_name = f".tmp_emb_{idx:05d}.parquet"
+        new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+        os.rename(
+            os.path.join(output_dir, tmp_name),
             os.path.join(output_dir, new_name),
         )
     logger.info(
-        "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet",
+        "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet (row-count sorted)",
         total,
         total,
     )
@@ -692,8 +764,8 @@ def run_embedding_pipeline(
     )
     throughput = num_docs / run_time if run_time > 0 else 0
 
-    # Rename hash-based output files to sequential indexed names
-    _rename_output_files(output_path)
+    # Rename hash-based output files to sequential indexed names matching input order
+    _rename_output_files(output_path, input_files=input_files)
 
     logger.success(
         "Pipeline completed in {:.2f}s – {:,} documents, {:.1f} docs/s",
@@ -904,7 +976,12 @@ def main() -> None:
             f.endswith(".parquet") for f in os.listdir(emb_dir)
         ):
             # Rename any leftover hash-based files from prior runs
-            _rename_output_files(emb_dir)
+            pre_dir = work_unit["preprocess_dir"]
+            pre_files = sorted(
+                os.path.join(pre_dir, f) for f in os.listdir(pre_dir)
+                if f.startswith("part_") and f.endswith(".parquet")
+            ) if os.path.isdir(pre_dir) else None
+            _rename_output_files(emb_dir, input_files=pre_files)
             logger.info("  Embeddings already exist in {} – skipping", emb_dir)
             results.append(
                 {
