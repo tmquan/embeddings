@@ -140,7 +140,66 @@ def _get_worker_logger(gpu_id: int) -> logging.Logger:
 # ---------------------------------------------------------------------------
 
 DATASET_CONFIGS: Dict[str, dict] = {
-    # ===== POST-TRAINING DATASETS =====
+    # ===== POST-TRAINING DATASETS (from 00_download: Llama / Nemotron-Post-Training v1/v2) =====
+    "Llama-Nemotron-Post-Training-Dataset": {
+        "hf_name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
+        "category": "post-training",
+        "format": "jsonl",
+        "sub_paths": [
+            ("SFT_chat", "SFT/chat/chat.jsonl"),
+            ("SFT_code_v1", "SFT/code/code_v1.jsonl"),
+            ("SFT_code_v1.1", "SFT/code/code_v1.1.jsonl"),
+            ("SFT_math_v1", "SFT/math/math_v1.jsonl"),
+            ("SFT_math_v1.1", "SFT/math/math_v1.1.jsonl"),
+            ("SFT_safety", "SFT/safety/safety.jsonl"),
+            ("SFT_science", "SFT/science/science.jsonl"),
+            ("RL_instruction_following", "RL/instruction_following/instruction_following.jsonl"),
+            ("train_when2call_sft", "train/when2call_train_sft.jsonl"),
+            ("train_when2call_pref", "train/when2call_train_pref.jsonl"),
+        ],
+        "text_strategy": {
+            "fields": ["input", "output"],
+            "template": "messages_concat",
+        },
+    },
+    "Nemotron-Post-Training-Dataset-v1": {
+        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v1",
+        "category": "post-training",
+        "format": "parquet",
+        "sub_paths": [
+            ("code", "data/code-*.parquet"),
+            ("math", "data/math-*.parquet"),
+            ("stem", "data/stem-*.parquet"),
+            ("tool", "data/tool-*.parquet"),
+            ("chat", "data/chat-*.parquet"),
+        ],
+        "text_strategy": {
+            "fields": ["messages"],
+            "template": "messages_list",
+        },
+    },
+    "Nemotron-Post-Training-Dataset-v2": {
+        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v2",
+        "category": "post-training",
+        "format": "parquet",
+        "sub_paths": [
+            ("chat", "data/chat-*.parquet"),
+            ("code", "data/code-*.parquet"),
+            ("math", "data/math-*.parquet"),
+            ("stem", "data/stem-*.parquet"),
+            ("multilingual", "data/multilingual-*.parquet"),
+            ("multilingual_de", "data/multilingual_de-*.parquet"),
+            ("multilingual_es", "data/multilingual_es-*.parquet"),
+            ("multilingual_fr", "data/multilingual_fr-*.parquet"),
+            ("multilingual_it", "data/multilingual_it-*.parquet"),
+            ("multilingual_ja", "data/multilingual_ja-*.parquet"),
+        ],
+        "text_strategy": {
+            "fields": ["messages"],
+            "template": "messages_list",
+        },
+    },
+    # ===== POST-TRAINING DATASETS (Nemotron v3 collection) =====
     "Nemotron-3-Nano-RL-Training-Blend": {
         "hf_name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
         "category": "post-training",
@@ -250,27 +309,27 @@ DATASET_CONFIGS: Dict[str, dict] = {
         },
     },
     # ===== PRETRAINING DATASETS =====
-    # "Nemotron-Pretraining-Dataset-sample": {
-    #     "hf_name": "nvidia/Nemotron-Pretraining-Dataset-sample",
-    #     "category": "pretraining",
-    #     "format": "parquet",
-    #     "sub_paths": [
-    #         ("CC-High-Quality", "Nemotron-CC-High-Quality/part_*.parquet"),
-    #         ("CC-High-Quality-Synthetic", "Nemotron-CC-High-Quality-Synthetic/part_*.parquet"),
-    #         ("CC-Diverse-QA", "Nemotron-CC-Diverse-QA/part_*.parquet"),
-    #         ("CC-Translated-Diverse-QA", "Nemotron-CC-Translated-Diverse-QA/part_*.parquet"),
-    #         ("CC-MATH", "Nemotron-CC-MATH/part_*.parquet"),
-    #         ("Code-Metadata", "Nemotron-Code-Metadata/part_*.parquet"),
-    #         ("SFT-Code", "Nemotron-SFT-Code/part_*.parquet"),
-    #         ("SFT-General", "Nemotron-SFT-General/part_*.parquet"),
-    #         ("SFT-MATH", "Nemotron-SFT-MATH/part_*.parquet"),
-    #         ("Synthetic-Code", "Nemotron-Synthetic-Code/part_*.parquet"),
-    #     ],
-    #     "text_strategy": {
-    #         "fields": ["text"],
-    #         "template": "raw_text",
-    #     },
-    # },
+    "Nemotron-Pretraining-Dataset-sample": {
+        "hf_name": "nvidia/Nemotron-Pretraining-Dataset-sample",
+        "category": "pretraining",
+        "format": "parquet",
+        "sub_paths": [
+            ("CC-High-Quality", "Nemotron-CC-High-Quality/part_*.parquet"),
+            ("CC-High-Quality-Synthetic", "Nemotron-CC-High-Quality-Synthetic/part_*.parquet"),
+            ("CC-Diverse-QA", "Nemotron-CC-Diverse-QA/part_*.parquet"),
+            ("CC-Translated-Diverse-QA", "Nemotron-CC-Translated-Diverse-QA/part_*.parquet"),
+            ("CC-MATH", "Nemotron-CC-MATH/part_*.parquet"),
+            ("Code-Metadata", "Nemotron-Code-Metadata/part_*.parquet"),
+            ("SFT-Code", "Nemotron-SFT-Code/part_*.parquet"),
+            ("SFT-General", "Nemotron-SFT-General/part_*.parquet"),
+            ("SFT-MATH", "Nemotron-SFT-MATH/part_*.parquet"),
+            ("Synthetic-Code", "Nemotron-Synthetic-Code/part_*.parquet"),
+        ],
+        "text_strategy": {
+            "fields": ["text"],
+            "template": "raw_text",
+        },
+    },
 }
 
 # ---------------------------------------------------------------------------
