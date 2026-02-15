@@ -14,7 +14,17 @@ Two extraction backends are provided:
 
 ## Overview
 
-This pipeline processes **8 Nemotron post-training datasets** (~13.2M records, ~380 GB on disk) and extracts 4096-dimensional embeddings using all 8 available GPUs. A full NeMo Curator run (2026-02-14) completed **13,505,137** documents in ~41.2 h at 92.3 docs/s (20 work units, 8 GPUs). The **embedding reduction** script (`04_embedding_reduction_nemocurator.py`) reduces **all** embeddings by default: when the corpus exceeds 8M points it runs in batches (8M per batch; cuDF row limit) (e.g. `reduced_2d_3d_part0.parquet`, `reduced_2d_3d_part1.parquet`). Subsampling is only for visualization afterward.
+This pipeline processes **11 Nemotron post-training datasets** (~48.2M records) and extracts 4096-dimensional embeddings using all 8 available GPUs. The NeMo Curator backend covers all 11 datasets (25 work units); the first 8 datasets (20 work units, 13,505,137 docs) completed in ~41.2 h at 92.3 docs/s on 2026-02-14.
+
+The three additional datasets added on 2026-02-15:
+
+| Dataset | HuggingFace Repo | Records | Splits |
+|---------|-----------------|---------|--------|
+| Llama-Nemotron-Post-Training-Dataset | `nvidia/Llama-Nemotron-Post-Training-Dataset` | ~16.2M | SFT (chat, code_v1/v1.1, math_v1/v1.1, safety, science), RL, train |
+| Nemotron-Post-Training-Dataset-v1 | `nvidia/Nemotron-Post-Training-Dataset-v1` | ~25.7M | code, math, stem, tool, chat |
+| Nemotron-Post-Training-Dataset-v2 | `nvidia/Nemotron-Post-Training-Dataset-v2` | ~6.3M | chat, code, math, stem, multilingual (de/es/fr/it/ja) |
+
+The **embedding reduction** script (`04_embedding_reduction_nemocurator.py`) processes each dataset/split independently on CPU (sklearn t-SNE + umap-learn), so each split is reduced separately and memory is bounded per-split. Resume-safe: existing output is skipped.
 
 | Property | Value |
 |----------|-------|
@@ -46,7 +56,7 @@ pip install -r requirements.txt
 python 00_download_nemotron_datasets.py
 ```
 
-Downloads 8 post-training datasets from HuggingFace to `/raid/datasets/`.  Already-downloaded datasets are skipped automatically.
+Downloads 11 post-training datasets from HuggingFace to `/raid/datasets/`.  Already-downloaded datasets are skipped automatically.
 
 ### 3. Explore Datasets
 
@@ -133,20 +143,23 @@ Full run completed successfully. Final task (Nemotron-SWE-v1/r2e_gym) and summar
 
 ## Dataset Catalog
 
-All 8 datasets are post-training JSONL format, stored at `/raid/datasets/`.
+All 11 datasets are post-training format (JSONL or Parquet), stored at `/raid/datasets/`.
 
-| Dataset | HuggingFace Repo | Rows | Disk Size | Text Strategy |
-|---------|-----------------|------|-----------|---------------|
-| Nemotron-Science-v1 | `nvidia/Nemotron-Science-v1` | 226K | 2.5 GB | `messages_list` |
-| Nemotron-Instruction-Following-Chat-v1 | `nvidia/Nemotron-Instruction-Following-Chat-v1` | 431K | 6.7 GB | `messages_list` |
-| Nemotron-3-Nano-RL-Training-Blend | `nvidia/Nemotron-3-Nano-RL-Training-Blend` | 93K | 6.5 GB | `rl_blend` |
-| Nemotron-Math-Proofs-v1 | `nvidia/Nemotron-Math-Proofs-v1` | 1.4M | 28 GB | `math_proof` |
-| Nemotron-Agentic-v1 | `nvidia/Nemotron-Agentic-v1` | 335K | 5.4 GB | `agentic` |
-| Nemotron-Competitive-Programming-v1 | `nvidia/Nemotron-Competitive-Programming-v1` | 3.9M | 177 GB | `messages_list` |
-| Nemotron-Math-v2 | `nvidia/Nemotron-Math-v2` | 7.1M | 142 GB | `math_v2` |
-| Nemotron-SWE-v1 | `nvidia/Nemotron-SWE-v1` | 51K | 11 GB | `agentic` |
+| Dataset | HuggingFace Repo | Rows | Text Strategy |
+|---------|-----------------|------|---------------|
+| Llama-Nemotron-Post-Training-Dataset | `nvidia/Llama-Nemotron-Post-Training-Dataset` | ~16.2M | `messages_concat` |
+| Nemotron-Post-Training-Dataset-v1 | `nvidia/Nemotron-Post-Training-Dataset-v1` | ~25.7M | `messages_list` |
+| Nemotron-Post-Training-Dataset-v2 | `nvidia/Nemotron-Post-Training-Dataset-v2` | ~6.3M | `messages_list` |
+| Nemotron-Science-v1 | `nvidia/Nemotron-Science-v1` | 226K | `messages_list` |
+| Nemotron-Instruction-Following-Chat-v1 | `nvidia/Nemotron-Instruction-Following-Chat-v1` | 431K | `messages_list` |
+| Nemotron-3-Nano-RL-Training-Blend | `nvidia/Nemotron-3-Nano-RL-Training-Blend` | 93K | `rl_blend` |
+| Nemotron-Math-Proofs-v1 | `nvidia/Nemotron-Math-Proofs-v1` | 1.4M | `math_proof` |
+| Nemotron-Agentic-v1 | `nvidia/Nemotron-Agentic-v1` | 335K | `agentic` |
+| Nemotron-Competitive-Programming-v1 | `nvidia/Nemotron-Competitive-Programming-v1` | 3.9M | `messages_list` |
+| Nemotron-Math-v2 | `nvidia/Nemotron-Math-v2` | 7.1M | `math_v2` |
+| Nemotron-SWE-v1 | `nvidia/Nemotron-SWE-v1` | 51K | `agentic` |
 
-**Total: ~13.2M records, ~380 GB source data**
+**Total: ~48.2M records across 25 work units (11 datasets)**
 
 ## Pipeline Scripts
 
@@ -224,17 +237,35 @@ Source datasets (JSONL/Parquet) are first pre-processed into standardised Parque
 
 ### `04_embedding_reduction_nemocurator.py`
 
-Reduces NeMo Curator embeddings to 2D/3D with t-SNE and UMAP (scikit-learn + umap-learn). **By default it reduces all** data in batches of 8M (cuDF row limit). Subsampling is only for visualization afterward (e.g. when building plots from the reduced Parquet/CSV). Use `--max-points-per-split` only to run a lighter reduction for testing.
+Reduces NeMo Curator embeddings to 2D/3D with t-SNE and UMAP (scikit-learn + umap-learn, CPU). Processes each dataset/split **independently** so memory is bounded per-split (not all 13M+ at once). Resume-safe: existing output is skipped.
 
 **Parameters:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--embeddings-dir` | `/raid/embeddings_curator` | Root with `{dataset_key}/{sub_label}/embeddings/` |
-| `--output-dir` | `/raid/embeddings_curator/reduced` | Output Parquet/CSV |
-| `--max-points-per-split` | 0 (no limit) | Cap points per split; set only to subsample for faster runs |
-| `--max-total-points` | 0 (reduce all) | 0 = all data in batches of 8M (memory/runtime); set e.g. 8M for single-run cap |
+| `--output-dir` | `/raid/embeddings_reduced` | Output Parquet/CSV per split |
+| `--datasets` | all | Filter by dataset key substring |
+| `--max-points-for-reduction` | 0 (all rows) | Per-split cap; splits with more rows are subsampled |
+| `--tsne-perplexity` | 30 | t-SNE perplexity |
+| `--umap-neighbors` | 15 | UMAP n_neighbors |
+| `--umap-min-dist` | 0.1 | UMAP min_dist |
+| `--no-csv` | — | Skip CSV output |
 | `--dry-run` | — | List splits and row counts only |
+
+Output structure mirrors the embeddings directory:
+
+```
+/raid/embeddings_reduced/
+├── Nemotron-Science-v1/
+│   ├── MCQ/
+│   │   ├── reduced_2d_3d.parquet
+│   │   ├── reduced_2d_3d.csv
+│   │   └── metadata.json
+│   └── RQA/
+│       └── ...
+└── ...
+```
 
 ## Output Format
 
@@ -330,6 +361,9 @@ Each dataset has a tailored text concatenation strategy:
 
 | Dataset | Records | Output Size |
 |---------|---------|-------------|
+| Llama-Nemotron-Post-Training-Dataset | ~16.2M | ~252 GB |
+| Nemotron-Post-Training-Dataset-v1 | ~25.7M | ~399 GB |
+| Nemotron-Post-Training-Dataset-v2 | ~6.3M | ~98 GB |
 | Nemotron-Science-v1 | 226K | ~3.5 GB |
 | Nemotron-Instruction-Following-Chat-v1 | 431K | ~6.7 GB |
 | Nemotron-3-Nano-RL-Training-Blend | 93K | ~1.5 GB |
@@ -338,7 +372,7 @@ Each dataset has a tailored text concatenation strategy:
 | Nemotron-Competitive-Programming-v1 | 3.9M | ~61 GB |
 | Nemotron-Math-v2 | 7.1M | ~110 GB |
 | Nemotron-SWE-v1 | 51K | ~0.8 GB |
-| **Total** | **~13.2M** | **~216 GB** |
+| **Total** | **~48.2M** | **~960 GB** |
 
 ## Troubleshooting
 

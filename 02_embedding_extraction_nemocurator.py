@@ -109,115 +109,196 @@ CHARS_PER_TOKEN = 4
 # ---------------------------------------------------------------------------
 
 DATASET_CONFIGS: Dict[str, dict] = {
-    # ===== POST-TRAINING DATASETS =====
-    "Nemotron-3-Nano-RL-Training-Blend": {
-        "hf_name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
+   # ===== POST-TRAINING DATASETS (from 00_download: Llama / Nemotron-Post-Training v1/v2) =====
+    "Llama-Nemotron-Post-Training-Dataset": {
+        "hf_name": "nvidia/Llama-Nemotron-Post-Training-Dataset",
         "category": "post-training",
         "format": "jsonl",
         "sub_paths": [
-            ("train", "train.jsonl"),
+            ("SFT_chat", "SFT/chat/chat.jsonl"),
+            ("SFT_code_v1", "SFT/code/code_v1.jsonl"),
+            ("SFT_code_v1.1", "SFT/code/code_v1.1.jsonl"),
+            ("SFT_math_v1", "SFT/math/math_v1.jsonl"),
+            ("SFT_math_v1.1", "SFT/math/math_v1.1.jsonl"),
+            ("SFT_safety", "SFT/safety/safety.jsonl"),
+            ("SFT_science", "SFT/science/science.jsonl"),
+            ("RL_instruction_following", "RL/instruction_following/instruction_following.jsonl"),
+            ("train_when2call_sft", "train/when2call_train_sft.jsonl"),
+            ("train_when2call_pref", "train/when2call_train_pref.jsonl"),
         ],
         "text_strategy": {
-            "fields": ["responses_create_params", "ground_truth"],
-            "template": "rl_blend",
+            "fields": ["input", "output"],
+            "template": "messages_concat",
         },
     },
-    "Nemotron-Science-v1": {
-        "hf_name": "nvidia/Nemotron-Science-v1",
+    "Nemotron-Post-Training-Dataset-v1": {
+        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v1",
         "category": "post-training",
-        "format": "jsonl",
+        "format": "parquet",
         "sub_paths": [
-            ("MCQ", "data/MCQ.jsonl"),
-            ("RQA", "data/RQA.jsonl"),
-        ],
-        "text_strategy": {
-            "fields": ["messages"],
-            "template": "messages_list",
-        },
-    },
-    "Nemotron-Instruction-Following-Chat-v1": {
-        "hf_name": "nvidia/Nemotron-Instruction-Following-Chat-v1",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("chat_if", "data/chat_if.jsonl"),
-            ("structured_outputs", "data/structured_outputs.jsonl"),
-        ],
-        "text_strategy": {
-            "fields": ["messages"],
-            "template": "messages_list",
-        },
-    },
-    "Nemotron-Math-Proofs-v1": {
-        "hf_name": "nvidia/Nemotron-Math-Proofs-v1",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("lean", "data/lean.jsonl"),
-        ],
-        "text_strategy": {
-            "fields": ["problem", "formal_statement", "lean_header"],
-            "template": "math_proof",
-        },
-    },
-    "Nemotron-Agentic-v1": {
-        "hf_name": "nvidia/Nemotron-Agentic-v1",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("tool_calling", "data/tool_calling.jsonl"),
-            ("interactive_agent", "data/interactive_agent.jsonl"),
-        ],
-        "text_strategy": {
-            "fields": ["messages", "tools"],
-            "template": "agentic",
-        },
-    },
-    "Nemotron-Competitive-Programming-v1": {
-        "hf_name": "nvidia/Nemotron-Competitive-Programming-v1",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("cpp_part0", "data/competitive_coding_cpp.part_00.jsonl"),
-            ("cpp_part1", "data/competitive_coding_cpp.part_01.jsonl"),
-            ("python_part0", "data/competitive_coding_python.part_00.jsonl"),
-            ("python_part1", "data/competitive_coding_python.part_01.jsonl"),
-            ("infinibyte_part0", "data/infinibyte.part_00.jsonl"),
-            ("infinibyte_part1", "data/infinibyte.part_01.jsonl"),
+            ("code", "data/code-*.parquet"),
+            ("math", "data/math-*.parquet"),
+            ("stem", "data/stem-*.parquet"),
+            ("tool", "data/tool-*.parquet"),
+            ("chat", "data/chat-*.parquet"),
         ],
         "text_strategy": {
             "fields": ["messages"],
             "template": "messages_list",
         },
     },
-    "Nemotron-Math-v2": {
-        "hf_name": "nvidia/Nemotron-Math-v2",
+    "Nemotron-Post-Training-Dataset-v2": {
+        "hf_name": "nvidia/Nemotron-Post-Training-Dataset-v2",
         "category": "post-training",
-        "format": "jsonl",
+        "format": "parquet",
         "sub_paths": [
-            ("low", "data/low.jsonl"),
-            ("medium", "data/medium.jsonl"),
-            ("high_part0", "data/high.part_00.jsonl"),
-            ("high_part1", "data/high.part_01.jsonl"),
-            ("high_part2", "data/high.part_02.jsonl"),
+            ("chat", "data/chat-*.parquet"),
+            ("code", "data/code-*.parquet"),
+            ("math", "data/math-*.parquet"),
+            ("stem", "data/stem-*.parquet"),
+            ("multilingual", "data/multilingual-*.parquet"),
+            ("multilingual_de", "data/multilingual_de-*.parquet"),
+            ("multilingual_es", "data/multilingual_es-*.parquet"),
+            ("multilingual_fr", "data/multilingual_fr-*.parquet"),
+            ("multilingual_it", "data/multilingual_it-*.parquet"),
+            ("multilingual_ja", "data/multilingual_ja-*.parquet"),
         ],
         "text_strategy": {
-            "fields": ["problem", "messages"],
-            "template": "math_v2",
+            "fields": ["messages"],
+            "template": "messages_list",
         },
     },
-    "Nemotron-SWE-v1": {
-        "hf_name": "nvidia/Nemotron-SWE-v1",
-        "category": "post-training",
-        "format": "jsonl",
-        "sub_paths": [
-            ("r2e_gym", "data/r2e_gym.jsonl"),
-        ],
-        "text_strategy": {
-            "fields": ["messages", "tools"],
-            "template": "agentic",
-        },
-    },
+    # ===== POST-TRAINING DATASETS (Nemotron v3 collection) =====
+    # "Nemotron-3-Nano-RL-Training-Blend": {
+    #     "hf_name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("train", "train.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["responses_create_params", "ground_truth"],
+    #         "template": "rl_blend",
+    #     },
+    # },
+    # "Nemotron-Science-v1": {
+    #     "hf_name": "nvidia/Nemotron-Science-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("MCQ", "data/MCQ.jsonl"),
+    #         ("RQA", "data/RQA.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages"],
+    #         "template": "messages_list",
+    #     },
+    # },
+    # "Nemotron-Instruction-Following-Chat-v1": {
+    #     "hf_name": "nvidia/Nemotron-Instruction-Following-Chat-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("chat_if", "data/chat_if.jsonl"),
+    #         ("structured_outputs", "data/structured_outputs.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages"],
+    #         "template": "messages_list",
+    #     },
+    # },
+    # "Nemotron-Math-Proofs-v1": {
+    #     "hf_name": "nvidia/Nemotron-Math-Proofs-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("lean", "data/lean.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["problem", "formal_statement", "lean_header"],
+    #         "template": "math_proof",
+    #     },
+    # },
+    # "Nemotron-Agentic-v1": {
+    #     "hf_name": "nvidia/Nemotron-Agentic-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("tool_calling", "data/tool_calling.jsonl"),
+    #         ("interactive_agent", "data/interactive_agent.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages", "tools"],
+    #         "template": "agentic",
+    #     },
+    # },
+    # "Nemotron-Competitive-Programming-v1": {
+    #     "hf_name": "nvidia/Nemotron-Competitive-Programming-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("cpp_part0", "data/competitive_coding_cpp.part_00.jsonl"),
+    #         ("cpp_part1", "data/competitive_coding_cpp.part_01.jsonl"),
+    #         ("python_part0", "data/competitive_coding_python.part_00.jsonl"),
+    #         ("python_part1", "data/competitive_coding_python.part_01.jsonl"),
+    #         ("infinibyte_part0", "data/infinibyte.part_00.jsonl"),
+    #         ("infinibyte_part1", "data/infinibyte.part_01.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages"],
+    #         "template": "messages_list",
+    #     },
+    # },
+    # "Nemotron-Math-v2": {
+    #     "hf_name": "nvidia/Nemotron-Math-v2",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("low", "data/low.jsonl"),
+    #         ("medium", "data/medium.jsonl"),
+    #         ("high_part0", "data/high.part_00.jsonl"),
+    #         ("high_part1", "data/high.part_01.jsonl"),
+    #         ("high_part2", "data/high.part_02.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["problem", "messages"],
+    #         "template": "math_v2",
+    #     },
+    # },
+    # "Nemotron-SWE-v1": {
+    #     "hf_name": "nvidia/Nemotron-SWE-v1",
+    #     "category": "post-training",
+    #     "format": "jsonl",
+    #     "sub_paths": [
+    #         ("r2e_gym", "data/r2e_gym.jsonl"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["messages", "tools"],
+    #         "template": "agentic",
+    #     },
+    # },
+    # # ===== PRETRAINING DATASETS =====
+    # "Nemotron-Pretraining-Dataset-sample": {
+    #     "hf_name": "nvidia/Nemotron-Pretraining-Dataset-sample",
+    #     "category": "pretraining",
+    #     "format": "parquet",
+    #     "sub_paths": [
+    #         ("CC-High-Quality", "Nemotron-CC-High-Quality/part_*.parquet"),
+    #         ("CC-High-Quality-Synthetic", "Nemotron-CC-High-Quality-Synthetic/part_*.parquet"),
+    #         ("CC-Diverse-QA", "Nemotron-CC-Diverse-QA/part_*.parquet"),
+    #         ("CC-Translated-Diverse-QA", "Nemotron-CC-Translated-Diverse-QA/part_*.parquet"),
+    #         ("CC-MATH", "Nemotron-CC-MATH/part_*.parquet"),
+    #         ("Code-Metadata", "Nemotron-Code-Metadata/part_*.parquet"),
+    #         ("SFT-Code", "Nemotron-SFT-Code/part_*.parquet"),
+    #         ("SFT-General", "Nemotron-SFT-General/part_*.parquet"),
+    #         ("SFT-MATH", "Nemotron-SFT-MATH/part_*.parquet"),
+    #         ("Synthetic-Code", "Nemotron-Synthetic-Code/part_*.parquet"),
+    #     ],
+    #     "text_strategy": {
+    #         "fields": ["text"],
+    #         "template": "raw_text",
+    #     },
+    # },
 }
 
 # ---------------------------------------------------------------------------

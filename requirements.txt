@@ -22,8 +22,7 @@ ray==2.53.0
 nemo-curator==1.0.0
 loguru==0.7.3
 
-# Embedding reduction / visualization (04_embedding_reduction_nemocurator.py) – RAPIDS GPU
-# Install RAPIDS (cudf, cupy, cuml) to match your CUDA, e.g.:
-#   pip install cudf-cu12 cupy-cuda-12x cuml-cu12
-#   or: conda install -c rapidsai cudf cuml
+# Embedding reduction / visualization (04_embedding_reduction_nemocurator.py)
+scikit-learn
+umap-learn
 tqdm
