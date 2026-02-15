@@ -14,7 +14,7 @@ Two extraction backends are provided:
 
 ## Overview
 
-This pipeline processes **8 Nemotron post-training datasets** (~13.2M records, ~380 GB on disk) and extracts 4096-dimensional embeddings using all 8 available GPUs.
+This pipeline processes **8 Nemotron post-training datasets** (~13.2M records, ~380 GB on disk) and extracts 4096-dimensional embeddings using all 8 available GPUs. A full NeMo Curator run (2026-02-14) completed **13,505,137** documents in ~41.2 h at 92.3 docs/s (20 work units, 8 GPUs). The **embedding reduction** script (`04_embedding_reduction_nemocurator.py`) reduces **all** embeddings by default: when the corpus exceeds 8M points it runs in batches (8M per batch; cuDF row limit) (e.g. `reduced_2d_3d_part0.parquet`, `reduced_2d_3d_part1.parquet`). Subsampling is only for visualization afterward.
 
 | Property | Value |
 |----------|-------|
@@ -89,48 +89,45 @@ python 02_embedding_extraction_nemocurator.py --batch-size 16 --max-seq-length 4
 ```
 
 <details>
-<summary>Sample NeMo Curator pipeline output (13.2M records, 8 GPUs)</summary>
+<summary>Sample NeMo Curator pipeline output (discovery, 13.2M records, 8 GPUs)</summary>
 
 ```
 2026-02-12 08:46:55.876 | INFO     | ========================================================================
 2026-02-12 08:46:55.876 | INFO     | Nemotron Embedding Extraction Pipeline (NeMo Curator)
-2026-02-12 08:46:55.876 | INFO     | ========================================================================
-2026-02-12 08:46:55.876 | INFO     |   Model             : nvidia/llama-embed-nemotron-8b
-2026-02-12 08:46:55.876 | INFO     |   Embedding dim     : 4096
-2026-02-12 08:46:55.877 | INFO     |   GPUs              : 8
-2026-02-12 08:46:55.877 | INFO     |   Batch size        : 8
-2026-02-12 08:46:55.877 | INFO     |   Max seq length    : 8192 tokens
-2026-02-12 08:46:55.877 | INFO     |   Chunk size        : 10,000 records
-2026-02-12 08:46:55.877 | INFO     |   Executor          : ray_data
-2026-02-12 08:46:55.877 | INFO     |   Datasets dir      : /raid/datasets
-2026-02-12 08:46:55.877 | INFO     |   Embeddings dir    : /raid/embeddings_curator
-2026-02-12 08:46:55.877 | INFO     |   Dataset filter    : (all)
-2026-02-12 08:46:55.877 | INFO     | ------------------------------------------------------------------------
-2026-02-12 08:46:55.877 | INFO     | Discovering datasets and files ...
-2026-02-12 08:46:55.889 | INFO     |   [Nemotron-3-Nano-RL-Training-Blend/train] 1 file(s), ~592,353 records
-2026-02-12 08:46:55.901 | INFO     |   [Nemotron-Science-v1/MCQ] 1 file(s), ~174,530 records
-2026-02-12 08:46:55.907 | INFO     |   [Nemotron-Science-v1/RQA] 1 file(s), ~55,409 records
-2026-02-12 08:46:55.914 | INFO     |   [Nemotron-Instruction-Following-Chat-v1/chat_if] 1 file(s), ~417,251 records
-2026-02-12 08:46:55.921 | INFO     |   [Nemotron-Instruction-Following-Chat-v1/structured_outputs] 1 file(s), ~4,979 records
-2026-02-12 08:46:55.929 | INFO     |   [Nemotron-Math-Proofs-v1/lean] 1 file(s), ~1,613,418 records
-2026-02-12 08:46:55.935 | INFO     |   [Nemotron-Agentic-v1/tool_calling] 1 file(s), ~325,317 records
-2026-02-12 08:46:55.942 | INFO     |   [Nemotron-Agentic-v1/interactive_agent] 1 file(s), ~31,913 records
-2026-02-12 08:46:55.949 | INFO     |   [Nemotron-Competitive-Programming-v1/cpp_part0] 1 file(s), ~486,006 records
-2026-02-12 08:46:55.956 | INFO     |   [Nemotron-Competitive-Programming-v1/cpp_part1] 1 file(s), ~472,163 records
-2026-02-12 08:46:55.962 | INFO     |   [Nemotron-Competitive-Programming-v1/python_part0] 1 file(s), ~891,829 records
-2026-02-12 08:46:55.969 | INFO     |   [Nemotron-Competitive-Programming-v1/python_part1] 1 file(s), ~907,526 records
-2026-02-12 08:46:55.976 | INFO     |   [Nemotron-Competitive-Programming-v1/infinibyte_part0] 1 file(s), ~574,913 records
-2026-02-12 08:46:55.983 | INFO     |   [Nemotron-Competitive-Programming-v1/infinibyte_part1] 1 file(s), ~592,189 records
-2026-02-12 08:46:55.990 | INFO     |   [Nemotron-Math-v2/low] 1 file(s), ~1,626,858 records
-2026-02-12 08:46:55.997 | INFO     |   [Nemotron-Math-v2/medium] 1 file(s), ~1,762,371 records
-2026-02-12 08:46:56.004 | INFO     |   [Nemotron-Math-v2/high_part0] 1 file(s), ~666,099 records
-2026-02-12 08:46:56.015 | INFO     |   [Nemotron-Math-v2/high_part1] 1 file(s), ~784,780 records
-2026-02-12 08:46:56.025 | INFO     |   [Nemotron-Math-v2/high_part2] 1 file(s), ~1,176,313 records
-2026-02-12 08:46:56.032 | INFO     |   [Nemotron-SWE-v1/r2e_gym] 1 file(s), ~51,000 records
+...
 2026-02-12 08:46:56.032 | INFO     | Found 20 work units (13,207,217 total records)
-2026-02-12 08:46:56.032 | INFO     | ------------------------------------------------------------------------
 2026-02-12 08:46:56.032 | INFO     | Initialising ray_data executor with 8 GPUs ...
 ```
+
+</details>
+
+<details>
+<summary>NeMo Curator pipeline run completion (2026-02-14)</summary>
+
+Full run completed successfully. Final task (Nemotron-SWE-v1/r2e_gym) and summary:
+
+```
+2026-02-14 18:57:25.404 | INFO     | nemo_curator.backends.experimental.ray_data.executor:execute:97 - Pipeline completed. Final results: 6 tasks
+2026-02-14 18:57:28.084 | INFO     | __main__:_rename_output_files:646 -   Renamed 6 output file(s) → part_XXXXX_of_00006.parquet (matched to input order)
+2026-02-14 18:57:28.084 | SUCCESS  | __main__:run_embedding_pipeline:770 - Pipeline completed in 18384.51s – 51,029 documents, 2.8 docs/s
+2026-02-14 18:57:28.084 | INFO     | __main__:main:1087 -   Metadata saved → /raid/embeddings_curator/Nemotron-SWE-v1/r2e_gym/metadata.json
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1092 - ========================================================================
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1093 - Pipeline complete
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1094 -   Total wall-clock time : 148355.7s (2472.6 min)
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1095 -   Output directory      : /raid/embeddings_curator
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1102 -   Results: 20 succeeded, 0 skipped, 0 empty, 0 errors
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1123 -   Total documents processed : 13,505,137
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1128 -   Aggregate throughput      : 92.3 docs/s
+2026-02-14 18:57:28.085 | INFO     | __main__:main:1133 - ========================================================================
+```
+
+| Metric | Value |
+|--------|-------|
+| Work units | 20 succeeded |
+| Total documents processed | 13,505,137 |
+| Wall-clock time | 148,355.7 s (~2473 min / ~41.2 h) |
+| Aggregate throughput | 92.3 docs/s |
+| Output directory | `/raid/embeddings_curator` |
 
 </details>
 
@@ -224,6 +221,20 @@ Source datasets (JSONL/Parquet) are first pre-processed into standardised Parque
 - **float32 Parquet output**: Embeddings stored as `list<element: float>` in columnar Parquet format (patched from default float64)
 - **Indexed output naming**: Output files are renamed from hash-based names to `part_XXXXX_of_XXXXX.parquet`
 - **Patched NeMo Curator v1.0**: Installed source files patched for `trust_remote_code=True`, `torch_dtype=bfloat16`, and `attn_implementation="eager"` (see [Troubleshooting](#nemo-curator-trust_remote_code-error))
+
+### `04_embedding_reduction_nemocurator.py`
+
+Reduces NeMo Curator embeddings to 2D/3D with t-SNE and UMAP (scikit-learn + umap-learn). **By default it reduces all** data in batches of 8M (cuDF row limit). Subsampling is only for visualization afterward (e.g. when building plots from the reduced Parquet/CSV). Use `--max-points-per-split` only to run a lighter reduction for testing.
+
+**Parameters:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--embeddings-dir` | `/raid/embeddings_curator` | Root with `{dataset_key}/{sub_label}/embeddings/` |
+| `--output-dir` | `/raid/embeddings_curator/reduced` | Output Parquet/CSV |
+| `--max-points-per-split` | 0 (no limit) | Cap points per split; set only to subsample for faster runs |
+| `--max-total-points` | 0 (reduce all) | 0 = all data in batches of 8M (memory/runtime); set e.g. 8M for single-run cap |
+| `--dry-run` | — | List splits and row counts only |
 
 ## Output Format
 
