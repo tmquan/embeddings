@@ -46,12 +46,13 @@ from __future__ import annotations
 
 import os
 
-# Configure OpenBLAS before NumPy/SciPy load to avoid "Bad memory unallocation" and SIGSEGV
-# when running t-SNE/UMAP on large arrays (precompiled NUM_THREADS is often exceeded otherwise).
-if "OPENBLAS_NUM_THREADS" not in os.environ:
-    os.environ["OPENBLAS_NUM_THREADS"] = "8"
-if "OPENBLAS_MAIN_FREE" not in os.environ:
-    os.environ["OPENBLAS_MAIN_FREE"] = "1"  # free memory on main thread exit
+# Re-exec with OPENBLAS_NUM_THREADS set so it is in the process env before any library loads.
+# This avoids "precompiled NUM_THREADS exceeded" and "Bad memory unallocation" / SIGSEGV.
+if __name__ == "__main__":
+    import sys
+    if "OPENBLAS_NUM_THREADS" not in os.environ:
+        os.environ["OPENBLAS_NUM_THREADS"] = "1"
+        os.execv(sys.executable, [sys.executable] + sys.argv)
 
 import argparse
 import gc
@@ -123,8 +124,8 @@ DEFAULT_OUTPUT_DIR = "/raid/embeddings_reduced"
 DEFAULT_MAX_POINTS_PER_SPLIT = 0
 DEFAULT_MAX_TOTAL_POINTS = 0  # 0 = reduce all in batches
 BATCH_MAX_POINTS = 16_000_000  # per-batch cap (e.g. 2TB RAM); full ~13.5M fits in one batch
-# Subsample to this many points before reduction when >0; 0 = full reduction (clear buffers between steps to avoid OpenBLAS crash).
-DEFAULT_MAX_POINTS_FOR_REDUCTION = 0
+# Subsample to this many points before reduction when >0; 0 = run on all (may OOM/SIGSEGV on 10M+).
+DEFAULT_MAX_POINTS_FOR_REDUCTION = 500_000
 DEFAULT_TSNE_PERPLEXITY = 30
 DEFAULT_UMAP_NEIGHBORS = 15
 DEFAULT_UMAP_MIN_DIST = 0.1
@@ -296,7 +297,7 @@ def load_embeddings_and_metadata(
 
 
 def _clear_reduction_buffers() -> None:
-    """Release Python objects and run GC between reduction steps to free OpenBLAS/NumPy buffers and avoid SIGSEGV."""
+    """Release Python objects and run GC between reduction steps to free memory."""
     gc.collect()
 
 
@@ -309,7 +310,7 @@ def run_reductions(
 ) -> Dict[str, np.ndarray]:
     """
     Run t-SNE (2D, 3D) and UMAP (2D, 3D) via scikit-learn and umap-learn (CPU).
-    Clears buffers after each step to reduce OpenBLAS memory pressure and avoid SIGSEGV on full-size runs.
+    Clears buffers after each step to free memory on full-size runs.
     """
     from sklearn.manifold import TSNE
     import umap
@@ -454,7 +455,7 @@ def main() -> None:
         "--max-points-for-reduction",
         type=int,
         default=DEFAULT_MAX_POINTS_FOR_REDUCTION,
-        help="Subsample to at most this many points before t-SNE/UMAP (default: 0 = full reduction). Buffers are cleared between each 2D/3D step to reduce OpenBLAS pressure. Set >0 to cap for lighter runs.",
+        help="Subsample to at most this many points before t-SNE/UMAP (default: 0 = full reduction). Set >0 to cap for lighter runs.",
     )
     parser.add_argument(
         "--no-csv",
