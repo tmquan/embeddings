@@ -44,9 +44,18 @@ Requirements
 
 from __future__ import annotations
 
-import argparse
-import json
 import os
+
+# Configure OpenBLAS before NumPy/SciPy load to avoid "Bad memory unallocation" and SIGSEGV
+# when running t-SNE/UMAP on large arrays (precompiled NUM_THREADS is often exceeded otherwise).
+if "OPENBLAS_NUM_THREADS" not in os.environ:
+    os.environ["OPENBLAS_NUM_THREADS"] = "8"
+if "OPENBLAS_MAIN_FREE" not in os.environ:
+    os.environ["OPENBLAS_MAIN_FREE"] = "1"  # free memory on main thread exit
+
+import argparse
+import gc
+import json
 import sys
 import time
 from pathlib import Path
@@ -114,6 +123,8 @@ DEFAULT_OUTPUT_DIR = "/raid/embeddings_reduced"
 DEFAULT_MAX_POINTS_PER_SPLIT = 0
 DEFAULT_MAX_TOTAL_POINTS = 0  # 0 = reduce all in batches
 BATCH_MAX_POINTS = 16_000_000  # per-batch cap (e.g. 2TB RAM); full ~13.5M fits in one batch
+# Subsample to this many points before reduction when >0; 0 = full reduction (clear buffers between steps to avoid OpenBLAS crash).
+DEFAULT_MAX_POINTS_FOR_REDUCTION = 0
 DEFAULT_TSNE_PERPLEXITY = 30
 DEFAULT_UMAP_NEIGHBORS = 15
 DEFAULT_UMAP_MIN_DIST = 0.1
@@ -284,6 +295,11 @@ def load_embeddings_and_metadata(
     return vectors, meta_df
 
 
+def _clear_reduction_buffers() -> None:
+    """Release Python objects and run GC between reduction steps to free OpenBLAS/NumPy buffers and avoid SIGSEGV."""
+    gc.collect()
+
+
 def run_reductions(
     embeddings: np.ndarray,
     tsne_perplexity: int,
@@ -293,6 +309,7 @@ def run_reductions(
 ) -> Dict[str, np.ndarray]:
     """
     Run t-SNE (2D, 3D) and UMAP (2D, 3D) via scikit-learn and umap-learn (CPU).
+    Clears buffers after each step to reduce OpenBLAS memory pressure and avoid SIGSEGV on full-size runs.
     """
     from sklearn.manifold import TSNE
     import umap
@@ -303,16 +320,9 @@ def run_reductions(
     n_neighbors = min(umap_n_neighbors, n - 1) if n > 1 else 2
 
     X = embeddings.astype(np.float32)
-
-    steps = [
-        ("t-SNE 2D", "tsne_2d"),
-        ("t-SNE 3D", "tsne_3d"),
-        ("UMAP 2D", "umap_2d"),
-        ("UMAP 3D", "umap_3d"),
-    ]
     coords_tsne_2d = coords_tsne_3d = coords_umap_2d = coords_umap_3d = None
 
-    with tqdm(steps, desc="Reduction", unit="step") as pbar:
+    with tqdm(total=4, desc="Reduction", unit="step") as pbar:
         # t-SNE 2D
         pbar.set_postfix_str("t-SNE 2D")
         tsne_2d = TSNE(
@@ -323,7 +333,9 @@ def run_reductions(
             init="pca",
             verbose=1,
         )
-        coords_tsne_2d = tsne_2d.fit_transform(X)
+        coords_tsne_2d = np.ascontiguousarray(tsne_2d.fit_transform(X), dtype=np.float32)
+        del tsne_2d
+        _clear_reduction_buffers()
         pbar.update(1)
 
         # t-SNE 3D
@@ -336,7 +348,9 @@ def run_reductions(
             init="pca",
             verbose=1,
         )
-        coords_tsne_3d = tsne_3d.fit_transform(X)
+        coords_tsne_3d = np.ascontiguousarray(tsne_3d.fit_transform(X), dtype=np.float32)
+        del tsne_3d
+        _clear_reduction_buffers()
         pbar.update(1)
 
         # UMAP 2D
@@ -349,7 +363,9 @@ def run_reductions(
             metric="cosine",
             verbose=True,
         )
-        coords_umap_2d = reducer_2d.fit_transform(X)
+        coords_umap_2d = np.ascontiguousarray(reducer_2d.fit_transform(X), dtype=np.float32)
+        del reducer_2d
+        _clear_reduction_buffers()
         pbar.update(1)
 
         # UMAP 3D
@@ -362,14 +378,16 @@ def run_reductions(
             metric="cosine",
             verbose=True,
         )
-        coords_umap_3d = reducer_3d.fit_transform(X)
+        coords_umap_3d = np.ascontiguousarray(reducer_3d.fit_transform(X), dtype=np.float32)
+        del reducer_3d
+        _clear_reduction_buffers()
         pbar.update(1)
 
     return {
-        "tsne_2d": coords_tsne_2d.astype(np.float32),
-        "tsne_3d": coords_tsne_3d.astype(np.float32),
-        "umap_2d": coords_umap_2d.astype(np.float32),
-        "umap_3d": coords_umap_3d.astype(np.float32),
+        "tsne_2d": coords_tsne_2d,
+        "tsne_3d": coords_tsne_3d,
+        "umap_2d": coords_umap_2d,
+        "umap_3d": coords_umap_3d,
     }
 
 
@@ -433,6 +451,12 @@ def main() -> None:
         help="Random seed for subsampling and t-SNE/UMAP (default: %(default)s).",
     )
     parser.add_argument(
+        "--max-points-for-reduction",
+        type=int,
+        default=DEFAULT_MAX_POINTS_FOR_REDUCTION,
+        help="Subsample to at most this many points before t-SNE/UMAP (default: 0 = full reduction). Buffers are cleared between each 2D/3D step to reduce OpenBLAS pressure. Set >0 to cap for lighter runs.",
+    )
+    parser.add_argument(
         "--no-csv",
         action="store_true",
         help="Do not write a CSV copy (only Parquet).",
@@ -451,6 +475,7 @@ def main() -> None:
     logger.info("Output dir     : {}", args.output_dir)
     logger.info("Max points/split : {}", max_per_split or "no limit")
     logger.info("Max total points : {}", max_total or "no limit")
+    logger.info("Max points for reduction : {} (0 = no cap)", args.max_points_for_reduction or "no cap")
     logger.info("Discovering splits ...")
     splits = discover_embedding_splits(args.embeddings_dir, args.datasets)
     if not splits:
@@ -526,7 +551,17 @@ def main() -> None:
         meta_df["row_id"] = np.arange(len(meta_df))
         meta_df["batch"] = batch_idx
         logger.info("Total points loaded: {:,}", len(meta_df))
-        logger.info("Running t-SNE and UMAP (2D + 3D) ...")
+        n_loaded = len(meta_df)
+        max_for_reduction = args.max_points_for_reduction
+        if max_for_reduction > 0 and n_loaded > max_for_reduction:
+            rng = np.random.default_rng(args.random_state)
+            ix = rng.choice(n_loaded, size=max_for_reduction, replace=False)
+            ix = np.sort(ix)  # preserve rough ordering
+            X = X[ix]
+            meta_df = meta_df.iloc[ix].reset_index(drop=True)
+            meta_df["row_id"] = np.arange(len(meta_df))
+            logger.info("Subsampled to {:,} points for t-SNE/UMAP (--max-points-for-reduction)", len(meta_df))
+        logger.info("Running t-SNE and UMAP (2D + 3D) on {:,} points ...", len(meta_df))
 
         coords = run_reductions(
             X,
