@@ -68,51 +68,10 @@ from tqdm import tqdm
 EMBEDDING_DIM = 4096
 
 # ---------------------------------------------------------------------------
-# Dataset config (metadata for hover/color – must match 02_embedding_extraction_nemocurator)
+# Dataset config – imported from dataset_configs.py (single source of truth)
 # ---------------------------------------------------------------------------
 
-DATASET_CONFIGS: Dict[str, dict] = {
-    "Nemotron-3-Nano-RL-Training-Blend": {
-        "hf_name": "nvidia/Nemotron-3-Nano-RL-Training-Blend",
-        "category": "post-training",
-        "text_strategy": {"fields": ["responses_create_params", "ground_truth"], "template": "rl_blend"},
-    },
-    "Nemotron-Science-v1": {
-        "hf_name": "nvidia/Nemotron-Science-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["messages"], "template": "messages_list"},
-    },
-    "Nemotron-Instruction-Following-Chat-v1": {
-        "hf_name": "nvidia/Nemotron-Instruction-Following-Chat-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["messages"], "template": "messages_list"},
-    },
-    "Nemotron-Math-Proofs-v1": {
-        "hf_name": "nvidia/Nemotron-Math-Proofs-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["problem", "formal_statement", "lean_header"], "template": "math_proof"},
-    },
-    "Nemotron-Agentic-v1": {
-        "hf_name": "nvidia/Nemotron-Agentic-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["messages", "tools"], "template": "agentic"},
-    },
-    "Nemotron-Competitive-Programming-v1": {
-        "hf_name": "nvidia/Nemotron-Competitive-Programming-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["messages"], "template": "messages_list"},
-    },
-    "Nemotron-Math-v2": {
-        "hf_name": "nvidia/Nemotron-Math-v2",
-        "category": "post-training",
-        "text_strategy": {"fields": ["problem", "messages"], "template": "math_v2"},
-    },
-    "Nemotron-SWE-v1": {
-        "hf_name": "nvidia/Nemotron-SWE-v1",
-        "category": "post-training",
-        "text_strategy": {"fields": ["messages", "tools"], "template": "agentic"},
-    },
-}
+from dataset_configs import DATASET_CONFIGS  # noqa: E402
 
 DEFAULT_EMBEDDINGS_DIR = "/raid/embeddings_curator"
 DEFAULT_OUTPUT_DIR = "/raid/embeddings_reduced"
