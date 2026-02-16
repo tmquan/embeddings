@@ -57,15 +57,15 @@ POST_TRAINING_DATASETS = [
 # Pretraining Datasets (9 datasets, ~15.1B rows, ~24 TB total)
 # WARNING: These are VERY LARGE! Start with the sample dataset first.
 PRETRAINING_DATASETS = [
-    "nvidia/Nemotron-Pretraining-Dataset-sample", 
-    "nvidia/Nemotron-CC-Code-v1",                 
-    "nvidia/Nemotron-CC-v2.1",                    
-    "nvidia/Nemotron-Pretraining-Code-v2",        
-    "nvidia/Nemotron-Pretraining-Specialized-v1", 
-    "nvidia/Nemotron-CC-Math-v1",                 
-    "nvidia/Nemotron-CC-v2",                      
-    "nvidia/Nemotron-Pretraining-SFT-v1",         
-    "nvidia/Nemotron-Pretraining-Code-v1",        
+    # "nvidia/Nemotron-Pretraining-Dataset-sample", 
+    # "nvidia/Nemotron-CC-Code-v1",                 
+    # "nvidia/Nemotron-CC-v2.1",                    
+    # "nvidia/Nemotron-Pretraining-Code-v2",        
+    # "nvidia/Nemotron-Pretraining-Specialized-v1", 
+    # "nvidia/Nemotron-CC-Math-v1",                 
+    # "nvidia/Nemotron-CC-v2",                      
+    # "nvidia/Nemotron-Pretraining-SFT-v1",         
+    # "nvidia/Nemotron-Pretraining-Code-v1",        
 ]
 
 # Combine datasets to download
