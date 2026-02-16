@@ -177,7 +177,7 @@ def preprocess_to_parquet(
             texts.append(text)
 
         if len(texts) >= chunk_size:
-            tmp_path = os.path.join(output_dir, f".tmp_part_{part_idx:05d}.parquet")
+            tmp_path = os.path.join(output_dir, f".tmp_part_{part_idx:06d}.parquet")
             table = pa.table({"text": texts})
             pq.write_table(table, tmp_path)
             tmp_files.append(tmp_path)
@@ -186,7 +186,7 @@ def preprocess_to_parquet(
 
     # Flush remaining texts
     if texts:
-        tmp_path = os.path.join(output_dir, f".tmp_part_{part_idx:05d}.parquet")
+        tmp_path = os.path.join(output_dir, f".tmp_part_{part_idx:06d}.parquet")
         table = pa.table({"text": texts})
         pq.write_table(table, tmp_path)
         tmp_files.append(tmp_path)
@@ -200,7 +200,7 @@ def preprocess_to_parquet(
     total_parts = len(tmp_files)
     output_files: List[str] = []
     for idx, tmp_path in enumerate(tmp_files):
-        final_name = f"part_{idx:05d}_of_{total_parts:05d}.parquet"
+        final_name = f"part_{idx:06d}_of_{total_parts:06d}.parquet"
         final_path = os.path.join(output_dir, final_name)
         os.rename(tmp_path, final_path)
         output_files.append(final_path)
@@ -375,20 +375,20 @@ def _rename_output_files(output_dir: str, input_files: Optional[List[str]] = Non
         if len(mapping) == total:
             # Use temp names to avoid collisions during rename
             for old_name, idx in mapping.items():
-                tmp_name = f".tmp_emb_{idx:05d}.parquet"
+                tmp_name = f".tmp_emb_{idx:06d}.parquet"
                 os.rename(
                     os.path.join(output_dir, old_name),
                     os.path.join(output_dir, tmp_name),
                 )
             for idx in range(total):
-                tmp_name = f".tmp_emb_{idx:05d}.parquet"
-                new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+                tmp_name = f".tmp_emb_{idx:06d}.parquet"
+                new_name = f"part_{idx:06d}_of_{total:06d}.parquet"
                 os.rename(
                     os.path.join(output_dir, tmp_name),
                     os.path.join(output_dir, new_name),
                 )
             logger.info(
-                "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet (matched to input order)",
+                "  Renamed {} output file(s) → part_XXXXXX_of_{:06d}.parquet (matched to input order)",
                 total,
                 total,
             )
@@ -410,20 +410,20 @@ def _rename_output_files(output_dir: str, input_files: Optional[List[str]] = Non
     hash_files.sort(key=_row_count, reverse=True)
 
     for idx, old_name in enumerate(hash_files):
-        tmp_name = f".tmp_emb_{idx:05d}.parquet"
+        tmp_name = f".tmp_emb_{idx:06d}.parquet"
         os.rename(
             os.path.join(output_dir, old_name),
             os.path.join(output_dir, tmp_name),
         )
     for idx in range(total):
-        tmp_name = f".tmp_emb_{idx:05d}.parquet"
-        new_name = f"part_{idx:05d}_of_{total:05d}.parquet"
+        tmp_name = f".tmp_emb_{idx:06d}.parquet"
+        new_name = f"part_{idx:06d}_of_{total:06d}.parquet"
         os.rename(
             os.path.join(output_dir, tmp_name),
             os.path.join(output_dir, new_name),
         )
     logger.info(
-        "  Renamed {} output file(s) → part_XXXXX_of_{:05d}.parquet (row-count sorted)",
+        "  Renamed {} output file(s) → part_XXXXXX_of_{:06d}.parquet (row-count sorted)",
         total,
         total,
     )

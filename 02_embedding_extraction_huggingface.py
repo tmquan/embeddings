@@ -369,7 +369,7 @@ def _save_chunk(
 ) -> str:
     """Save a chunk array and return the file path."""
     os.makedirs(output_dir, exist_ok=True)
-    path = os.path.join(output_dir, f"embeddings_{chunk_idx:05d}.npy")
+    path = os.path.join(output_dir, f"embeddings_{chunk_idx:06d}.npy")
     np.save(path, embeddings)
     return path
 
@@ -465,7 +465,7 @@ def process_work_unit(
         # Skip chunks that already exist on disk
         if chunk_idx in existing and existing[chunk_idx] == len(texts):
             wlogger.info(
-                "  Chunk %05d already exists (%d rows) – skipping",
+                "  Chunk %06d already exists (%d rows) – skipping",
                 chunk_idx,
                 len(texts),
             )
@@ -489,7 +489,7 @@ def process_work_unit(
         records_processed += len(texts)
 
         wlogger.info(
-            "  Chunk %05d saved: %s  (%d rows, %.1f MB)  [%s/%s total]",
+            "  Chunk %06d saved: %s  (%d rows, %.1f MB)  [%s/%s total]",
             chunk_idx,
             os.path.basename(path),
             len(texts),
