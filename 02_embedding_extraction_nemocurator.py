@@ -69,21 +69,16 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from loguru import logger
 
+# Auto-patch NeMo Curator for nvidia/llama-embed-nemotron-8b compatibility
+# (trust_remote_code, bfloat16, eager attention, float32 embeddings).
+# Must run BEFORE importing nemo_curator so Ray workers pick up the fixes.
+from patch_nemocurator import ensure_patches
+ensure_patches(verbose=True)
+
 from nemo_curator.pipeline import Pipeline
 from nemo_curator.stages.text.embedders import EmbeddingCreatorStage
 from nemo_curator.stages.text.io.reader import ParquetReader
 from nemo_curator.stages.text.io.writer import ParquetWriter
-
-# NOTE: NeMo Curator v1.0 hard-codes from_pretrained(...) without
-# trust_remote_code=True and loads in float32 instead of bfloat16.
-# nvidia/llama-embed-nemotron-8b ships custom modelling code that requires
-# trust_remote_code, and needs bfloat16 + eager attention to fit in GPU memory.
-# We patched the installed source files directly so that Ray workers also
-# pick up the fixes:
-#   - nemo_curator/stages/text/embedders/base.py  (EmbeddingModelStage.setup)
-#     → trust_remote_code=True, torch_dtype=torch.bfloat16, attn_implementation="eager"
-#   - nemo_curator/stages/text/models/tokenizer.py (TokenizerStage._setup, load_cfg)
-#     → trust_remote_code=True
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -115,7 +110,8 @@ from dataset_preprocess import (  # noqa: E402
     stream_jsonl,
     stream_parquet,
     resolve_glob,
-    estimate_record_count,
+    count_jsonl_rows_fast,
+    count_parquet_rows,
 )
 
 
@@ -291,7 +287,9 @@ def discover_work_units(
                 continue
 
             total_records = sum(
-                estimate_record_count(fpath, file_format) for fpath in files
+                count_parquet_rows(fpath) if file_format == "parquet"
+                else count_jsonl_rows_fast(fpath)
+                for fpath in files
             )
 
             preprocess_dir = os.path.join(

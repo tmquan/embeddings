@@ -144,7 +144,6 @@ from dataset_preprocess import (  # noqa: E402
     flatten_messages,
     extract_text_from_record,
     count_jsonl_rows_fast,
-    estimate_jsonl_rows,
     count_parquet_rows,
     stream_jsonl,
     stream_parquet,
@@ -201,7 +200,7 @@ def discover_work_units(
             total_records = 0
             for fpath in files:
                 if file_format == "jsonl":
-                    total_records += estimate_jsonl_rows(fpath)
+                    total_records += count_jsonl_rows_fast(fpath)
                 elif file_format == "parquet":
                     total_records += count_parquet_rows(fpath)
 
