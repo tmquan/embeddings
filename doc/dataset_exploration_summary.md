@@ -1,6 +1,6 @@
 # Nemotron Dataset Exploration Summary
 
-*Generated: 2026-02-12 08:24:55*
+*Generated: 2026-02-16 08:42:05*
 
 ## Configuration
 
@@ -13,21 +13,119 @@
 
 | # | Dataset | Category | Format | Row Count | Text Strategy | Median Tokens | % Over Max |
 |---|---------|----------|--------|-----------|---------------|---------------|------------|
-| 1 | Nemotron-3-Nano-RL-Training-Blend | post-training | jsonl | 93.2K | `rl_blend` | 152 | 0.0% |
-| 2 | Nemotron-Science-v1 | post-training | jsonl | 226.3K | `messages_list` | 443 | 0.0% |
-| 3 | Nemotron-Instruction-Following-Chat-v1 | post-training | jsonl | 431.0K | `messages_list` | 2.1K | 0.0% |
-| 4 | Nemotron-Math-Proofs-v1 | post-training | jsonl | 1.4M | `math_proof` | 1.2K | 0.0% |
-| 5 | Nemotron-Agentic-v1 | post-training | jsonl | 335.1K | `agentic` | 1.6K | 0.0% |
-| 6 | Nemotron-Competitive-Programming-v1 | post-training | jsonl | 3.9M | `messages_list` | 1.2K | 0.0% |
-| 7 | Nemotron-Math-v2 | post-training | jsonl | 7.1M | `math_v2` | 697 | 0.0% |
-| 8 | Nemotron-SWE-v1 | post-training | jsonl | 51.0K | `agentic` | 34.0K | 54.9% |
-| 9 | Nemotron-Pretraining-Dataset-sample (NOT FOUND) | pretraining | parquet | 0 | `raw_text` | 0 | 0% |
+| 1 | Llama-Nemotron-Post-Training-Dataset | post-training | jsonl | 33.0M | `messages_concat` | 762 | 0.0% |
+| 2 | Nemotron-Post-Training-Dataset-v1 | post-training | parquet | 25.7M | `messages_list` | 0 | 0% |
+| 3 | Nemotron-Post-Training-Dataset-v2 | post-training | parquet | 6.3M | `messages_list` | 0 | 0% |
+| 4 | Nemotron-3-Nano-RL-Training-Blend | post-training | jsonl | 93.2K | `rl_blend` | 152 | 0.0% |
+| 5 | Nemotron-Science-v1 | post-training | jsonl | 226.3K | `messages_list` | 443 | 0.0% |
+| 6 | Nemotron-Instruction-Following-Chat-v1 | post-training | jsonl | 431.0K | `messages_list` | 2.1K | 0.0% |
+| 7 | Nemotron-Math-Proofs-v1 | post-training | jsonl | 1.4M | `math_proof` | 1.2K | 0.0% |
+| 8 | Nemotron-Agentic-v1 | post-training | jsonl | 335.1K | `agentic` | 1.6K | 0.0% |
+| 9 | Nemotron-Competitive-Programming-v1 | post-training | jsonl | 3.9M | `messages_list` | 1.2K | 0.0% |
+| 10 | Nemotron-Math-v2 | post-training | jsonl | 7.1M | `math_v2` | 697 | 0.0% |
+| 11 | Nemotron-SWE-v1 | post-training | jsonl | 51.0K | `agentic` | 34.0K | 54.9% |
 
 ---
 
 ## Detailed Findings
 
 ### Post-Training Datasets
+
+#### Llama-Nemotron-Post-Training-Dataset
+
+- **HuggingFace**: `nvidia/Llama-Nemotron-Post-Training-Dataset`
+- **Format**: jsonl
+- **Total rows**: 33,035,757
+- **Text concatenation strategy**: Flatten the 'input' message list (role: content pairs) and append the 'output' field. Format: 'User: ... \nAssistant: ...' preserving multi-turn structure. For RL/when2call subsets, flatten the 'messages' list instead.
+- **Preprocessing notes**: Strip system_prompt if it duplicates the first system message. Remove <think> tags for non-reasoning variants if needed.
+- **Text length stats** (sampled): min=0 / median=762 / mean=2.4K / max=37.1K tokens
+
+**Sub-path breakdown:**
+
+| Sub-path | Files | Rows | Schema Fields |
+|----------|-------|------|---------------|
+| SFT_chat | 1 | 39.8K | input, output, category, license, reasoning, generator, u... |
+| SFT_code_v1 | 1 | 9.6M | input, output, category, license, reasoning, generator, u... |
+| SFT_code_v1.1 | 1 | 496.2K | input, output, category, license, reasoning, generator, u... |
+| SFT_math_v1 | 1 | 19.8M | input, output, category, license, reasoning, generator, v... |
+| SFT_math_v1.1 | 1 | 2.2M | input, output, category, license, reasoning, generator, u... |
+| SFT_safety | 1 | 31.4K | input, output, category, generator, license, reasoning, u... |
+| SFT_science | 1 | 708.9K | input, output, category, license, reasoning, generator, u... |
+| RL_instruction_following | 1 | 56.3K | input, args, category, license, reasoning, used_in_traini... |
+| train_when2call_sft | 1 | 15.0K | tools, messages |
+| train_when2call_pref | 1 | 9.0K | tools, messages, chosen_response, rejected_response |
+
+**Processing recommendation:**
+
+- Chunked processing: ~330 chunks of 100,000 rows each
+
+#### Nemotron-Post-Training-Dataset-v1
+
+- **HuggingFace**: `nvidia/Nemotron-Post-Training-Dataset-v1`
+- **Format**: parquet
+- **Total rows**: 25,659,642
+- **Text concatenation strategy**: Flatten the 'messages' column (list of {role, content} dicts) into a single text. Format: 'User: ...\nAssistant: ...' Multi-turn conversations are concatenated in order.
+- **Preprocessing notes**: Handle nested tool_calls structs—serialize tool call names/arguments as text if present. Skip metadata column (JSON string).
+
+**Sub-path breakdown:**
+
+| Sub-path | Files | Rows | Schema Fields |
+|----------|-------|------|---------------|
+| code | 183 | 1.9M | uuid, license, generator, version, category, reasoning, m... |
+| math | 159 | 2.0M | uuid, license, generator, version, category, reasoning, m... |
+| stem | 660 | 20.7M | uuid, license, generator, version, category, reasoning, m... |
+| tool | 13 | 310.1K | uuid, license, generator, version, category, reasoning, m... |
+| chat | 8 | 746.6K | uuid, license, generator, version, category, reasoning, m... |
+
+**Data quality observations:**
+
+- [code] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [math] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [stem] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [tool] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [chat] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+
+**Processing recommendation:**
+
+- Chunked processing: ~256 chunks of 100,000 rows each
+
+#### Nemotron-Post-Training-Dataset-v2
+
+- **HuggingFace**: `nvidia/Nemotron-Post-Training-Dataset-v2`
+- **Format**: parquet
+- **Total rows**: 6,341,514
+- **Text concatenation strategy**: Same as v1: flatten 'messages' list into role-prefixed text. Includes multilingual subsets (DE, ES, FR, IT, JA)—embeddings will capture cross-lingual semantics.
+- **Preprocessing notes**: No tool_calls in v2 schema. Some shards have 'metadata' column (string)—ignore for embedding. Handle non-Latin scripts (JA) carefully.
+
+**Sub-path breakdown:**
+
+| Sub-path | Files | Rows | Schema Fields |
+|----------|-------|------|---------------|
+| chat | 12 | 627.7K | uuid, license, generator, version, category, reasoning, m... |
+| code | 2 | 175.0K | uuid, license, generator, version, category, reasoning, m... |
+| math | 2 | 239.5K | uuid, license, generator, version, category, reasoning, m... |
+| stem | 2 | 355.0K | uuid, license, generator, version, category, reasoning, m... |
+| multilingual | 1 | 100 | uuid, license, generator, version, category, reasoning, m... |
+| multilingual_de | 38 | 1.0M | uuid, license, generator, version, category, reasoning, m... |
+| multilingual_es | 33 | 935.7K | uuid, license, generator, version, category, reasoning, m... |
+| multilingual_fr | 37 | 1.0M | uuid, license, generator, version, category, reasoning, m... |
+| multilingual_it | 38 | 1.0M | uuid, license, generator, version, category, reasoning, m... |
+| multilingual_ja | 37 | 975.2K | uuid, license, generator, version, category, reasoning, m... |
+
+**Data quality observations:**
+
+- [chat] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [code] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [math] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [stem] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [multilingual] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [multilingual_de] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [multilingual_es] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+- [multilingual_fr] Error sampling data: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+
+**Processing recommendation:**
+
+- Chunked processing: ~63 chunks of 100,000 rows each
 
 #### Nemotron-3-Nano-RL-Training-Blend
 
@@ -227,13 +325,6 @@
 
 ### Pretraining Datasets
 
-#### Nemotron-Pretraining-Dataset-sample
-
-- **HuggingFace**: `nvidia/Nemotron-Pretraining-Dataset-sample`
-- **Format**: parquet
-- **Total rows**: 0
-- **Status**: NOT FOUND on disk
-
 ---
 
 ## Processing Recommendations by Category
@@ -269,6 +360,300 @@ Pretraining datasets use **raw text format** with a simple `text` column. No con
 ---
 
 ## Appendix: Schema Reference
+
+### Llama-Nemotron-Post-Training-Dataset
+
+**SFT_chat:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**SFT_code_v1:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**SFT_code_v1.1:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**SFT_math_v1:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  version: str
+  system_prompt: str
+  used_in_training: str
+```
+
+**SFT_math_v1.1:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**SFT_safety:**
+```
+  input: list
+  output: str
+  category: str
+  generator: str
+  license: str
+  reasoning: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**SFT_science:**
+```
+  input: list
+  output: str
+  category: str
+  license: str
+  reasoning: str
+  generator: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**RL_instruction_following:**
+```
+  input: list
+  args: dict
+  category: str
+  license: str
+  reasoning: str
+  used_in_training: str
+  version: str
+  system_prompt: str
+```
+
+**train_when2call_sft:**
+```
+  tools: list
+  messages: list
+```
+
+**train_when2call_pref:**
+```
+  tools: list
+  messages: list
+  chosen_response: dict
+  rejected_response: dict
+```
+
+### Nemotron-Post-Training-Dataset-v1
+
+**code:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string, tool_calls: list<element: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>
+  metadata: string
+```
+
+**math:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string, tool_calls: list<element: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>
+  metadata: string
+```
+
+**stem:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string, tool_calls: list<element: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>
+  metadata: string
+```
+
+**tool:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string, tool_calls: list<element: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>
+  metadata: string
+```
+
+**chat:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string, tool_calls: list<element: struct<id: string, type: string, function: struct<name: string, arguments: string>>>>>
+  metadata: string
+```
+
+### Nemotron-Post-Training-Dataset-v2
+
+**chat:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**code:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**math:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**stem:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**multilingual:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+  metadata: string
+```
+
+**multilingual_de:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**multilingual_es:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**multilingual_fr:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**multilingual_it:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
+
+**multilingual_ja:**
+```
+  uuid: string
+  license: string
+  generator: string
+  version: string
+  category: string
+  reasoning: string
+  messages: list<element: struct<role: string, content: string>>
+```
 
 ### Nemotron-3-Nano-RL-Training-Blend
 
