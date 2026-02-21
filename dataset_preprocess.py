@@ -75,7 +75,7 @@ def extract_text_from_record(record: dict, config: dict) -> str:
     if template == "messages_concat":
         text_parts: List[str] = []
         input_msgs = record.get("input", [])
-        if isinstance(input_msgs, list):
+        if isinstance(input_msgs, list) and input_msgs:
             text_parts.append(flatten_messages(input_msgs))
         output = record.get("output", "")
         if output:
@@ -212,12 +212,18 @@ def stream_jsonl(filepath: str) -> Generator[dict, None, None]:
 
 
 def stream_parquet(filepath: str) -> Generator[dict, None, None]:
-    """Yield one record dict at a time from a parquet file."""
+    """Yield one record dict at a time from a parquet file.
+
+    Uses pyarrow's ``to_pydict()`` instead of pandas to ensure nested
+    list/struct columns are returned as native Python types (not numpy arrays).
+    """
     pf = pq.ParquetFile(filepath)
     for batch in pf.iter_batches(batch_size=1024):
-        df = batch.to_pandas()
-        for _, row in df.iterrows():
-            yield row.to_dict()
+        cols = batch.to_pydict()
+        n_rows = batch.num_rows
+        keys = list(cols.keys())
+        for i in range(n_rows):
+            yield {k: cols[k][i] for k in keys}
 
 
 # ---------------------------------------------------------------------------
